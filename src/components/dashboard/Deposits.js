@@ -2,12 +2,16 @@ import * as React from 'react';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
+import { Context } from '../../store/context';
 
 function preventDefault(event) {
   event.preventDefault();
 }
 
 export default function Deposits() {
+  const {valueTabs, setValueTabs} = React.useContext(Context);
+  console.log(valueTabs, ' -valueTabs');
+
   return (
     <React.Fragment>
       <Title>Recent Deposits</Title>
