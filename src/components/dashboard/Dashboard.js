@@ -9,37 +9,22 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import ListItems, { mainListItems, secondaryListItems } from "./listItems";
-import Chart from "./Chart";
-import Deposits from "./Deposits";
-import Orders from "./Orders";
-import { Context } from "../../store/context";
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import ListItems from "./listItems";
+
+import { Context } from "../../store/context";
+import DashboardPages from "../dashboardPages/dashboardPages";
+import FieldsPages from "../dashboardPages/fieldsPages";
+import { useDispatch, useSelector } from "react-redux";
+import { SignInApi } from "../../api/singIn";
+import { setUserFio } from "../../store/userDto";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -91,8 +76,26 @@ const Drawer = styled(MuiDrawer, {
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
+  const user = useSelector((state) => state.user.fio);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [valueTabs, setValueTabs] = React.useState("menu_dashboard");
   const [open, setOpen] = React.useState(true);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    try {
+      SignInApi.getMe().then((user) => {
+        setLoading(false);
+        dispatch(
+          setUserFio(`${user.data.first_name + " " + user.data.last_name}`)
+        );
+      });
+    } catch (error) {
+      navigate("/");
+    }
+  }, []);
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -109,6 +112,24 @@ export default function Dashboard() {
       default:
         break;
     }
+  }
+
+  function getPagesDashboard() {
+    switch (valueTabs) {
+      case "menu_dashboard":
+        return <DashboardPages />;
+        break;
+      case "menu_fields":
+        return <FieldsPages />;
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  if (loading) {
+    return <>loading</>;
   }
 
   return (
@@ -143,32 +164,50 @@ export default function Dashboard() {
               >
                 {getNameTabs()}
               </Typography>
-              <IconButton color="inherit">
-                <Badge badgeContent={4} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
+              {user ?? ""}
             </Toolbar>
           </AppBar>
           <Drawer variant="permanent" open={open}>
-            <Toolbar
+            <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                px: [1],
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "100%",
+                paddingBottom: "50px",
               }}
             >
-              <IconButton onClick={toggleDrawer}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </Toolbar>
-            <Divider />
-            <List component="nav">
-              <ListItems />
-              {/* {mainListItems} */}
-              <Divider sx={{ my: 1 }} />
-            </List>
+              <Box>
+                <Toolbar
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    px: [1],
+                  }}
+                >
+                  <IconButton onClick={toggleDrawer}>
+                    <ChevronLeftIcon />
+                  </IconButton>
+                </Toolbar>
+                <Divider />
+                <List component="nav">
+                  <ListItems />
+                  {/* {mainListItems} */}
+
+                  <Divider sx={{ my: 1 }} />
+                </List>
+              </Box>
+              <Button
+                onClick={() => {
+                  localStorage.removeItem("access_token");
+                  dispatch(setUserFio(``));
+                  navigate("/");
+                }}
+              >
+                Выход
+              </Button>
+            </Box>
           </Drawer>
           <Box
             component="main"
@@ -183,44 +222,8 @@ export default function Dashboard() {
             }}
           >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-              <Grid container spacing={3}>
-                {/* Chart */}
-                <Grid item xs={12} md={8} lg={9}>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      display: "flex",
-                      flexDirection: "column",
-                      height: 240,
-                    }}
-                  >
-                    <Chart />
-                  </Paper>
-                </Grid>
-                {/* Recent Deposits */}
-                <Grid item xs={12} md={4} lg={3}>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      display: "flex",
-                      flexDirection: "column",
-                      height: 240,
-                    }}
-                  >
-                    <Deposits />
-                  </Paper>
-                </Grid>
-                {/* Recent Orders */}
-                <Grid item xs={12}>
-                  <Paper
-                    sx={{ p: 2, display: "flex", flexDirection: "column" }}
-                  >
-                    <Orders />
-                  </Paper>
-                </Grid>
-              </Grid>
-              <Copyright sx={{ pt: 4 }} />
+            <Container maxWidth="lg" sx={{ marginTop: "24px" }}>
+              {getPagesDashboard()}
             </Container>
           </Box>
         </Box>

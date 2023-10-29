@@ -10,44 +10,45 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import LayersIcon from "@mui/icons-material/Layers";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { Context } from "../../store/context";
-
+import AgricultureIcon from "@mui/icons-material/Agriculture";
+import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 
 export default function ListItems() {
   const { valueTabs, setValueTabs } = React.useContext(Context);
 
   return (
     <>
-      <ListItemButton onClick={() => setValueTabs('menu_dashboard')}>
+      <ListItemButton onClick={() => setValueTabs("menu_dashboard")}>
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
         <ListItemText primary="Дашборд" />
       </ListItemButton>
 
-      <ListItemButton  onClick={() => setValueTabs("menu_fields")}>
+      <ListItemButton onClick={() => setValueTabs("menu_fields")}>
         <ListItemIcon>
-          <ShoppingCartIcon />
+          <AgricultureIcon />
         </ListItemIcon>
         <ListItemText primary="Поля" />
       </ListItemButton>
 
       <ListItemButton>
         <ListItemIcon>
-          <PeopleIcon />
+          <BarChartIcon />
         </ListItemIcon>
         <ListItemText primary="Госмониторинг" />
       </ListItemButton>
 
       <ListItemButton>
         <ListItemIcon>
-          <BarChartIcon />
+          <PeopleIcon />
         </ListItemIcon>
         <ListItemText primary="Пользователи" />
       </ListItemButton>
 
       <ListItemButton>
         <ListItemIcon>
-          <LayersIcon />
+          <SettingsApplicationsIcon />
         </ListItemIcon>
         <ListItemText primary="Настройки сайта" />
       </ListItemButton>

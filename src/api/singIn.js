@@ -1,0 +1,32 @@
+import { httpService } from "./setup";
+
+class SignInService {
+  /**
+   * Авторизация пользователя
+   */
+  auth(data) {
+    return httpService
+      .post("/auth/token", data, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      .then((res) => {
+        // try {
+          localStorage.setItem("access_token", res?.data?.access_token);
+        // } catch (error) {
+        //   window.location.href = '/'
+        // }
+        return res;
+      })
+  }
+
+  getMe() {
+    return httpService.get("/auth/get_me/");
+  }
+}
+
+const SignInApi = new SignInService();
+
+export { SignInApi };
+
