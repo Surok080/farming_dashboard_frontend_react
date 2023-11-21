@@ -23,7 +23,7 @@ const router = createBrowserRouter([
     path: "*",
     element: <Dashboard />,
   },
-], {basename: '/dashboard1'});
+], {basename: '/dashboard'});
 
 
 
