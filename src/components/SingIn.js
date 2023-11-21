@@ -83,7 +83,7 @@ export default function SignIn() {
             <AgricultureIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Авторизация
+            Авторизация Дашборд
           </Typography>
           <Box
             component="form"

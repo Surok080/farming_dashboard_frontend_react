@@ -12,6 +12,10 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
+    path: "/test",
+    element: <SignIn />,
+  },
+  {
     path: "/dashboard",
     element: <Dashboard />,
   },
@@ -19,7 +23,7 @@ const router = createBrowserRouter([
     path: "*",
     element: <Dashboard />,
   },
-], {basename: '/dashboard'});
+], {basename: '/dashboard1'});
 
 
 
