@@ -46,7 +46,7 @@ export default function SignIn() {
               variant: "success",
             });
 
-            navigate("/jurnal");
+            navigate("/dashboard");
           });
         } else if (res.status === 403) {
           enqueueSnackbar("Доступ запрещен", {
