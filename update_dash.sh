@@ -1,9 +1,15 @@
-#!/bin/bash
-echo "###GIT PULL"
+#!/bin/bash#!/bin/bash
+echo "###GIT PULL###"
 git pull
-echo "###npm run build"
+
+echo "###npm run build###"
 npm run build
-echo "###update service"
-scp -r build/* hodakoov@80.249.145.246:/var/www/hodakoov.ru/dashboard/
 
+echo "###download project###"
 
+read -rp "Введите username и ip для входа [example: username@111.111.111.111]: " username_ip
+echo ""
+scp -r build/* "${username_ip}":/var/www/html/agro-connect.online
+echo ""
+echo "Если ошибки, то нужно дать права пользователю для изменения папки"
+echo "На сервере прописать [example: sudo chown -R hodakoov:hodakoov html/] указав свои данные и нужную папку"
