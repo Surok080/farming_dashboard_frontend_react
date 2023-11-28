@@ -25,7 +25,7 @@ const Meteo = () => {
   function updateMeteo() {
     fetch(
       // https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={lat}&lon={lon}&date={date}&appid={API key}
-       "http://api.openweathermap.org/data/2.5/forecast?lat=55.9685263&lon=49.42067429999999&lang=ru&limit=5&units=metric&appid=7d805bb1253aca5ed8f8a5bba0fb6f04"
+       "https://api.openweathermap.org/data/2.5/forecast?lat=55.9685263&lon=49.42067429999999&lang=ru&limit=5&units=metric&appid=7d805bb1253aca5ed8f8a5bba0fb6f04"
       // "https://api.openweathermap.org/data/2.5/onecall/day_summary?lat=60.45&lon=-38.67&date=2023-03-30&tz=+03:00&appid=7d805bb1253aca5ed8f8a5bba0fb6f04"
     )
       .then((res) => res.json())
