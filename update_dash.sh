@@ -2,8 +2,11 @@
 echo "###GIT PULL###"
 git pull
 
-echo "###npm run build###"
-npm run build
+echo "###yarn###"
+yarn 
+
+echo "###yarn build###"
+yarn build
 
 echo "###download project###"
 

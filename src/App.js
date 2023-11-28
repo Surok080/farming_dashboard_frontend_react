@@ -23,7 +23,7 @@ const router = createBrowserRouter([
     path: "*",
     element: <Dashboard />,
   },
-], {basename: process.env.NODE_ENV === "development" ?  '' : '/dashboard'});
+], );
 
 
 
