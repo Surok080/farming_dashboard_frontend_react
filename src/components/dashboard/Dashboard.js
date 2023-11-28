@@ -46,6 +46,25 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
+const AppBar2 = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  marginTop: '64px',
+  width: `100%`,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -72,8 +91,16 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+
+const defaultTheme = createTheme(
+  {
+    palette: {
+      primary: {
+        main: '#82F865'
+      },
+    },
+  }
+);
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.fio);
@@ -167,6 +194,24 @@ export default function Dashboard() {
               {user ?? ""}
             </Toolbar>
           </AppBar>
+          <AppBar2 position="absolute" open={open}>
+            <Toolbar
+              sx={{
+                pr: "24px", // keep right padding when drawer closed
+              }}
+            >
+              <Typography
+                component="h1"
+                variant="h6"
+                color="inherit"
+                noWrap
+                sx={{ flexGrow: 1 }}
+              >
+                {getNameTabs()}
+              </Typography>
+              {user ?? ""}
+            </Toolbar>
+          </AppBar2>
           <Drawer variant="permanent" open={open}>
             <Box
               sx={{
@@ -191,7 +236,7 @@ export default function Dashboard() {
                   </IconButton>
                 </Toolbar>
                 <Divider />
-                <List component="nav">
+                <List sx={{paddingTop: '74px'}} component="nav">
                   <ListItems />
                   {/* {mainListItems} */}
 
@@ -222,7 +267,7 @@ export default function Dashboard() {
             }}
           >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ marginTop: "24px" }}>
+            <Container maxWidth="lg" sx={{ marginTop: "74px" }}>
               {getPagesDashboard()}
             </Container>
           </Box>

@@ -25,16 +25,17 @@ const DashboardPages = () => {
   const [value, setValue] = React.useState("0");
   const TabsStyle = (valueRef) => ({
     color: "black",
-    border: "1px solid grey",
     padding: "20px 15px",
-    borderRadius: "5px",
-    background: value == valueRef ? "#8080801f" : "none",
     transition: "all .2s linear",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     flexDirection: "column",
     justifyContent: "center",
+    minWidth: '190px',
+    borderRadius: '8px',
+    border: `3px solid ${value == valueRef ? "#82F865" : "#F3E8FF"}`,
+    background:' #FFF'
   });
 
   const handleChange = (event, newValue) => {
