@@ -4,12 +4,15 @@ import { TileLayer, LayersControl, useMap, useMapEvents, Marker, GeoJSON, MapCon
 import ReactLeafletKml from "react-leaflet-kml";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
+import test2 from "../map.json"
 
 
 const Map = () => {
   const [layer, setLayer] = useState(null);
 
   const handleFileSelection = (event) => {
+
+   
     const file = event.target.files[0]; // get file
     console.log(file);
     const ext = getFileExtension(file);
@@ -36,8 +39,9 @@ const Map = () => {
     const dom = new DOMParser().parseFromString(text, "text/xml"); // create xml dom object
     const converted = tj.kml(dom); // convert xml dom to geojson
     rewind(converted, false); // correct right hand rule
-    console.log(converted);
-    setLayer(converted); // save converted geojson to hook state
+    console.log(converted, ' converted');
+    console.log(test2);
+    setLayer(test2); // save converted geojson to hook state
   };
 
   const getFileExtension = (file) => {
@@ -51,7 +55,8 @@ const Map = () => {
     <div style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
      <input type="file" onChange={handleFileSelection} />
     <MapContainer 
-      center={[	56.679853,53.70455062]}
+      center={[56.370531444782,	49.0179221630735
+              ]}
       zoom={12} 
       zoomControl={false} 
       style={{ height: '500px', width: '100%' }}

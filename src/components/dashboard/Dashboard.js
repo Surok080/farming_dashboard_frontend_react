@@ -115,7 +115,7 @@ export default function Dashboard() {
       SignInApi.getMe().then((user) => {
         setLoading(false);
         dispatch(
-          setUserFio(`${user.data.first_name + " " + user.data.last_name}`)
+          setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
         );
       });
     } catch (error) {

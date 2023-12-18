@@ -27,6 +27,9 @@ const Layers = ({ layer }) => {
       // Get bounds once move has ended:
       console.log(map.getBounds());
     },
+    click: (e) => {
+      console.log(e,'item.properties')
+    }
   });
 
   const hashString = (str) => {
@@ -38,8 +41,10 @@ const Layers = ({ layer }) => {
       hash = (hash << 5) - hash + chr;
       hash |= 0; // Convert to 32bit integer
     }
+    console.log(hash);
     return hash;
   };
+
   function getRandomColor() {
     var letters = "0123456789ABCDEF";
     var color = "#";
@@ -49,33 +54,17 @@ const Layers = ({ layer }) => {
     return color;
   }
 
-  // const getMarkerPosition = (state_name) => {
-  //   switch (state_name) {
-  //     case "Montana":
-  //       // Use L.latLng to create latLng object.
-  //       // { "lat": LATITUDE, "lng": LONGITUDE }
-  //       return L.latLng(46.8797, -110.3626);
-  //     case "Wyoming":
-  //       return L.latLng(43.076, -107.2903);
-  //     case "North Dakota":
-  //       return L.latLng(47.5515, -101.002);
-  //     case "South Dakota":
-  //       return L.latLng(43.9695, -99.9018);
-  //     default:
-  //       return;
-  //   }
-  // };
   return (
     <>
       <LayersControl position="topright">
-        <LayersControl.BaseLayer checked name="Basic Map">
+        <LayersControl.BaseLayer  name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}"
             ext="png"
           />
         </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="Topo Map">
+        <LayersControl.BaseLayer checked name="Topo Map">
           <TileLayer
             attribution='Map data: &amp;copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &amp;copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
             url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
@@ -90,13 +79,13 @@ const Layers = ({ layer }) => {
             let centerX = 0;
             let centerY = 0;
 
-            for (let i = 0; i < item.geometry.coordinates[0].length; i++) {
-              centerX += item.geometry.coordinates[0][i][0];
-              centerY += item.geometry.coordinates[0][i][1];
+            {/* for (let i = 0; i < item.coordinates.length; i++) {
+              centerX += item.coordinates[i][0];
+              centerY += item.coordinates[i][1];
             }
 
-            centerX = centerX / item.geometry.coordinates[0].length;
-            centerY = centerY / item.geometry.coordinates[0].length;
+            centerX = centerX / item.coordinates.length;
+            centerY = centerY / item.coordinates.length; */}
 
             // Получаем координаты центра полигона
             console.log("Центр полигона: (" + centerX + ", " + centerY + ")");
@@ -105,25 +94,29 @@ const Layers = ({ layer }) => {
               <LayersControl.Overlay
                 key={key}
                 checked
-                name={item.properties["Наим �_1"]}
+                // name={item.properties["Наим �_1"]}
+                onClick={() => console.log('item.properties')}
               >
-                <LayerGroup>
+                <LayerGroup
+              
+                >
                   <GeoJSON
                     key={hashString(JSON.stringify(layer))}
                     data={item}
                     pathOptions={{ color: getRandomColor() }}
+                    
                   >
                     <Marker position={[centerY, centerX]}>
                       <Popup>
                         <Typography variant="subtitle2">
-                          {item.properties["Наим �_1"]}
+                          {/* {item.properties["Наим �_1"]} */}
                         </Typography>
                         <Divider />
                         <Typography variant="body2" style={{ margin: 3 }}>
-                        {item.properties["Наим �"]}
+                        {/* {item.properties["Наим �"]} */}
                       </Typography>
                       <Typography variant="body2" style={{ margin: 3 }}>
-                      {item.properties["Наиме"]}
+                      {/* {item.properties["Наиме"]} */}
                       </Typography>
                       </Popup>
                     </Marker>
