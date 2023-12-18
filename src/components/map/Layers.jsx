@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TileLayer,
   LayersControl,
@@ -9,7 +9,6 @@ import {
   Popup,
   LayerGroup,
 } from "react-leaflet";
-import ReactLeafletKml from "react-leaflet-kml";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
 import L from "leaflet";
@@ -28,9 +27,32 @@ const Layers = ({ layer }) => {
       console.log(map.getBounds());
     },
     click: (e) => {
-      console.log(e,'item.properties')
-    }
+
+    },
   });
+
+  useEffect(() => {
+    let centerX = 0;
+    let centerY = 0;
+if (layer) {
+  
+  layer.features.map((item, key) => {
+    //TODO сделять учитывая все поля
+if (layer.features.length / 2 === key) {
+  for (let i = 0; i < item.geometry.coordinates[0].length; i++) {
+    centerX += item.geometry.coordinates[0][i][0];
+    centerY += item.geometry.coordinates[0][i][1];
+  }
+  centerX = centerX / item.geometry.coordinates[0].length;
+  centerY = centerY / item.geometry.coordinates[0].length;
+}
+    
+})
+
+console.log(centerX, centerY);
+map.setView([centerY, centerX], map.getZoom())
+}
+  }, [layer])
 
   const hashString = (str) => {
     var hash = 0,
@@ -57,7 +79,7 @@ const Layers = ({ layer }) => {
   return (
     <>
       <LayersControl position="topright">
-        <LayersControl.BaseLayer  name="Basic Map">
+        <LayersControl.BaseLayer name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}"
@@ -73,19 +95,18 @@ const Layers = ({ layer }) => {
 
         {layer &&
           layer.features.map((item, key) => {
-
-
             // Находим среднее значение координат X и Y
             let centerX = 0;
             let centerY = 0;
 
-            {/* for (let i = 0; i < item.coordinates.length; i++) {
-              centerX += item.coordinates[i][0];
-              centerY += item.coordinates[i][1];
+            for (let i = 0; i < item.geometry.coordinates[0].length; i++) {
+              centerX += item.geometry.coordinates[0][i][0];
+              centerY += item.geometry.coordinates[0][i][1];
             }
 
-            centerX = centerX / item.coordinates.length;
-            centerY = centerY / item.coordinates.length; */}
+            centerX = centerX / item.geometry.coordinates[0].length;
+            centerY = centerY / item.geometry.coordinates[0].length;
+          
 
             // Получаем координаты центра полигона
             console.log("Центр полигона: (" + centerX + ", " + centerY + ")");
@@ -95,16 +116,19 @@ const Layers = ({ layer }) => {
                 key={key}
                 checked
                 // name={item.properties["Наим �_1"]}
-                onClick={() => console.log('item.properties')}
+                onClick={() => console.log("item.properties")}
               >
-                <LayerGroup
-              
-                >
+                <LayerGroup>
                   <GeoJSON
                     key={hashString(JSON.stringify(layer))}
                     data={item}
                     pathOptions={{ color: getRandomColor() }}
-                    
+                    eventHandlers={{
+                      click: (event, type) => {
+                        map.fitBounds(item.geometry.coordinates[0].map(item => item.reverse()));
+                        item.geometry.coordinates[0].map(item => item.reverse())
+                      },
+                    }}
                   >
                     <Marker position={[centerY, centerX]}>
                       <Popup>
@@ -113,11 +137,11 @@ const Layers = ({ layer }) => {
                         </Typography>
                         <Divider />
                         <Typography variant="body2" style={{ margin: 3 }}>
-                        {/* {item.properties["Наим �"]} */}
-                      </Typography>
-                      <Typography variant="body2" style={{ margin: 3 }}>
-                      {/* {item.properties["Наиме"]} */}
-                      </Typography>
+                          {/* {item.properties["Наим �"]} */}
+                        </Typography>
+                        <Typography variant="body2" style={{ margin: 3 }}>
+                          {/* {item.properties["Наиме"]} */}
+                        </Typography>
                       </Popup>
                     </Marker>
                   </GeoJSON>
