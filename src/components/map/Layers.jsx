@@ -26,33 +26,14 @@ const Layers = ({ layer }) => {
       // Get bounds once move has ended:
       console.log(map.getBounds());
     },
-    click: (e) => {
-
-    },
+    click: (e) => {},
   });
 
   useEffect(() => {
-    let centerX = 0;
-    let centerY = 0;
-if (layer) {
-  
-  layer.features.map((item, key) => {
-    //TODO сделять учитывая все поля
-if (layer.features.length / 2 === key) {
-  for (let i = 0; i < item.geometry.coordinates[0].length; i++) {
-    centerX += item.geometry.coordinates[0][i][0];
-    centerY += item.geometry.coordinates[0][i][1];
-  }
-  centerX = centerX / item.geometry.coordinates[0].length;
-  centerY = centerY / item.geometry.coordinates[0].length;
-}
-    
-})
-
-console.log(centerX, centerY);
-map.setView([centerY, centerX], map.getZoom())
-}
-  }, [layer])
+    if (layer) {
+      map.setView([layer.center[1], layer.center[0]], map.getZoom());
+    }
+  }, [layer]);
 
   const hashString = (str) => {
     var hash = 0,
@@ -63,7 +44,7 @@ map.setView([centerY, centerX], map.getZoom())
       hash = (hash << 5) - hash + chr;
       hash |= 0; // Convert to 32bit integer
     }
-    console.log(hash);
+    // console.log(hash);
     return hash;
   };
 
@@ -95,27 +76,11 @@ map.setView([centerY, centerX], map.getZoom())
 
         {layer &&
           layer.features.map((item, key) => {
-            // Находим среднее значение координат X и Y
-            let centerX = 0;
-            let centerY = 0;
-
-            for (let i = 0; i < item.geometry.coordinates[0].length; i++) {
-              centerX += item.geometry.coordinates[0][i][0];
-              centerY += item.geometry.coordinates[0][i][1];
-            }
-
-            centerX = centerX / item.geometry.coordinates[0].length;
-            centerY = centerY / item.geometry.coordinates[0].length;
-          
-
-            // Получаем координаты центра полигона
-            console.log("Центр полигона: (" + centerX + ", " + centerY + ")");
-
             return (
               <LayersControl.Overlay
                 key={key}
                 checked
-                // name={item.properties["Наим �_1"]}
+                name={item.properties.crop + ' - ' + item.properties.name}
                 onClick={() => console.log("item.properties")}
               >
                 <LayerGroup>
@@ -125,22 +90,36 @@ map.setView([centerY, centerX], map.getZoom())
                     pathOptions={{ color: getRandomColor() }}
                     eventHandlers={{
                       click: (event, type) => {
-                        map.fitBounds(item.geometry.coordinates[0].map(item => item.reverse()));
-                        item.geometry.coordinates[0].map(item => item.reverse())
+                        map.fitBounds(
+                          item.geometry.coordinates[0].map((item) =>
+                            item.reverse()
+                          )
+                        );
+                        item.geometry.coordinates[0].map((item) =>
+                          item.reverse()
+                        );
                       },
                     }}
                   >
-                    <Marker position={[centerY, centerX]}>
+                    <Marker
+                      position={[
+                        item.geometry.center[1],
+                        item.geometry.center[0],
+                      ]}
+                    >
                       <Popup>
                         <Typography variant="subtitle2">
                           {/* {item.properties["Наим �_1"]} */}
+                          вфы
                         </Typography>
                         <Divider />
                         <Typography variant="body2" style={{ margin: 3 }}>
                           {/* {item.properties["Наим �"]} */}
+                          12
                         </Typography>
                         <Typography variant="body2" style={{ margin: 3 }}>
                           {/* {item.properties["Наиме"]} */}
+                          фыв12
                         </Typography>
                       </Popup>
                     </Marker>

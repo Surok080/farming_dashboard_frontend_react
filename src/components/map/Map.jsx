@@ -15,6 +15,7 @@ import ReactLeafletKml from "react-leaflet-kml";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
 import test2 from "../map.json";
+import { httpService } from "../../api/setup";
 
 const Map = () => {
   const [layer, setLayer] = useState(null);
@@ -25,21 +26,29 @@ const Map = () => {
     const ext = getFileExtension(file);
     const reader = new FileReader();
 
-    // on load file end, parse the text read
-    reader.onloadend = (event) => {
-      var text = event.target.result;
-      if (ext === "kml") {
-        parseTextAsKml(text);
-      } else {
-        // imported geojson
-        const json = JSON.parse(text);
-        rewind(json, false);
-        console.log(json);
-        setLayer(json);
-      }
-    };
+    let formData = new FormData();
+    formData.append('file', file);
 
-    reader.readAsText(file); // start reading file
+    httpService.post('/data/upload_file/', formData)
+    .then(res => {
+      console.log(test2);
+      console.log(res.data);
+      setLayer(res.data)
+    })
+    // reader.onloadend = (event) => {
+    //   var text = event.target.result;
+    //   if (ext === "kml") {
+    //     parseTextAsKml(text);
+    //   } else {
+    //     // imported geojson
+    //     const json = JSON.parse(text);
+    //     rewind(json, false);
+    //     console.log(json);
+    //     setLayer(json);
+    //   }
+    // };
+
+    // reader.readAsText(file); // start reading file
   };
 
   const parseTextAsKml = (text) => {
