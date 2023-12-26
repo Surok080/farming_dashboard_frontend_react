@@ -1,7 +1,6 @@
 import { Box, Grid, Tab, Tabs, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import Meteo from "../Meteo";
-import Test from "../Test";
 import { styled } from "@mui/material/styles";
 import Map from "../map/Map";
 
@@ -38,9 +37,6 @@ const DashboardPages = () => {
     background:' #FFF'
   });
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
 
   return (
     <Grid container spacing={3}>
@@ -74,13 +70,12 @@ const DashboardPages = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "50px",
                 minHeight: "400px",
                 background: "#9797971c",
+                position: 'relative'
               }}
             >
             <Map/>
-
             </Box>
           </CustomTabPanel>
           <CustomTabPanel value={value} index={"1"}>
@@ -94,7 +89,7 @@ const DashboardPages = () => {
                 background: "#9797971c",
               }}
             >
-              <Test/>
+              
             </Box>
           </CustomTabPanel>
           <CustomTabPanel value={value} index={"2"}>

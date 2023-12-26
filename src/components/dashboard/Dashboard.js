@@ -10,21 +10,18 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-
 import ListItems from "./listItems";
-
 import { Context } from "../../store/context";
 import DashboardPages from "../dashboardPages/dashboardPages";
 import FieldsPages from "../dashboardPages/fieldsPages";
 import { useDispatch, useSelector } from "react-redux";
 import { SignInApi } from "../../api/singIn";
 import { setUserFio } from "../../store/userDto";
-import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
+import Logo from "../../images/logo.svg";
 
 const drawerWidth = 240;
 
@@ -39,25 +36,6 @@ const AppBar = styled(MuiAppBar, {
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-const AppBar2 = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  marginTop: '64px',
-  width: `100%`,
-  transition: theme.transitions.create(["width", "margin"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -91,23 +69,20 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-
-const defaultTheme = createTheme(
-  {
-    palette: {
-      primary: {
-        main: '#82F865'
-      },
+const defaultTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#F0F0F0",
     },
-  }
-);
+  },
+});
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.fio);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [valueTabs, setValueTabs] = React.useState("menu_dashboard");
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -130,10 +105,16 @@ export default function Dashboard() {
   function getNameTabs() {
     switch (valueTabs) {
       case "menu_dashboard":
-        return "Дашборд";
+        return "Обзор";
         break;
       case "menu_fields":
         return "Поля";
+        break;
+      case "menu_gos":
+        return "Госмониторинг";
+        break;
+      case "menu_settings":
+        return "Настройки";
         break;
 
       default:
@@ -184,35 +165,22 @@ export default function Dashboard() {
               </IconButton>
               <Typography
                 component="h1"
-                variant="h6"
+                variant="h5"
                 color="inherit"
                 noWrap
                 sx={{ flexGrow: 1 }}
+                textAlign={"left"}
               >
                 {getNameTabs()}
               </Typography>
               {user ?? ""}
             </Toolbar>
           </AppBar>
-          <AppBar2 position="absolute" open={open}>
-            <Toolbar
-              sx={{
-                pr: "24px", // keep right padding when drawer closed
-              }}
-            >
-              <Typography
-                component="h1"
-                variant="h6"
-                color="inherit"
-                noWrap
-                sx={{ flexGrow: 1 }}
-              >
-                {getNameTabs()}
-              </Typography>
-              {user ?? ""}
-            </Toolbar>
-          </AppBar2>
-          <Drawer variant="permanent" open={open}>
+          <Drawer
+            sx={{ position: "absolute", height: "100%" }}
+            variant="permanent"
+            open={open}
+          >
             <Box
               sx={{
                 display: "flex",
@@ -220,6 +188,7 @@ export default function Dashboard() {
                 justifyContent: "space-between",
                 height: "100%",
                 paddingBottom: "50px",
+                background: "#F0F0F0",
               }}
             >
               <Box>
@@ -236,10 +205,29 @@ export default function Dashboard() {
                   </IconButton>
                 </Toolbar>
                 <Divider />
-                <List sx={{paddingTop: '74px'}} component="nav">
-                  <ListItems />
-                  {/* {mainListItems} */}
+                <List sx={{ paddingTop: "10px" }} component="nav">
+                  <Box height={"50px"}>
+                    {open ? (
+                      <Typography
+                        component="h2"
+                        variant="h6"
+                        color="inherit"
+                        noWrap
+                        sx={{ flexGrow: 1 }}
+                        textAlign={"center"}
+                      >
+                        ЗАО «БИРЮЛИ»
+                      </Typography>
+                    ) : (
+                      <img
+                        style={{ margin: "15px 25px 15px 10px" }}
+                        src={Logo}
+                        alt="Logo"
+                      />
+                    )}
+                  </Box>
 
+                  <ListItems />
                   <Divider sx={{ my: 1 }} />
                 </List>
               </Box>
@@ -267,7 +255,13 @@ export default function Dashboard() {
             }}
           >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ marginTop: "74px" }}>
+            <Container
+              maxWidth="lg"
+              sx={{
+                marginTop: "10px",
+                marginLeft: "71px",
+              }}
+            >
               {getPagesDashboard()}
             </Container>
           </Box>

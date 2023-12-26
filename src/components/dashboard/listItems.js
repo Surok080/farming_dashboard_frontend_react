@@ -2,16 +2,11 @@ import * as React from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import ListSubheader from "@mui/material/ListSubheader";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import PeopleIcon from "@mui/icons-material/People";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import LayersIcon from "@mui/icons-material/Layers";
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import { Context } from "../../store/context";
-import AgricultureIcon from "@mui/icons-material/Agriculture";
-import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
+import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 export default function ListItems() {
   const { valueTabs, setValueTabs } = React.useContext(Context);
@@ -20,37 +15,37 @@ export default function ListItems() {
     <>
       <ListItemButton onClick={() => setValueTabs("menu_dashboard")}>
         <ListItemIcon>
-          <DashboardIcon />
+          <GridViewOutlinedIcon sx={{color: valueTabs ===  "menu_dashboard" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
-        <ListItemText primary="Дашборд" />
+        <ListItemText primary="Обзор" />
       </ListItemButton>
 
       <ListItemButton onClick={() => setValueTabs("menu_fields")}>
         <ListItemIcon>
-          <AgricultureIcon />
+          <LayersOutlinedIcon sx={{color: valueTabs ===  "menu_fields" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Поля" />
       </ListItemButton>
 
-      <ListItemButton>
+      <ListItemButton onClick={() => setValueTabs("menu_gos")}>
         <ListItemIcon>
-          <BarChartIcon />
+          <DashboardOutlinedIcon sx={{color: valueTabs ===  "menu_gos" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Госмониторинг" />
       </ListItemButton>
 
-      <ListItemButton>
+      {/* <ListItemButton>
         <ListItemIcon>
           <PeopleIcon />
         </ListItemIcon>
         <ListItemText primary="Пользователи" />
-      </ListItemButton>
+      </ListItemButton> */}
 
-      <ListItemButton>
+      <ListItemButton onClick={() => setValueTabs("menu_settings")}>
         <ListItemIcon>
-          <SettingsApplicationsIcon />
+          <SettingsOutlinedIcon sx={{color: valueTabs ===  "menu_settings" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
-        <ListItemText primary="Настройки сайта" />
+        <ListItemText primary="Настройки" />
       </ListItemButton>
     </>
   );

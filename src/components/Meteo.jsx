@@ -14,7 +14,6 @@ const Meteo = () => {
 
   useEffect(() => {
     updateMeteo();
-    console.log('updateMeteo()');
     const interval = setInterval(() => {
       updateMeteo()
     }, 100000);
