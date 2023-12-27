@@ -125,10 +125,10 @@ export default function Dashboard() {
   function getPagesDashboard() {
     switch (valueTabs) {
       case "menu_dashboard":
-        return <DashboardPages />;
+        return <FieldsPages />;
         break;
       case "menu_fields":
-        return <FieldsPages />;
+        return <DashboardPages />;
         break;
 
       default:
@@ -256,10 +256,12 @@ export default function Dashboard() {
           >
             <Toolbar />
             <Container
-              maxWidth="lg"
+              maxWidth="xl"
               sx={{
-                marginTop: "10px",
+                marginTop: "20px",
                 marginLeft: "71px",
+                paddingRight: '71px !important',
+                height: 'calc(100% - 68px)'
               }}
             >
               {getPagesDashboard()}
