@@ -22,6 +22,14 @@ import { setUserFio } from "../../store/userDto";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import Logo from "../../images/logo.svg";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import ListItemText from "@mui/material/ListItemText";
+
 
 const drawerWidth = 240;
 
@@ -189,6 +197,7 @@ export default function Dashboard() {
                 height: "100%",
                 paddingBottom: "50px",
                 background: "#F0F0F0",
+                overflow: 'hidden'
               }}
             >
               <Box>
@@ -231,7 +240,9 @@ export default function Dashboard() {
                   <Divider sx={{ my: 1 }} />
                 </List>
               </Box>
-              <Button
+
+              {/* <Button
+                variant={"contained"}
                 onClick={() => {
                   localStorage.removeItem("access_token");
                   dispatch(setUserFio(``));
@@ -239,7 +250,33 @@ export default function Dashboard() {
                 }}
               >
                 Выход
-              </Button>
+              </Button> */}
+              <Box>
+                <ListItemButton onClick={() => console.log('Вопрос')}>
+                  <ListItemIcon>
+                    <HelpOutlineOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Вопросы" />
+                </ListItemButton>
+                <ListItemButton onClick={() => console.log('Пользователи')}>
+                  <ListItemIcon>
+                    <PersonOutlineOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Пользователи" />
+                </ListItemButton>
+                <ListItemButton onClick={() => console.log('Уведомления')}>
+                  <ListItemIcon>
+                    <NotificationsOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Уведомления" />
+                </ListItemButton>
+                <ListItemButton onClick={() => console.log('Выход')}>
+                  <ListItemIcon>
+                    <LogoutOutlinedIcon/>
+                  </ListItemIcon>
+                  <ListItemText primary="Выход" />
+                </ListItemButton>
+              </Box>
             </Box>
           </Drawer>
           <Box
@@ -260,8 +297,8 @@ export default function Dashboard() {
               sx={{
                 marginTop: "20px",
                 marginLeft: "71px",
-                paddingRight: '71px !important',
-                height: 'calc(100% - 68px)'
+                paddingRight: "71px !important",
+                height: "calc(100% - 68px)",
               }}
             >
               {getPagesDashboard()}
