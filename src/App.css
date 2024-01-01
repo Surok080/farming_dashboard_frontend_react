@@ -42,3 +42,7 @@
 .leaflet-attribution-flag {
   display: none;
 }
+
+.leaflet-interactive:focus {
+  outline: none;
+}

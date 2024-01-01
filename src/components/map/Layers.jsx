@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   TileLayer,
   LayersControl,
@@ -8,13 +8,14 @@ import {
   GeoJSON,
   Popup,
   LayerGroup,
+  Tooltip,
 } from "react-leaflet";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
 import L from "leaflet";
-import { Divider, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 
-const Layers = ({ layer }) => {
+const Layers = memo(({ layer }) => {
   const map = useMapEvents({
     // Use leaflet map event as the key and a call back with the
     // map method as the value:
@@ -76,11 +77,12 @@ const Layers = ({ layer }) => {
 
         {layer &&
           layer.features.map((item, key) => {
+            console.log(item);
             return (
               <LayersControl.Overlay
                 key={key}
                 checked
-                name={item.properties.crop + ' - ' + item.properties.name}
+                name={item.properties.crop + " - " + item.properties.name}
                 onClick={() => console.log("item.properties")}
               >
                 <LayerGroup>
@@ -101,28 +103,10 @@ const Layers = ({ layer }) => {
                       },
                     }}
                   >
-                    <Marker
-                      position={[
-                        item.geometry.center[1],
-                        item.geometry.center[0],
-                      ]}
-                    >
-                      <Popup>
-                        <Typography variant="subtitle2">
-                          {/* {item.properties["Наим �_1"]} */}
-                          вфы
-                        </Typography>
-                        <Divider />
-                        <Typography variant="body2" style={{ margin: 3 }}>
-                          {/* {item.properties["Наим �"]} */}
-                          12
-                        </Typography>
-                        <Typography variant="body2" style={{ margin: 3 }}>
-                          {/* {item.properties["Наиме"]} */}
-                          фыв12
-                        </Typography>
-                      </Popup>
-                    </Marker>
+                    <Tooltip sticky>
+                      <Typography>{item.properties.area} Га</Typography>
+                      <Typography>{item.properties.crop.charAt(0).toUpperCase() + item.properties.crop.slice(1)}</Typography>
+                    </Tooltip>
                   </GeoJSON>
                 </LayerGroup>
               </LayersControl.Overlay>
@@ -139,5 +123,5 @@ const Layers = ({ layer }) => {
       <input type="file" onChange={handleFileSelection} /> */}
     </>
   );
-};
+});
 export default Layers;

@@ -299,6 +299,7 @@ export default function Dashboard() {
                 marginLeft: "71px",
                 paddingRight: "71px !important",
                 height: "calc(100% - 68px)",
+                width:'calc(100% - 71px)'
               }}
             >
               {getPagesDashboard()}

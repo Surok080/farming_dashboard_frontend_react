@@ -21,110 +21,25 @@ function CustomTabPanel(props) {
 }
 
 const DashboardPages = () => {
-  const [value, setValue] = React.useState("0");
-  const TabsStyle = (valueRef) => ({
-    color: "black",
-    padding: "20px 15px",
-    transition: "all .2s linear",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    flexDirection: "column",
-    justifyContent: "center",
-    minWidth: '190px',
-    borderRadius: '8px',
-    border: `3px solid ${value == valueRef ? "#82F865" : "#F3E8FF"}`,
-    background:' #FFF'
-  });
-
-
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={9}>
-        <Box sx={{ width: "100%", padding: "0" }}>
-          <Box
-            sx={{
-              margin: "10px 0 50px 0",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box sx={TabsStyle("0")} onClick={() => setValue("0")}>
-              <Typography>Пашня</Typography>
-              <Typography>16000Га</Typography>
-            </Box>
-            <Box sx={TabsStyle("1")} onClick={() => setValue("1")}>
-              <Typography>Структура посевов</Typography>
-              <Typography>5 культур</Typography>
-            </Box>
-            <Box sx={TabsStyle("2")} onClick={() => setValue("2")}>
-              <Typography>Ход полевых работ</Typography>
-            </Box>
-            <Box sx={TabsStyle("3")} onClick={() => setValue("3")}>
-              <Typography>Оперативная отчетность</Typography>
-            </Box>
-          </Box>
-          <CustomTabPanel value={value} index={"0"}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "400px",
-                background: "#9797971c",
-                position: 'relative'
-              }}
-            >
-            <Map/>
-            </Box>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={"1"}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "50px",
-                minHeight: "400px",
-                background: "#9797971c",
-              }}
-            >
-              
-            </Box>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={"2"}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "50px",
-                minHeight: "400px",
-                background: "#9797971c",
-              }}
-            >
-              Container 1
-            </Box>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={"3"}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "50px",
-                minHeight: "400px",
-                background: "#9797971c",
-              }}
-            >
-              Container 2
-            </Box>
-          </CustomTabPanel>
+    <Grid sx={{ height: "100%", }} container spacing={3}>
+      <Grid item xs={12}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "600px",
+            background: "#9797971c",
+            position: "relative",
+            width: "100%",
+            padding: "0",
+            height: "100%",
+            overflow: 'hidden'
+          }}
+        >
+          <Map />
         </Box>
-      </Grid>
-
-      <Grid item xs={3} sx={{ padding: "10px" }}>
-        <Meteo />
       </Grid>
     </Grid>
   );
