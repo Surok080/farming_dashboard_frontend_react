@@ -149,7 +149,7 @@ const Map = () => {
               {layer.features.map((item, key) => {
                 return (
                   <Typography variant="caption">
-                    {item.properties.crop_group}
+                    {item.properties.crop}
                   </Typography>
                 );
               })}
