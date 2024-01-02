@@ -104,8 +104,8 @@ const Layers = memo(({ layer }) => {
                     }}
                   >
                     <Tooltip sticky>
-                      <Typography>{item.properties.area} Га</Typography>
                       <Typography>{item.properties.crop.charAt(0).toUpperCase() + item.properties.crop.slice(1)}</Typography>
+                      <Typography>{item.properties.area} га</Typography>
                     </Tooltip>
                   </GeoJSON>
                 </LayerGroup>
