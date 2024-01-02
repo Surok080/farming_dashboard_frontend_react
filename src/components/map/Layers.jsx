@@ -27,7 +27,11 @@ const Layers = memo(({ layer }) => {
       // Get bounds once move has ended:
       console.log(map.getBounds());
     },
-    click: (e) => {},
+    click: (e) => {
+      map.setView(e.latlng, map.getZoom(), {
+        animate: true,
+      })
+    },
   });
 
   useEffect(() => {
