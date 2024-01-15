@@ -46,3 +46,7 @@
 .leaflet-interactive:focus {
   outline: none;
 }
+
+.svgTest svg {
+  width: 100%;
+}
