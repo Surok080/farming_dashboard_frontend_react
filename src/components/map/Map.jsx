@@ -19,20 +19,45 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { PieChart, pieArcLabelClasses } from "@mui/x-charts/PieChart";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import ImageIcon from "@mui/icons-material/Image";
-import WorkIcon from "@mui/icons-material/Work";
-import BeachAccessIcon from "@mui/icons-material/BeachAccess";
 
-const data = [
+
+const data1 = [
   { value: 5, label: "Пшеница яровая" },
   { value: 10, label: "Пшеница озимая" },
   { value: 15, label: "Люцерна " },
   { value: 20, label: "Рапс яровой" },
 ];
 
+const data = [
+  {
+      "label": "пшеница озимая",
+      "value": 215.1
+  },
+  {
+      "label": "ячмень яровой",
+      "value": 178.4
+  },
+  {
+      "label": "подсолнечник",
+      "value": 69
+  },
+  {
+      "label": "свекла сахарная",
+      "value": 141.6
+  },
+  {
+      "label": "пшеница яровая",
+      "value": 272.2
+  },
+  {
+      "label": "рапс яровой",
+      "value": 86.5
+  },
+  {
+      "label": "кукуруза на силос",
+      "value": 116.1
+  }
+];
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -47,12 +72,14 @@ const VisuallyHiddenInput = styled("input")({
 
 const Map = () => {
   const [layer, setLayer] = useState(null);
+  const [statistics, setStatistics] = useState([]);
 
   useEffect(() => {
     if (sessionStorage.getItem("map")) {
       try {
         console.log(JSON.parse(sessionStorage.getItem("map")));
         setLayer(JSON.parse(sessionStorage.getItem("map")));
+        getAreaLayers(JSON.parse(sessionStorage.getItem("map")))
       } catch {
         sessionStorage.setItem("map", null);
       }
@@ -90,6 +117,26 @@ const Map = () => {
     const lastDot = name.lastIndexOf(".");
     return name.substring(lastDot + 1);
   };
+
+  const getAreaLayers = (layers) => {
+    const graphStatics = [];
+    // graphStatics.push({name: layers.features[0].properties.crop, area: +parseFloat(layers.features[0].properties.area).toFixed(1)})
+    layers.features.map((item, index) => {
+      if (graphStatics.find(area => area.label === item.properties.crop)) {
+        graphStatics.map(area => {
+          if (area.label === item.properties.crop) {
+            area.value = +parseFloat(area.value + +parseFloat(item.properties.area).toFixed(1)).toFixed(1)
+          }
+        })
+        // graphStatics.find(area => area.name === item.properties.crop).area = +parseFloat(graphStatics.find(area => area.name === item.properties.crop).area + item.properties.area).toFixed(1);
+      } else {
+        graphStatics.push({label: item.properties.crop, value: +parseFloat(item.properties.area).toFixed(1)})
+      }
+    })
+    setStatistics(graphStatics)
+  };
+
+
 
   return (
     <>
@@ -175,7 +222,6 @@ const Map = () => {
           <Accordion
             sx={{
               width: "450px",
-
             }}
           >
             <AccordionSummary
@@ -185,15 +231,17 @@ const Map = () => {
             >
               <Typography>Список полей</Typography>
             </AccordionSummary>
-            <AccordionDetails             sx={{
-   
-              height: '100%'
-            }}>
+            <AccordionDetails
+              sx={{
+                height: "100%",
+              }}
+            >
               <Box>
+              {
+                statistics.length ?
                 <PieChart
                   series={[
                     {
-                      arcLabel: (item) => ``,
                       arcLabelMinAngle: 45,
                       innerRadius: 37,
                       outerRadius: 56,
@@ -203,8 +251,8 @@ const Map = () => {
                       endAngle: 360,
                       cx: 55,
                       cy: 95,
-                      data,
-                    },
+                      data: statistics
+                    }
                   ]}
                   sx={{
                     [`& .${pieArcLabelClasses.root}`]: {
@@ -213,36 +261,53 @@ const Map = () => {
                     },
                   }}
                   width={350}
-                  height={200}
+                  height={statistics.length * 35}
                 />
+                :
+                null
+              }
+                
               </Box>
               <Box>
                 <List
                   sx={{
                     width: "100%",
-                    height: '400px',
-                    overflowY: 'scroll',
+                    height: "400px",
+                    overflowY: "scroll",
                     maxWidth: 360,
                     bgcolor: "background.paper",
                   }}
                 >
                   {layer ? (
                     layer.features.map((item, index) => {
-                      console.log(item);
-                      const svgString = item.properties.svg.replace('stroke-width="100"', 'stroke-width="50"');
+                      const svgString = item.properties.svg.replace(
+                        'stroke-width="100"',
+                        'stroke-width="50"'
+                      );
                       return (
                         <ListItem
                           key={index}
-                          style={{ width: "100%", display: 'flex', gap: '10px' }}
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            gap: "10px",
+                          }}
                         >
                           {/* <div
                           className="svgTest"
                             style={{ width: "100px", height: "100%" }}
                             dangerouslySetInnerHTML={{ __html: svgString }}
                           /> */}
-                          <svg style={{ width: '150px', height: '100%' }} dangerouslySetInnerHTML={{ __html: svgString }} />
-                          <Typography variant="subtitle1">{item.properties.crop}</Typography>
-                          <Typography>{item.properties.area.split('.')[0]} га</Typography>
+                          <svg
+                            style={{ width: "150px", height: "100%" }}
+                            dangerouslySetInnerHTML={{ __html: svgString }}
+                          />
+                          <Typography variant="subtitle1">
+                            {item.properties.crop}
+                          </Typography>
+                          <Typography>
+                            {item.properties.area.split(".")[0]} га
+                          </Typography>
                         </ListItem>
                       );
                     })

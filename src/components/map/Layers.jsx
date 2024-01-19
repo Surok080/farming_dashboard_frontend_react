@@ -1,19 +1,13 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect } from "react";
 import {
   TileLayer,
   LayersControl,
-  useMap,
   useMapEvents,
-  Marker,
   GeoJSON,
-  Popup,
   LayerGroup,
   Tooltip,
 } from "react-leaflet";
-import * as tj from "@mapbox/togeojson";
-import rewind from "@mapbox/geojson-rewind";
-import L from "leaflet";
-import { Box, Divider, Typography } from "@mui/material";
+import {Typography } from "@mui/material";
 
 const Layers = memo(({ layer }) => {
   const map = useMapEvents({
@@ -81,7 +75,7 @@ const Layers = memo(({ layer }) => {
 
         {layer &&
           layer.features.map((item, key) => {
-            console.log(item);
+
             return (
               <LayersControl.Overlay
                 key={key}
@@ -109,7 +103,7 @@ const Layers = memo(({ layer }) => {
                   >
                     <Tooltip sticky>
                       <Typography>{item.properties.crop.charAt(0).toUpperCase() + item.properties.crop.slice(1)}</Typography>
-                      <Typography>{item.properties.area} га</Typography>
+                      <Typography>{item.properties.area.split('.')[0]} га</Typography>
                     </Tooltip>
                   </GeoJSON>
                 </LayerGroup>
@@ -117,14 +111,6 @@ const Layers = memo(({ layer }) => {
             );
           })}
       </LayersControl>
-      {/* <TileLayer
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {layer && (
-            <GeoJSON key={hashString(JSON.stringify(layer))} data={layer} />
-          )}
-      <input type="file" onChange={handleFileSelection} /> */}
     </>
   );
 });
