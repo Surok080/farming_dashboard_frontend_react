@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Layers from "./Layers";
-import { MapContainer, ZoomControl } from "react-leaflet";
+import { MapContainer, ZoomControl, useMapEvents } from "react-leaflet";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
 import test2 from "../map.json";
@@ -11,53 +11,48 @@ import {
   AccordionSummary,
   Box,
   Button,
+  ListItemButton,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { PieChart, pieArcLabelClasses } from "@mui/x-charts/PieChart";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import { Chart } from "react-google-charts";
 
-
-const data1 = [
-  { value: 5, label: "Пшеница яровая" },
-  { value: 10, label: "Пшеница озимая" },
-  { value: 15, label: "Люцерна " },
-  { value: 20, label: "Рапс яровой" },
+export const data12 = [
+  ["Task", "Hours per Day"],
+  ["Work", 11],
+  ["Eat", 2],
+  ["Commute", 2],
+  ["Watch TV", 2],
+  ["Sleep", 7],
+  ["Work", 11],
+  ["Eat", 2],
+  ["Commute", 2],
+  ["Watch TV", 2],
+  ["Sleep", 7],
+  ["Work", 11],
+  ["Eat", 2],
+  ["Commute", 2],
+  ["Watch TV", 2],
+  ["Sleep", 7],
+  ["Work", 11],
+  ["Eat", 2],
+  ["Commute", 2],
+  ["Watch TV", 2],
+  ["Sleep", 7],
 ];
 
-const data = [
-  {
-      "label": "пшеница озимая",
-      "value": 215.1
-  },
-  {
-      "label": "ячмень яровой",
-      "value": 178.4
-  },
-  {
-      "label": "подсолнечник",
-      "value": 69
-  },
-  {
-      "label": "свекла сахарная",
-      "value": 141.6
-  },
-  {
-      "label": "пшеница яровая",
-      "value": 272.2
-  },
-  {
-      "label": "рапс яровой",
-      "value": 86.5
-  },
-  {
-      "label": "кукуруза на силос",
-      "value": 116.1
-  }
-];
+export const options = {
+  title: "Бирюли",
+  legend: { position: "right",  }, // Размещение легенды справа от диаграммы
+  chartArea: { left: 0, top: 20, width: "100%", height: "80%" }, // Управление областью рисования диаграммы
+  pieHole: 0.4,
+  is3D: false,
+};
+
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -73,18 +68,31 @@ const VisuallyHiddenInput = styled("input")({
 const Map = () => {
   const [layer, setLayer] = useState(null);
   const [statistics, setStatistics] = useState([]);
+  const [activeArea, setActiveArea] = useState(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem("map")) {
-      try {
-        console.log(JSON.parse(sessionStorage.getItem("map")));
-        setLayer(JSON.parse(sessionStorage.getItem("map")));
-        getAreaLayers(JSON.parse(sessionStorage.getItem("map")))
-      } catch {
-        sessionStorage.setItem("map", null);
-      }
-    }
+    getData();
   }, []);
+
+  const getData = () => {
+    httpService.get("/data/fields").then((res) => {
+      console.log(res);
+      if (res.status !== 404) {
+        console.log(res.data);
+        setLayer(res.data);
+        getAreaLayers(res.data);
+      }
+    });
+    // if (sessionStorage.getItem("map")) {
+    //   try {
+    //     console.log(JSON.parse(sessionStorage.getItem("map")));
+    //     setLayer(JSON.parse(sessionStorage.getItem("map")));
+    //     getAreaLayers(JSON.parse(sessionStorage.getItem("map")));
+    //   } catch {
+    //     sessionStorage.setItem("map", null);
+    //   }
+    // }
+  };
 
   const handleFileSelection = (event) => {
     const file = event.target.files[0]; // get file
@@ -96,10 +104,13 @@ const Map = () => {
     formData.append("file", file);
 
     httpService.post("/data/upload_file/", formData).then((res) => {
-      console.log(" Эталонный файл ", test2);
-      console.log(" Импортируемый файл ", res.data);
-      sessionStorage.setItem("map", JSON.stringify(res.data));
-      setLayer(res.data);
+      if (res.status === 200) {
+        getData();
+        console.log(res);
+      }
+      // console.log(" Эталонный файл ", test2);
+      // console.log(" Импортируемый файл ", res.data);
+      // sessionStorage.setItem("map", JSON.stringify(res.data));
     });
   };
 
@@ -119,52 +130,41 @@ const Map = () => {
   };
 
   const getAreaLayers = (layers) => {
-    const graphStatics = [];
-    // graphStatics.push({name: layers.features[0].properties.crop, area: +parseFloat(layers.features[0].properties.area).toFixed(1)})
+    const graphStatics = [["Task", "Hours per Day"]];
+
     layers.features.map((item, index) => {
-      if (graphStatics.find(area => area.label === item.properties.crop)) {
-        graphStatics.map(area => {
-          if (area.label === item.properties.crop) {
-            area.value = +parseFloat(area.value + +parseFloat(item.properties.area).toFixed(1)).toFixed(1)
+      if (graphStatics.find((area) => area[0] === item.properties.crop)) {
+        graphStatics.map((area) => {
+          if (area[0] === item.properties.crop) {
+            area[1] = +parseFloat(
+              area[1] + +parseFloat(item.properties.area).toFixed(1)
+            ).toFixed(1);
           }
-        })
+        });
         // graphStatics.find(area => area.name === item.properties.crop).area = +parseFloat(graphStatics.find(area => area.name === item.properties.crop).area + item.properties.area).toFixed(1);
       } else {
-        graphStatics.push({label: item.properties.crop, value: +parseFloat(item.properties.area).toFixed(1)})
+        graphStatics.push([
+          item.properties.crop,
+          +parseFloat(item.properties.area).toFixed(1),
+        ]);
       }
-    })
-    setStatistics(graphStatics)
+    });
+
+    setStatistics(graphStatics);
   };
-
-
 
   return (
     <>
-      {layer ? (
-        <Button
-          variant="contained"
-          sx={{ position: "absolute", top: "5px", zIndex: "10000" }}
-          onClick={() => {
-            console.log("delete");
-            sessionStorage.setItem("map", null);
-            setLayer(null);
-          }}
-        >
-          Удалить карты
-        </Button>
-      ) : (
-        <Button
-          sx={{ position: "absolute", top: "5px", zIndex: "10000" }}
-          component="label"
-          variant="contained"
-          startIcon={<CloudUploadIcon />}
-          onChange={handleFileSelection}
-        >
-          Загрузить файл
-          <VisuallyHiddenInput type="file" />
-        </Button>
-      )}
-
+      <Button
+        sx={{ position: "absolute", top: "5px", zIndex: "10000" }}
+        component="label"
+        variant="contained"
+        startIcon={<CloudUploadIcon />}
+        onChange={handleFileSelection}
+      >
+        Загрузить файл
+        <VisuallyHiddenInput type="file" />
+      </Button>
       <div
         style={{
           display: "flex",
@@ -183,7 +183,11 @@ const Map = () => {
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
           <ZoomControl position="topright" />
-          <Layers layer={layer} />
+          <Layers
+            layer={layer}
+            activeArea={activeArea}
+            setActiveArea={setActiveArea}
+          />
         </MapContainer>
         {layer ? (
           <Box
@@ -237,36 +241,16 @@ const Map = () => {
               }}
             >
               <Box>
-              {
-                statistics.length ?
-                <PieChart
-                  series={[
-                    {
-                      arcLabelMinAngle: 45,
-                      innerRadius: 37,
-                      outerRadius: 56,
-                      paddingAngle: 0,
-                      cornerRadius: 2,
-                      startAngle: 0,
-                      endAngle: 360,
-                      cx: 55,
-                      cy: 95,
-                      data: statistics
-                    }
-                  ]}
-                  sx={{
-                    [`& .${pieArcLabelClasses.root}`]: {
-                      fill: "white",
-                      fontWeight: "bold",
-                    },
-                  }}
-                  width={350}
-                  height={statistics.length * 35}
-                />
-                :
-                null
-              }
-                
+                {statistics ? (
+                  <Chart
+                    chartType="PieChart"
+                    width="100%"
+                    height="250px"
+                    data={statistics}
+                    options={options}
+                    style={{display: 'flex', justifyContent: 'space-between'}}
+                  />
+                ) : null}
               </Box>
               <Box>
                 <List
@@ -274,7 +258,6 @@ const Map = () => {
                     width: "100%",
                     height: "400px",
                     overflowY: "scroll",
-                    maxWidth: 360,
                     bgcolor: "background.paper",
                   }}
                 >
@@ -285,12 +268,23 @@ const Map = () => {
                         'stroke-width="50"'
                       );
                       return (
-                        <ListItem
+                        <ListItemButton
                           key={index}
                           style={{
                             width: "100%",
                             display: "flex",
                             gap: "10px",
+                            justifyContent: "space-between",
+                            "&:hover": {
+                              backgroundColor: "blue",
+                              color: "white",
+                              "& .MuiListItemIcon-root": {
+                                color: "white",
+                              },
+                            },
+                          }}
+                          onClick={() => {
+                            setActiveArea(item);
                           }}
                         >
                           {/* <div
@@ -299,16 +293,14 @@ const Map = () => {
                             dangerouslySetInnerHTML={{ __html: svgString }}
                           /> */}
                           <svg
-                            style={{ width: "150px", height: "100%" }}
+                            style={{ width: "100px", height: "100px" }}
                             dangerouslySetInnerHTML={{ __html: svgString }}
                           />
                           <Typography variant="subtitle1">
                             {item.properties.crop}
                           </Typography>
-                          <Typography>
-                            {item.properties.area.split(".")[0]} га
-                          </Typography>
-                        </ListItem>
+                          <Typography>{item.properties.area} га</Typography>
+                        </ListItemButton>
                       );
                     })
                   ) : (

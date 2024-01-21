@@ -9,7 +9,8 @@ import {
 } from "react-leaflet";
 import {Typography } from "@mui/material";
 
-const Layers = memo(({ layer }) => {
+
+const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
   const map = useMapEvents({
     // Use leaflet map event as the key and a call back with the
     // map method as the value:
@@ -21,11 +22,11 @@ const Layers = memo(({ layer }) => {
       // Get bounds once move has ended:
       console.log(map.getBounds());
     },
-    click: (e) => {
-      map.setView(e.latlng, map.getZoom(), {
-        animate: true,
-      })
-    },
+    // click: (e) => {
+    //   map.setView(e.latlng, map.getZoom(), {
+    //     animate: true,
+    //   })
+    // },
   });
 
   useEffect(() => {
@@ -33,6 +34,20 @@ const Layers = memo(({ layer }) => {
       map.setView([layer.center[1], layer.center[0]], map.getZoom());
     }
   }, [layer]);
+
+  useEffect(() => {
+    if (activeArea) {
+      map.fitBounds(
+        activeArea.geometry.coordinates[0].map((item) =>
+          item.reverse()
+        )
+      );
+      activeArea.geometry.coordinates[0].map((item) =>
+        item.reverse()
+      );
+      setActiveArea(null)
+    }
+  }, [activeArea]);
 
   const hashString = (str) => {
     var hash = 0,
@@ -87,7 +102,7 @@ const Layers = memo(({ layer }) => {
                   <GeoJSON
                     key={hashString(JSON.stringify(layer))}
                     data={item}
-                    pathOptions={{ color: getRandomColor() }}
+                    pathOptions={{ color: item.properties.crop_color }}
                     eventHandlers={{
                       click: (event, type) => {
                         map.fitBounds(
@@ -98,12 +113,12 @@ const Layers = memo(({ layer }) => {
                         item.geometry.coordinates[0].map((item) =>
                           item.reverse()
                         );
-                      },
+                      }
                     }}
                   >
                     <Tooltip sticky>
                       <Typography>{item.properties.crop.charAt(0).toUpperCase() + item.properties.crop.slice(1)}</Typography>
-                      <Typography>{item.properties.area.split('.')[0]} га</Typography>
+                      {/* <Typography>{item.properties.area.split('.')[0]} га</Typography> */}
                     </Tooltip>
                   </GeoJSON>
                 </LayerGroup>
