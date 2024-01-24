@@ -1,57 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Layers from "./Layers";
-import { MapContainer, ZoomControl, useMapEvents } from "react-leaflet";
+import { MapContainer, ZoomControl } from "react-leaflet";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
 import test2 from "../map.json";
 import { httpService } from "../../api/setup";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  ListItemButton,
-  Typography,
-} from "@mui/material";
+import { Box, Button, ListItemButton, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import { Chart } from "react-google-charts";
 
-export const data12 = [
-  ["Task", "Hours per Day"],
-  ["Work", 11],
-  ["Eat", 2],
-  ["Commute", 2],
-  ["Watch TV", 2],
-  ["Sleep", 7],
-  ["Work", 11],
-  ["Eat", 2],
-  ["Commute", 2],
-  ["Watch TV", 2],
-  ["Sleep", 7],
-  ["Work", 11],
-  ["Eat", 2],
-  ["Commute", 2],
-  ["Watch TV", 2],
-  ["Sleep", 7],
-  ["Work", 11],
-  ["Eat", 2],
-  ["Commute", 2],
-  ["Watch TV", 2],
-  ["Sleep", 7],
-];
 
-export const options = {
-  title: "Бирюли",
-  legend: { position: "right",  }, // Размещение легенды справа от диаграммы
-  chartArea: { left: 0, top: 20, width: "100%", height: "80%" }, // Управление областью рисования диаграммы
-  pieHole: 0.4,
-  is3D: false,
-};
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -69,34 +29,34 @@ const Map = () => {
   const [layer, setLayer] = useState(null);
   const [statistics, setStatistics] = useState([]);
   const [activeArea, setActiveArea] = useState(null);
+  const [colorLayers, setColorLayers] = useState([]);
 
   useEffect(() => {
     getData();
   }, []);
 
+  const options = {
+    title: "Структура посевов (га)",
+    legend: { position: "right" }, // Размещение легенды справа от диаграммы
+    chartArea: { left: 20, top: 30, width: "100%", height: "80%" }, // Управление областью рисования диаграммы
+    pieSliceText: "value",
+    pieHole: 0.4,
+    is3D: false,
+    colors: colorLayers.map(item => item.color)
+  };
+
   const getData = () => {
     httpService.get("/data/fields").then((res) => {
-      console.log(res);
       if (res.status !== 404) {
-        console.log(res.data);
         setLayer(res.data);
         getAreaLayers(res.data);
+        getColorLayers(res.data);
       }
     });
-    // if (sessionStorage.getItem("map")) {
-    //   try {
-    //     console.log(JSON.parse(sessionStorage.getItem("map")));
-    //     setLayer(JSON.parse(sessionStorage.getItem("map")));
-    //     getAreaLayers(JSON.parse(sessionStorage.getItem("map")));
-    //   } catch {
-    //     sessionStorage.setItem("map", null);
-    //   }
-    // }
   };
 
   const handleFileSelection = (event) => {
     const file = event.target.files[0]; // get file
-    console.log(file);
     const ext = getFileExtension(file);
     const reader = new FileReader();
 
@@ -106,11 +66,7 @@ const Map = () => {
     httpService.post("/data/upload_file/", formData).then((res) => {
       if (res.status === 200) {
         getData();
-        console.log(res);
       }
-      // console.log(" Эталонный файл ", test2);
-      // console.log(" Импортируемый файл ", res.data);
-      // sessionStorage.setItem("map", JSON.stringify(res.data));
     });
   };
 
@@ -130,7 +86,7 @@ const Map = () => {
   };
 
   const getAreaLayers = (layers) => {
-    const graphStatics = [["Task", "Hours per Day"]];
+    const graphStatics = [["Поле", "Площадь"]];
 
     layers.features.map((item, index) => {
       if (graphStatics.find((area) => area[0] === item.properties.crop)) {
@@ -141,7 +97,6 @@ const Map = () => {
             ).toFixed(1);
           }
         });
-        // graphStatics.find(area => area.name === item.properties.crop).area = +parseFloat(graphStatics.find(area => area.name === item.properties.crop).area + item.properties.area).toFixed(1);
       } else {
         graphStatics.push([
           item.properties.crop,
@@ -152,6 +107,22 @@ const Map = () => {
 
     setStatistics(graphStatics);
   };
+
+  const getColorLayers = (layers) => {
+    let colorsLayers = [];
+
+    layers.features.map((item, index) => {
+      if (colorsLayers.find((layer) => layer.name === item.properties.crop)) {
+      } else {
+        colorsLayers.push({
+          name: item.properties.crop,
+          color: item.properties.crop_color
+        });
+      }
+    });
+
+    setColorLayers(colorsLayers)
+  }
 
   return (
     <>
@@ -168,13 +139,99 @@ const Map = () => {
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
           width: "100%",
           position: "relative",
           height: "100%",
         }}
       >
-        <input style={{ position: "absolute" }} type="file" />
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "400px",
+            padding: "10px",
+            height: "calc(100vh - 85px)",
+            bgcolor: "background.paper",
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Typography>Список полей</Typography>
+          <Box>
+            {statistics ? (
+              <Chart
+                chartType="PieChart"
+                width="100%"
+                height="350px"
+                data={statistics}
+                options={options}
+                style={{ display: "flex", justifyContent: "space-between" }}
+              />
+            ) : null}
+          </Box>
+          <Box display={'flex'} flexDirection={'column'} overflow={'hidden'}>
+            <List
+              sx={{
+                width: "100%",
+                height: "100%",
+                overflowY: "scroll",
+                bgcolor: "background.paper",
+              }}
+            >
+              {layer ? (
+                layer.features.map((item, index) => {
+                  const svgString = item.properties.svg.replace(
+                    'stroke-width="40"',
+                    'stroke-width="30"'
+                  );
+                  console.log(item);
+                  
+                  return (
+                    <ListItemButton
+                      key={index}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        gap: "10px",
+                        height: '100px',
+                        justifyContent: "space-between",
+                        "&:hover": {
+                          backgroundColor: "blue",
+                          color: "white",
+                          "& .MuiListItemIcon-root": {
+                            color: "white",
+                          },
+                        },
+                      }}
+                      onClick={() => {
+                        setActiveArea(item);
+                      }}
+                    >
+                      <svg
+                        style={{ width: "100%", maxWidth: '70px', height: "70px" }}
+                        dangerouslySetInnerHTML={{ __html: svgString }}
+                      />
+                      <Box display={'flex'} flexDirection={'column'}>
+                      <Typography variant="body2">
+                        {item.properties.crop}
+                      </Typography>
+                      <Typography variant="body2">
+                        {item.properties.crop_group}
+                      </Typography>
+                      <Typography variant="body2">
+                        {item.properties.name}
+                      </Typography>
+                      </Box>
+                      
+                      <Typography variant="body2">{item.properties.name} га</Typography>
+                    </ListItemButton>
+                  );
+                })
+              ) : (
+                <p>Нет данных</p>
+              )}
+            </List>
+          </Box>
+        </Box>
         <MapContainer
           center={[56.66163543086128, 54.6566711425781]}
           zoom={12}
@@ -195,7 +252,7 @@ const Map = () => {
               position: "absolute",
               right: "5px",
               bottom: "20px",
-              width: "200px",
+              width: "170px",
               height: "180px",
               zIndex: "1000",
               background: "#ffffffed",
@@ -206,111 +263,36 @@ const Map = () => {
             }}
           >
             <Typography>Легенда</Typography>
-            {layer.features.map((item, key) => {
-              return (
-                <Typography variant="caption">
-                  {item.properties.crop}
-                </Typography>
-              );
-            })}
-          </Box>
-        ) : null}
-        <Box
-          sx={{
-            position: "absolute",
-            left: "0px",
-            top: "0px",
-            zIndex: "1000",
-          }}
-        >
-          <Accordion
-            sx={{
-              width: "450px",
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-            >
-              <Typography>Список полей</Typography>
-            </AccordionSummary>
-            <AccordionDetails
+            <Box
               sx={{
-                height: "100%",
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              <Box>
-                {statistics ? (
-                  <Chart
-                    chartType="PieChart"
-                    width="100%"
-                    height="250px"
-                    data={statistics}
-                    options={options}
-                    style={{display: 'flex', justifyContent: 'space-between'}}
-                  />
-                ) : null}
-              </Box>
-              <Box>
-                <List
-                  sx={{
-                    width: "100%",
-                    height: "400px",
-                    overflowY: "scroll",
-                    bgcolor: "background.paper",
-                  }}
-                >
-                  {layer ? (
-                    layer.features.map((item, index) => {
-                      const svgString = item.properties.svg.replace(
-                        'stroke-width="100"',
-                        'stroke-width="50"'
-                      );
-                      return (
-                        <ListItemButton
-                          key={index}
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            gap: "10px",
-                            justifyContent: "space-between",
-                            "&:hover": {
-                              backgroundColor: "blue",
-                              color: "white",
-                              "& .MuiListItemIcon-root": {
-                                color: "white",
-                              },
-                            },
+              {statistics &&
+                statistics.map((item, key) => {
+                  if (key > 0) {
+                    const color = colorLayers.find((layer) => layer.name === item[0])?.color ?? 'red';
+                    
+                    return (
+                      <Box alignItems={'center'} alignContent={'center'} display={'flex'} gap={'4px'}>
+                        <Box
+                          sx={{
+                            width: "10px",
+                            height: "10px",
+                            background: color,
                           }}
-                          onClick={() => {
-                            setActiveArea(item);
-                          }}
-                        >
-                          {/* <div
-                          className="svgTest"
-                            style={{ width: "100px", height: "100%" }}
-                            dangerouslySetInnerHTML={{ __html: svgString }}
-                          /> */}
-                          <svg
-                            style={{ width: "100px", height: "100px" }}
-                            dangerouslySetInnerHTML={{ __html: svgString }}
-                          />
-                          <Typography variant="subtitle1">
-                            {item.properties.crop}
-                          </Typography>
-                          <Typography>{item.properties.area} га</Typography>
-                        </ListItemButton>
-                      );
-                    })
-                  ) : (
-                    <p>Нет данных</p>
-                  )}
-                </List>
-              </Box>
-            </AccordionDetails>
-          </Accordion>
-        </Box>
+                        ></Box>
+                        <Typography align="left" variant="caption">
+                          {item[0]}
+                        </Typography>
+                      </Box>
+                    );
+                  }
+                })}
+            </Box>
+          </Box>
+        ) : null}
       </div>
     </>
   );

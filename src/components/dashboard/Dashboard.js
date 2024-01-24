@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { SignInApi } from "../../api/singIn";
 import { setUserFio } from "../../store/userDto";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
 import Logo from "../../images/logo.svg";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -31,7 +30,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ListItemText from "@mui/material/ListItemText";
 
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -90,7 +89,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [valueTabs, setValueTabs] = React.useState("menu_dashboard");
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -153,30 +152,18 @@ export default function Dashboard() {
       <Context.Provider value={{ valueTabs, setValueTabs }}>
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
-          <AppBar position="absolute" open={open}>
+          <AppBar position="absolute" open={open} sx={{boxShadow: 'none', borderBottom: '1px solid rgba(0, 0, 0, 0.12)'}}>
             <Toolbar
               sx={{
                 pr: "24px", // keep right padding when drawer closed
               }}
             >
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                sx={{
-                  marginRight: "36px",
-                  ...(open && { display: "none" }),
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
               <Typography
                 component="h1"
                 variant="h5"
                 color="inherit"
                 noWrap
-                sx={{ flexGrow: 1 }}
+                sx={{ flexGrow: 1, boxShadow: 'none'}}
                 textAlign={"left"}
               >
                 {getNameTabs()}
@@ -209,9 +196,9 @@ export default function Dashboard() {
                     px: [1],
                   }}
                 >
-                  <IconButton onClick={toggleDrawer}>
+                  {/* <IconButton onClick={toggleDrawer}>
                     <ChevronLeftIcon />
-                  </IconButton>
+                  </IconButton> */}
                 </Toolbar>
                 <Divider />
                 <List sx={{ paddingTop: "10px" }} component="nav">
@@ -293,12 +280,14 @@ export default function Dashboard() {
           >
             <Toolbar />
             <Container
+            style={{padding: '0'}}
               maxWidth="xl"
               sx={{
                 marginTop: "20px",
-                marginLeft: "71px",
-                height: "calc(100% - 68px)",
-                width:'calc(100% - 71px)'
+                marginLeft: "220px",
+                height: "calc(100% - 96px)",
+                width:'calc(100% - 240px)',
+                padding: '0'
               }}
             >
               {getPagesDashboard()}

@@ -20,7 +20,7 @@ const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
     },
     moveend: () => {
       // Get bounds once move has ended:
-      console.log(map.getBounds());
+      // console.log(map.getBounds());
     },
     // click: (e) => {
     //   map.setView(e.latlng, map.getZoom(), {
@@ -92,12 +92,12 @@ const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
           layer.features.map((item, key) => {
 
             return (
-              <LayersControl.Overlay
+              /* <LayersControl.Overlay
                 key={key}
                 checked
                 name={item.properties.crop + " - " + item.properties.name}
                 onClick={() => console.log("item.properties")}
-              >
+              > */
                 <LayerGroup>
                   <GeoJSON
                     key={hashString(JSON.stringify(layer))}
@@ -122,7 +122,7 @@ const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
                     </Tooltip>
                   </GeoJSON>
                 </LayerGroup>
-              </LayersControl.Overlay>
+              /* </LayersControl.Overlay> */
             );
           })}
       </LayersControl>
