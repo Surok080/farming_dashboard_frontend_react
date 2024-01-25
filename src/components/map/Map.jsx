@@ -1,11 +1,17 @@
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import Layers from "./Layers";
 import { MapContainer, ZoomControl } from "react-leaflet";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
 import test2 from "../map.json";
 import { httpService } from "../../api/setup";
-import { Box, Button, IconButton, ListItemButton, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  ListItemButton,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import List from "@mui/material/List";
@@ -30,13 +36,14 @@ const Map = memo(({ year }) => {
   const [statistics, setStatistics] = useState([]);
   const [activeArea, setActiveArea] = useState(null);
   const [colorLayers, setColorLayers] = useState([]);
+  const fileInputRef = useRef(null);
   const [load, setLoad] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (!load) {
       getData();
-      setLoad(true)
+      setLoad(true);
     }
   }, [year]);
 
@@ -50,20 +57,22 @@ const Map = memo(({ year }) => {
     colors: colorLayers.map((item) => item.color),
   };
 
-  const getData = useCallback(() => {
-    httpService.get(`/data/fields?year=${year}`).then((res) => {
-      if (res.status === 200) {
-        setLayer(res.data);
-        getAreaLayers(res.data);
-        getColorLayers(res.data);
-      } else {
-        resetState();
-      }
-    })
-    .finally(() => {
-      setLoad(false)
-    })
-  }, [year]);
+  const getData = () => {
+    httpService
+      .get(`/data/fields?year=${year}`)
+      .then((res) => {
+        if (res.status === 200) {
+          setLayer(res.data);
+          getAreaLayers(res.data);
+          getColorLayers(res.data);
+        } else {
+          resetState();
+        }
+      })
+      .finally(() => {
+        setLoad(false);
+      });
+  };
 
   const resetState = () => {
     setLayer(null);
@@ -73,6 +82,8 @@ const Map = memo(({ year }) => {
   };
 
   const handleFileSelection = (event) => {
+    console.log("testt");
+
     const file = event.target.files[0]; // get file
     const ext = getFileExtension(file);
     const reader = new FileReader();
@@ -98,7 +109,10 @@ const Map = memo(({ year }) => {
           variant: "error",
         });
       }
-    });
+    })
+    .finally(() => {
+      fileInputRef.current.value = null;
+    })
   };
 
   const deletArea = (id) => {
@@ -116,7 +130,7 @@ const Map = memo(({ year }) => {
         });
       }
     });
-  }
+  };
 
   const parseTextAsKml = (text) => {
     const dom = new DOMParser().parseFromString(text, "text/xml"); // create xml dom object
@@ -182,7 +196,7 @@ const Map = memo(({ year }) => {
         onChange={handleFileSelection}
       >
         Загрузить файл
-        <VisuallyHiddenInput type="file" />
+        <VisuallyHiddenInput type="file" ref={fileInputRef} />
       </Button>
       <div
         style={{
@@ -275,15 +289,15 @@ const Map = memo(({ year }) => {
                       <Typography variant="caption">
                         {item.properties.area} га
                       </Typography>
-                      <IconButton onClick={(e) => {
-                        e.stopPropagation()
-                        // e.preventDefault()
-                        deletArea(item.properties.id)
-                        
-                      }}>
-                      <DeleteForeverIcon />
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // e.preventDefault()
+                          deletArea(item.properties.id);
+                        }}
+                      >
+                        <DeleteForeverIcon />
                       </IconButton>
-
                     </ListItemButton>
                   );
                 })}
