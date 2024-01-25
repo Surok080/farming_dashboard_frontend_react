@@ -20,7 +20,7 @@ function CustomTabPanel(props) {
   );
 }
 
-const DashboardPages = () => {
+const DashboardPages = ({year}) => {
   return (
     <Grid sx={{ height: "100%", }} container spacing={3}>
       <Grid item xs={12}>
@@ -38,7 +38,7 @@ const DashboardPages = () => {
             overflow: 'hidden'
           }}
         >
-          <Map />
+          <Map year={year}/>
         </Box>
       </Grid>
     </Grid>

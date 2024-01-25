@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import Layers from "./Layers";
 import { MapContainer, ZoomControl } from "react-leaflet";
 import * as tj from "@mapbox/togeojson";
 import rewind from "@mapbox/geojson-rewind";
 import test2 from "../map.json";
 import { httpService } from "../../api/setup";
-import { Box, Button, ListItemButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, ListItemButton, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import List from "@mui/material/List";
 import { Chart } from "react-google-charts";
-
-
+import { useSnackbar } from "notistack";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -25,15 +25,20 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const Map = () => {
+const Map = memo(({ year }) => {
   const [layer, setLayer] = useState(null);
   const [statistics, setStatistics] = useState([]);
   const [activeArea, setActiveArea] = useState(null);
   const [colorLayers, setColorLayers] = useState([]);
+  const [load, setLoad] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    getData();
-  }, []);
+    if (!load) {
+      getData();
+      setLoad(true)
+    }
+  }, [year]);
 
   const options = {
     title: "Структура посевов (га)",
@@ -42,17 +47,29 @@ const Map = () => {
     pieSliceText: "value",
     pieHole: 0.4,
     is3D: false,
-    colors: colorLayers.map(item => item.color)
+    colors: colorLayers.map((item) => item.color),
   };
 
-  const getData = () => {
-    httpService.get("/data/fields").then((res) => {
-      if (res.status !== 404) {
+  const getData = useCallback(() => {
+    httpService.get(`/data/fields?year=${year}`).then((res) => {
+      if (res.status === 200) {
         setLayer(res.data);
         getAreaLayers(res.data);
         getColorLayers(res.data);
+      } else {
+        resetState();
       }
-    });
+    })
+    .finally(() => {
+      setLoad(false)
+    })
+  }, [year]);
+
+  const resetState = () => {
+    setLayer(null);
+    setStatistics([]);
+    setActiveArea(null);
+    setColorLayers([]);
   };
 
   const handleFileSelection = (event) => {
@@ -66,9 +83,40 @@ const Map = () => {
     httpService.post("/data/upload_file/", formData).then((res) => {
       if (res.status === 200) {
         getData();
+        enqueueSnackbar("Данные добавлены", {
+          autoHideDuration: 1000,
+          variant: "success",
+        });
+      } else if (res.status === 422) {
+        enqueueSnackbar("Некорректный файл", {
+          autoHideDuration: 1000,
+          variant: "error",
+        });
+      } else {
+        enqueueSnackbar("Ошибка загрузки файлов", {
+          autoHideDuration: 1000,
+          variant: "error",
+        });
       }
     });
   };
+
+  const deletArea = (id) => {
+    httpService.delete(`/data/fields/${id}`).then((res) => {
+      if (res.status === 200) {
+        getData();
+        enqueueSnackbar("Поле успешно удалено", {
+          autoHideDuration: 1000,
+          variant: "success",
+        });
+      } else {
+        enqueueSnackbar("Ошибка удаления поля", {
+          autoHideDuration: 1000,
+          variant: "error",
+        });
+      }
+    });
+  }
 
   const parseTextAsKml = (text) => {
     const dom = new DOMParser().parseFromString(text, "text/xml"); // create xml dom object
@@ -116,13 +164,13 @@ const Map = () => {
       } else {
         colorsLayers.push({
           name: item.properties.crop,
-          color: item.properties.crop_color
+          color: item.properties.crop_color,
         });
       }
     });
 
-    setColorLayers(colorsLayers)
-  }
+    setColorLayers(colorsLayers);
+  };
 
   return (
     <>
@@ -151,8 +199,8 @@ const Map = () => {
             padding: "10px",
             height: "calc(100vh - 85px)",
             bgcolor: "background.paper",
-            display: 'flex',
-            flexDirection: 'column',
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Typography>Список полей</Typography>
@@ -168,23 +216,21 @@ const Map = () => {
               />
             ) : null}
           </Box>
-          <Box display={'flex'} flexDirection={'column'} overflow={'hidden'}>
-            <List
-              sx={{
-                width: "100%",
-                height: "100%",
-                overflowY: "scroll",
-                bgcolor: "background.paper",
-              }}
-            >
-              {layer ? (
-                layer.features.map((item, index) => {
+          <Box display={"flex"} flexDirection={"column"} overflow={"hidden"}>
+            {layer ? (
+              <List
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  overflowY: "scroll",
+                  bgcolor: "background.paper",
+                }}
+              >
+                {layer.features.map((item, index) => {
                   const svgString = item.properties.svg.replace(
                     'stroke-width="40"',
                     'stroke-width="30"'
                   );
-                  console.log(item);
-                  
                   return (
                     <ListItemButton
                       key={index}
@@ -192,8 +238,8 @@ const Map = () => {
                         width: "100%",
                         display: "flex",
                         gap: "10px",
-                        height: '100px',
-                        padding: '0',
+                        height: "100px",
+                        padding: "0",
                         justifyContent: "space-between",
                         "&:hover": {
                           backgroundColor: "blue",
@@ -208,29 +254,43 @@ const Map = () => {
                       }}
                     >
                       <svg
-                        style={{ width: "100%", maxWidth: '70px', height: "70px" }}
+                        style={{
+                          width: "100%",
+                          maxWidth: "70px",
+                          height: "70px",
+                        }}
                         dangerouslySetInnerHTML={{ __html: svgString }}
                       />
-                      <Box display={'flex'} flexDirection={'column'}>
-                      <Typography variant="body2">
-                        {item.properties.crop}
-                      </Typography>
-                      <Typography variant="body2">
-                        {item.properties.crop_group}
-                      </Typography>
-                      <Typography variant="body2">
-                        {item.properties.name}
-                      </Typography>
+                      <Box display={"flex"} flexDirection={"column"}>
+                        <Typography variant="body2">
+                          {item.properties.crop}
+                        </Typography>
+                        <Typography variant="caption">
+                          {item.properties.crop_kind}
+                        </Typography>
+                        <Typography variant="caption">
+                          {item.properties.name}
+                        </Typography>
                       </Box>
-                      
-                      <Typography variant="body2">{item.properties.name} га</Typography>
+                      <Typography variant="caption">
+                        {item.properties.area} га
+                      </Typography>
+                      <IconButton onClick={(e) => {
+                        e.stopPropagation()
+                        // e.preventDefault()
+                        deletArea(item.properties.id)
+                        
+                      }}>
+                      <DeleteForeverIcon />
+                      </IconButton>
+
                     </ListItemButton>
                   );
-                })
-              ) : (
-                <p>Нет данных</p>
-              )}
-            </List>
+                })}
+              </List>
+            ) : (
+              <p>Нет данных</p>
+            )}
           </Box>
         </Box>
         <MapContainer
@@ -241,14 +301,12 @@ const Map = () => {
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
           <ZoomControl position="topright" />
-          {
-            layer && 
-            <Layers
+
+          <Layers
             layer={layer}
             activeArea={activeArea}
             setActiveArea={setActiveArea}
           />
-          }
         </MapContainer>
         {layer ? (
           <Box
@@ -276,10 +334,17 @@ const Map = () => {
               {statistics &&
                 statistics.map((item, key) => {
                   if (key > 0) {
-                    const color = colorLayers.find((layer) => layer.name === item[0])?.color ?? 'red';
-                    
+                    const color =
+                      colorLayers.find((layer) => layer.name === item[0])
+                        ?.color ?? "red";
+
                     return (
-                      <Box alignItems={'center'} alignContent={'center'} display={'flex'} gap={'4px'}>
+                      <Box
+                        alignItems={"center"}
+                        alignContent={"center"}
+                        display={"flex"}
+                        gap={"4px"}
+                      >
                         <Box
                           sx={{
                             width: "10px",
@@ -300,6 +365,6 @@ const Map = () => {
       </div>
     </>
   );
-};
+});
 
 export default Map;

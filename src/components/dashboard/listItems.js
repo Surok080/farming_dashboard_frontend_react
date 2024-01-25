@@ -14,21 +14,21 @@ export default function ListItems() {
   return (
     <>
       <ListItemButton onClick={() => setValueTabs("menu_dashboard")}>
-        <ListItemIcon>
+        <ListItemIcon sx={{minWidth: '36px'}}>
           <GridViewOutlinedIcon sx={{color: valueTabs ===  "menu_dashboard" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Обзор" />
       </ListItemButton>
 
       <ListItemButton onClick={() => setValueTabs("menu_fields")}>
-        <ListItemIcon>
+        <ListItemIcon sx={{minWidth: '36px'}}>
           <LayersOutlinedIcon sx={{color: valueTabs ===  "menu_fields" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Поля" />
       </ListItemButton>
 
       <ListItemButton onClick={() => setValueTabs("menu_gos")}>
-        <ListItemIcon>
+        <ListItemIcon sx={{minWidth: '36px'}}>
           <DashboardOutlinedIcon sx={{color: valueTabs ===  "menu_gos" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Госмониторинг" />
@@ -42,7 +42,7 @@ export default function ListItems() {
       </ListItemButton> */}
 
       <ListItemButton onClick={() => setValueTabs("menu_settings")}>
-        <ListItemIcon>
+        <ListItemIcon sx={{minWidth: '36px'}}>
           <SettingsOutlinedIcon sx={{color: valueTabs ===  "menu_settings" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Настройки" />

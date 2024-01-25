@@ -24,13 +24,13 @@ import Logo from "../../images/logo.svg";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import ListItemText from "@mui/material/ListItemText";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
-
-const drawerWidth = 200;
+const drawerWidth = 180;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -88,9 +88,10 @@ export default function Dashboard() {
   const user = useSelector((state) => state.user.fio);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [valueTabs, setValueTabs] = React.useState("menu_dashboard");
+  const [valueTabs, setValueTabs] = React.useState("menu_fields");
   const [open, setOpen] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
+  const [year, setYear] = React.useState(2023);
 
   React.useEffect(() => {
     try {
@@ -135,13 +136,17 @@ export default function Dashboard() {
         return <FieldsPages />;
         break;
       case "menu_fields":
-        return <DashboardPages />;
+        return <DashboardPages year={year} />;
         break;
 
       default:
         break;
     }
   }
+
+  const handleChangeYear = (e) => {
+    setYear(e.target.value);
+  };
 
   if (loading) {
     return <>loading</>;
@@ -152,7 +157,14 @@ export default function Dashboard() {
       <Context.Provider value={{ valueTabs, setValueTabs }}>
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
-          <AppBar position="absolute" open={open} sx={{boxShadow: 'none', borderBottom: '1px solid rgba(0, 0, 0, 0.12)'}}>
+          <AppBar
+            position="absolute"
+            open={open}
+            sx={{
+              boxShadow: "none",
+              borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+            }}
+          >
             <Toolbar
               sx={{
                 pr: "24px", // keep right padding when drawer closed
@@ -163,17 +175,44 @@ export default function Dashboard() {
                 variant="h5"
                 color="inherit"
                 noWrap
-                sx={{ flexGrow: 1, boxShadow: 'none'}}
+                sx={{ flexGrow: 1, boxShadow: "none" }}
                 textAlign={"left"}
               >
                 {getNameTabs()}
               </Typography>
+              <Box sx={{ minWidth: 120, marginRight: "20px" }}>
+                <FormControl fullWidth>
+                  <InputLabel id="select-label">Год</InputLabel>
+                  <Select
+                    size="small"
+                    labelId="select-label"
+                    id="simple-select"
+                    value={year}
+                    label="year"
+                    onChange={handleChangeYear}
+                  >
+                    <MenuItem value={2024}>2024</MenuItem>
+                    <MenuItem value={2023}>2023</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
               {user ?? ""}
             </Toolbar>
           </AppBar>
           <Drawer
-            sx={{ position: "absolute", height: "100%" }}
+            sx={{
+              position: "absolute",
+              height: "100%",
+              "& .MuiPaper-root": {
+                width: 180,
+              },
+            }}
             variant="permanent"
+            PaperProps={{
+              sx: {
+                width: "180",
+              },
+            }}
             open={open}
           >
             <Box
@@ -184,7 +223,7 @@ export default function Dashboard() {
                 height: "100%",
                 paddingBottom: "50px",
                 background: "#F0F0F0",
-                overflow: 'hidden'
+                overflow: "hidden",
               }}
             >
               <Box>
@@ -239,27 +278,27 @@ export default function Dashboard() {
                 Выход
               </Button> */}
               <Box>
-                <ListItemButton onClick={() => console.log('Вопрос')}>
-                  <ListItemIcon>
+                <ListItemButton onClick={() => console.log("Вопрос")}>
+                  <ListItemIcon sx={{ minWidth: "36px" }}>
                     <HelpOutlineOutlinedIcon />
                   </ListItemIcon>
                   <ListItemText primary="Вопросы" />
                 </ListItemButton>
-                <ListItemButton onClick={() => console.log('Пользователи')}>
-                  <ListItemIcon>
+                <ListItemButton onClick={() => console.log("Пользователи")}>
+                  <ListItemIcon sx={{ minWidth: "36px" }}>
                     <PersonOutlineOutlinedIcon />
                   </ListItemIcon>
                   <ListItemText primary="Пользователи" />
                 </ListItemButton>
-                <ListItemButton onClick={() => console.log('Уведомления')}>
-                  <ListItemIcon>
+                <ListItemButton onClick={() => console.log("Уведомления")}>
+                  <ListItemIcon sx={{ minWidth: "36px" }}>
                     <NotificationsOutlinedIcon />
                   </ListItemIcon>
                   <ListItemText primary="Уведомления" />
                 </ListItemButton>
-                <ListItemButton onClick={() => console.log('Выход')}>
-                  <ListItemIcon>
-                    <LogoutOutlinedIcon/>
+                <ListItemButton onClick={() => console.log("Выход")}>
+                  <ListItemIcon sx={{ minWidth: "36px" }}>
+                    <LogoutOutlinedIcon />
                   </ListItemIcon>
                   <ListItemText primary="Выход" />
                 </ListItemButton>
@@ -280,14 +319,14 @@ export default function Dashboard() {
           >
             <Toolbar />
             <Container
-            style={{padding: '0'}}
+              style={{ padding: "0" }}
               maxWidth="xl"
               sx={{
                 marginTop: "20px",
-                marginLeft: "220px",
+                marginLeft: "200px",
                 height: "calc(100% - 96px)",
-                width:'calc(100% - 240px)',
-                padding: '0'
+                width: "calc(100% - 220px)",
+                padding: "0",
               }}
             >
               {getPagesDashboard()}
