@@ -157,7 +157,7 @@ const Map = () => {
         >
           <Typography>Список полей</Typography>
           <Box>
-            {statistics ? (
+            {statistics.length ? (
               <Chart
                 chartType="PieChart"
                 width="100%"
@@ -193,6 +193,7 @@ const Map = () => {
                         display: "flex",
                         gap: "10px",
                         height: '100px',
+                        padding: '0',
                         justifyContent: "space-between",
                         "&:hover": {
                           backgroundColor: "blue",
@@ -240,11 +241,14 @@ const Map = () => {
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
           <ZoomControl position="topright" />
-          <Layers
+          {
+            layer && 
+            <Layers
             layer={layer}
             activeArea={activeArea}
             setActiveArea={setActiveArea}
           />
+          }
         </MapContainer>
         {layer ? (
           <Box
