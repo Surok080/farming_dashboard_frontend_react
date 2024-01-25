@@ -296,7 +296,10 @@ export default function Dashboard() {
                   </ListItemIcon>
                   <ListItemText primary="Уведомления" />
                 </ListItemButton>
-                <ListItemButton onClick={() => console.log("Выход")}>
+                <ListItemButton onClick={() => {
+                  localStorage.removeItem('access_token')
+                  navigate("/");
+                }}>
                   <ListItemIcon sx={{ minWidth: "36px" }}>
                     <LogoutOutlinedIcon />
                   </ListItemIcon>
