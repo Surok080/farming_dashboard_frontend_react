@@ -79,7 +79,7 @@ const Drawer = styled(MuiDrawer, {
 const defaultTheme = createTheme({
   palette: {
     primary: {
-      main: "#F0F0F0",
+      main: "#82F865",
     },
   },
 });
@@ -163,6 +163,7 @@ export default function Dashboard() {
             sx={{
               boxShadow: "none",
               borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+              background: '#f0f0f0'
             }}
           >
             <Toolbar

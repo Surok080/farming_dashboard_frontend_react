@@ -10,6 +10,7 @@ import {
   Button,
   IconButton,
   ListItemButton,
+  Tab,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -18,6 +19,7 @@ import List from "@mui/material/List";
 import { Chart } from "react-google-charts";
 import { useSnackbar } from "notistack";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -39,6 +41,11 @@ const Map = memo(({ year }) => {
   const fileInputRef = useRef(null);
   const [load, setLoad] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const [value, setValue] = React.useState('1');
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   useEffect(() => {
     if (!load) {
@@ -49,8 +56,10 @@ const Map = memo(({ year }) => {
 
   const options = {
     title: "Структура посевов (га)",
-    legend: { position: "right" }, // Размещение легенды справа от диаграммы
-    chartArea: { left: 20, top: 30, width: "100%", height: "80%" }, // Управление областью рисования диаграммы
+    legend: {            position: 'bottom', 
+    alignment: 'center' ,
+    orientation: 'vertical', }, // Размещение легенды 
+    chartArea: { left: 20, top: 100, width: "100%", height: "50%" }, // Управление областью рисования диаграммы
     pieSliceText: "value",
     pieHole: 0.4,
     is3D: false,
@@ -217,20 +226,30 @@ const Map = memo(({ year }) => {
             flexDirection: "column",
           }}
         >
-          <Typography>Список полей</Typography>
-          <Box>
+          <Box sx={{ width: '100%', typography: 'body1' }}>
+      <TabContext value={value}>
+        {/* <Box sx={{ borderBottom: 1, borderColor: 'red' }}> */}
+          <TabList centered textColor="primary" onChange={handleChange} aria-label="lab API tabs example">
+            <Tab label="Поля" value="1" />
+            <Tab label="Структура" value="2" />
+            <Tab label="Отчет" value="3" />
+          </TabList>
+        {/* </Box> */}
+        <TabPanel value="1">
+        <Box>
             {statistics.length ? (
               <Chart
                 chartType="PieChart"
                 width="100%"
-                height="350px"
+                height="650px"
                 data={statistics}
                 options={options}
-                style={{ display: "flex", justifyContent: "space-between" }}
+                // style={{ display: "flex", justifyContent: "space-between" }}
               />
             ) : null}
           </Box>
-          <Box display={"flex"} flexDirection={"column"} overflow={"hidden"}>
+        </TabPanel>
+        <TabPanel value="2"><Box display={"flex"} flexDirection={"column"} overflow={"hidden"}>
             {layer ? (
               <List
                 sx={{
@@ -305,7 +324,12 @@ const Map = memo(({ year }) => {
             ) : (
               <p>Нет данных</p>
             )}
-          </Box>
+          </Box></TabPanel>
+        <TabPanel value="3">Отчет скоро появится</TabPanel>
+      </TabContext>
+    </Box>
+          
+          
         </Box>
         <MapContainer
           center={[56.66163543086128, 54.6566711425781]}
