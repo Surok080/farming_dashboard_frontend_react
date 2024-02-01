@@ -57,7 +57,7 @@ const Map = memo(({ year }) => {
   const options = {
     title: "Структура посевов (га)",
     legend: {
-      position: "bottom",
+      position: "right",
       alignment: "center",
       orientation: "vertical",
     }, // Размещение легенды
