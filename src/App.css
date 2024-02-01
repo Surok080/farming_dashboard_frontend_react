@@ -50,3 +50,7 @@
 .svgTest svg {
   width: 100%;
 }
+
+#patch_1 path {
+  fill: transparent
+}
