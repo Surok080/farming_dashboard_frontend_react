@@ -270,7 +270,7 @@ const Map = memo(({ year }) => {
                       sx={{
                         width: "100%",
                         height: "100%",
-                        overflowY: "scroll",
+
                         bgcolor: "background.paper",
                       }}
                     >
