@@ -52,5 +52,5 @@
 }
 
 #patch_1 path {
-  fill: transparent
+  fill: transparent !important;
 }
