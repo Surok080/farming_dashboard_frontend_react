@@ -41,7 +41,7 @@ const Map = memo(({ year }) => {
   const fileInputRef = useRef(null);
   const [load, setLoad] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const [value, setValue] = React.useState('1');
+  const [value, setValue] = React.useState("1");
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -56,9 +56,11 @@ const Map = memo(({ year }) => {
 
   const options = {
     title: "Структура посевов (га)",
-    legend: {            position: 'bottom', 
-    alignment: 'center' ,
-    orientation: 'vertical', }, // Размещение легенды 
+    legend: {
+      position: "bottom",
+      alignment: "center",
+      orientation: "vertical",
+    }, // Размещение легенды
     chartArea: { left: 20, top: 100, width: "100%", height: "50%" }, // Управление областью рисования диаграммы
     pieSliceText: "value",
     pieHole: 0.4,
@@ -100,28 +102,30 @@ const Map = memo(({ year }) => {
     let formData = new FormData();
     formData.append("file", file);
 
-    httpService.post("/data/upload_file/", formData).then((res) => {
-      if (res.status === 200) {
-        getData();
-        enqueueSnackbar("Данные добавлены", {
-          autoHideDuration: 1000,
-          variant: "success",
-        });
-      } else if (res.status === 422) {
-        enqueueSnackbar("Некорректный файл", {
-          autoHideDuration: 1000,
-          variant: "error",
-        });
-      } else {
-        enqueueSnackbar("Ошибка загрузки файлов", {
-          autoHideDuration: 1000,
-          variant: "error",
-        });
-      }
-    })
-    .finally(() => {
-      fileInputRef.current.value = null;
-    })
+    httpService
+      .post("/data/upload_file/", formData)
+      .then((res) => {
+        if (res.status === 200) {
+          getData();
+          enqueueSnackbar("Данные добавлены", {
+            autoHideDuration: 1000,
+            variant: "success",
+          });
+        } else if (res.status === 422) {
+          enqueueSnackbar("Некорректный файл", {
+            autoHideDuration: 1000,
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar("Ошибка загрузки файлов", {
+            autoHideDuration: 1000,
+            variant: "error",
+          });
+        }
+      })
+      .finally(() => {
+        fileInputRef.current.value = null;
+      });
   };
 
   const deletArea = (id) => {
@@ -220,116 +224,140 @@ const Map = memo(({ year }) => {
             width: "100%",
             maxWidth: "400px",
             padding: "10px",
-            height: "calc(100vh - 85px)",
+            height: "auto",
             bgcolor: "background.paper",
             display: "flex",
             flexDirection: "column",
           }}
         >
-          <Box sx={{ width: '100%', typography: 'body1' }}>
-      <TabContext value={value}>
-        {/* <Box sx={{ borderBottom: 1, borderColor: 'red' }}> */}
-          <TabList centered textColor="primary" onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Поля" value="1" />
-            <Tab label="Структура" value="2" />
-            <Tab label="Отчет" value="3" />
-          </TabList>
-        {/* </Box> */}
-        <TabPanel value="1">
-        <Box>
-            {statistics.length ? (
-              <Chart
-                chartType="PieChart"
-                width="100%"
-                height="650px"
-                data={statistics}
-                options={options}
-                // style={{ display: "flex", justifyContent: "space-between" }}
-              />
-            ) : null}
-          </Box>
-        </TabPanel>
-        <TabPanel value="2"><Box display={"flex"} flexDirection={"column"} overflow={"hidden"}>
-            {layer ? (
-              <List
+          <Box
+            sx={{
+              width: "100%",
+              typography: "body1",
+              height: "100%",
+              overflow: "hidden",
+            }}
+          >
+            <TabContext value={value}>
+              {/* <Box sx={{ borderBottom: 1, borderColor: 'red' }}> */}
+              <TabList
+                centered
+                textColor="primary"
+                onChange={handleChange}
+                aria-label="lab API tabs example"
+              >
+                <Tab label="Поля" value="1" />
+                <Tab label="Структура" value="2" />
+                <Tab label="Отчет" value="3" />
+              </TabList>
+              {/* </Box> */}
+              <TabPanel
                 sx={{
-                  width: "100%",
                   height: "100%",
                   overflowY: "scroll",
-                  bgcolor: "background.paper",
+                  maxHeight: "100%",
+                  paddingBottom: "50px",
                 }}
+                value="1"
               >
-                {layer.features.map((item, index) => {
-                  const svgString = item.properties.svg.replace(
-                    'stroke-width="40"',
-                    'stroke-width="30"'
-                  );
-                  return (
-                    <ListItemButton
-                      key={index}
-                      style={{
+                <Box
+                  display={"flex"}
+                  flexDirection={"column"}
+                  overflow={"hidden"}
+                >
+                  {layer ? (
+                    <List
+                      sx={{
                         width: "100%",
-                        display: "flex",
-                        gap: "10px",
-                        height: "100px",
-                        padding: "0",
-                        justifyContent: "space-between",
-                        "&:hover": {
-                          backgroundColor: "blue",
-                          color: "white",
-                          "& .MuiListItemIcon-root": {
-                            color: "white",
-                          },
-                        },
-                      }}
-                      onClick={() => {
-                        setActiveArea(item);
+                        height: "100%",
+                        overflowY: "scroll",
+                        bgcolor: "background.paper",
                       }}
                     >
-                      <svg
-                        style={{
-                          width: "100%",
-                          maxWidth: "70px",
-                          height: "70px",
-                        }}
-                        dangerouslySetInnerHTML={{ __html: svgString }}
-                      />
-                      <Box display={"flex"} flexDirection={"column"}>
-                        <Typography variant="body2">
-                          {item.properties.crop}
-                        </Typography>
-                        <Typography variant="caption">
-                          {item.properties.crop_kind}
-                        </Typography>
-                        <Typography variant="caption">
-                          {item.properties.name}
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption">
-                        {item.properties.area} га
-                      </Typography>
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // e.preventDefault()
-                          deletArea(item.properties.id);
-                        }}
-                      >
-                        <DeleteForeverIcon />
-                      </IconButton>
-                    </ListItemButton>
-                  );
-                })}
-              </List>
-            ) : (
-              <p>Нет данных</p>
-            )}
-          </Box></TabPanel>
-        <TabPanel value="3">Отчет скоро появится</TabPanel>
-      </TabContext>
-    </Box>
-          
-          
+                      {layer.features.map((item, index) => {
+                        const svgString = item.properties.svg.replace(
+                          'stroke-width="40"',
+                          'stroke-width="30"'
+                        );
+                        return (
+                          <ListItemButton
+                            key={index}
+                            style={{
+                              width: "100%",
+                              display: "flex",
+                              gap: "10px",
+                              height: "100px",
+                              padding: "0",
+                              justifyContent: "space-between",
+                              "&:hover": {
+                                backgroundColor: "blue",
+                                color: "white",
+                                "& .MuiListItemIcon-root": {
+                                  color: "white",
+                                },
+                              },
+                            }}
+                            onClick={() => {
+                              setActiveArea(item);
+                            }}
+                          >
+                            <svg
+                              style={{
+                                width: "100%",
+                                maxWidth: "70px",
+                                height: "70px",
+                              }}
+                              dangerouslySetInnerHTML={{ __html: svgString }}
+                            />
+                            <Box display={"flex"} flexDirection={"column"}>
+                              <Typography variant="body2">
+                                {item.properties.crop}
+                              </Typography>
+                              <Typography variant="caption">
+                                {item.properties.crop_kind}
+                              </Typography>
+                              <Typography variant="caption">
+                                {item.properties.name}
+                              </Typography>
+                            </Box>
+                            <Typography variant="caption">
+                              {item.properties.area} га
+                            </Typography>
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // e.preventDefault()
+                                deletArea(item.properties.id);
+                              }}
+                            >
+                              <DeleteForeverIcon />
+                            </IconButton>
+                          </ListItemButton>
+                        );
+                      })}
+                    </List>
+                  ) : (
+                    <p>Нет данных</p>
+                  )}
+                </Box>
+              </TabPanel>
+              <TabPanel value="2">
+                <Box>
+                  {statistics.length ? (
+                    <Chart
+                      chartType="PieChart"
+                      width="100%"
+                      height="650px"
+                      data={statistics}
+                      options={options}
+                      // style={{ display: "flex", justifyContent: "space-between" }}
+                    />
+                  ) : null}
+                </Box>
+              </TabPanel>
+              <TabPanel value="3">Отчет скоро появится</TabPanel>
+            </TabContext>
+          </Box>
         </Box>
         <MapContainer
           center={[56.66163543086128, 54.6566711425781]}

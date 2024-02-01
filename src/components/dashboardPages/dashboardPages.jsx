@@ -23,7 +23,7 @@ function CustomTabPanel(props) {
 const DashboardPages = ({year}) => {
   return (
     <Grid sx={{ height: "100%", }} container spacing={3}>
-      <Grid item xs={12}>
+      <Grid height={'100%'} item xs={12}>
         <Box
           sx={{
             display: "flex",
