@@ -163,7 +163,7 @@ export default function Dashboard() {
             sx={{
               boxShadow: "none",
               borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-              background: '#f0f0f0'
+              background: "#f0f0f0",
             }}
           >
             <Toolbar
@@ -297,10 +297,12 @@ export default function Dashboard() {
                   </ListItemIcon>
                   <ListItemText primary="Уведомления" />
                 </ListItemButton>
-                <ListItemButton onClick={() => {
-                  localStorage.removeItem('access_token')
-                  navigate("/");
-                }}>
+                <ListItemButton
+                  onClick={() => {
+                    localStorage.removeItem("access_token");
+                    navigate("/");
+                  }}
+                >
                   <ListItemIcon sx={{ minWidth: "36px" }}>
                     <LogoutOutlinedIcon />
                   </ListItemIcon>
@@ -323,9 +325,10 @@ export default function Dashboard() {
           >
             <Toolbar />
             <Container
+              maxWidth={false}
               style={{ padding: "0" }}
-              maxWidth="xl"
               sx={{
+                maxWidth: "100%",
                 marginTop: "20px",
                 marginLeft: "200px",
                 height: "calc(100% - 96px)",

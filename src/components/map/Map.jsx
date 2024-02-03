@@ -456,7 +456,7 @@ const Map = memo(({ year }) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Вы уверны что хотите удалить это поле?"}
+          {"Вы уверены что хотите удалить это поле?"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
