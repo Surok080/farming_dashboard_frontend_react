@@ -8,6 +8,11 @@ import { httpService } from "../../api/setup";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   ListItemButton,
   Tab,
@@ -37,11 +42,21 @@ const Map = memo(({ year }) => {
   const [layer, setLayer] = useState(null);
   const [statistics, setStatistics] = useState([]);
   const [activeArea, setActiveArea] = useState(null);
+  const [deleteIdArea, setDeleteIdArea] = useState(null);
   const [colorLayers, setColorLayers] = useState([]);
   const fileInputRef = useRef(null);
   const [load, setLoad] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [value, setValue] = React.useState("1");
+  const [openConfirmDelete, setOpenConfirmDelete] = React.useState(false);
+
+  const handleOpenConfirmDelete = () => {
+    setOpenConfirmDelete(true);
+  };
+
+  const handleCloseConfirmDelete = () => {
+    setOpenConfirmDelete(false);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -128,30 +143,34 @@ const Map = memo(({ year }) => {
       });
   };
 
-  const deletArea = (id) => {
-    httpService.delete(`/data/fields/${id}`).then((res) => {
-      if (res.status === 200) {
-        getData();
-        enqueueSnackbar("Поле успешно удалено", {
-          autoHideDuration: 1000,
-          variant: "success",
+  const deletArea = () => {
+    if (deleteIdArea) {
+      httpService
+        .delete(`/data/fields/${deleteIdArea}`)
+        .then((res) => {
+          if (res.status === 200) {
+            getData();
+            enqueueSnackbar("Поле успешно удалено", {
+              autoHideDuration: 1000,
+              variant: "success",
+            });
+          } else {
+            enqueueSnackbar("Ошибка удаления поля", {
+              autoHideDuration: 1000,
+              variant: "error",
+            });
+          }
+        })
+        .catch((e) => {
+          enqueueSnackbar("Ошибка удаления поля", {
+            autoHideDuration: 1000,
+            variant: "error",
+          });
+        })
+        .finally(() => {
+          handleCloseConfirmDelete();
         });
-      } else {
-        enqueueSnackbar("Ошибка удаления поля", {
-          autoHideDuration: 1000,
-          variant: "error",
-        });
-      }
-    });
-  };
-
-  const parseTextAsKml = (text) => {
-    const dom = new DOMParser().parseFromString(text, "text/xml"); // create xml dom object
-    const converted = tj.kml(dom); // convert xml dom to geojson
-    rewind(converted, false); // correct right hand rule
-    console.log(converted, " converted");
-    console.log(test2);
-    setLayer(converted); // save converted geojson to hook state
+    }
   };
 
   const getFileExtension = (file) => {
@@ -327,7 +346,8 @@ const Map = memo(({ year }) => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 // e.preventDefault()
-                                deletArea(item.properties.id);
+                                setDeleteIdArea(item.properties.id);
+                                handleOpenConfirmDelete();
                               }}
                             >
                               <DeleteForeverIcon />
@@ -429,6 +449,33 @@ const Map = memo(({ year }) => {
           </Box>
         ) : null}
       </div>
+      <Dialog
+        open={openConfirmDelete}
+        onClose={handleCloseConfirmDelete}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Вы уверны что хотите удалить это поле?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Поле удалится безвозвратно, вы уверены что хотите это сделать?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleCloseConfirmDelete}
+          >
+            Отмена
+          </Button>
+          <Button variant="contained" onClick={deletArea} autoFocus>
+            Подтвердить
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 });
