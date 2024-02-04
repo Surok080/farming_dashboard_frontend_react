@@ -1,30 +1,16 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import Layers from "./Layers";
 import { MapContainer, ZoomControl } from "react-leaflet";
-import * as tj from "@mapbox/togeojson";
-import rewind from "@mapbox/geojson-rewind";
-import test2 from "../map.json";
 import { httpService } from "../../api/setup";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  ListItemButton,
-  Tab,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Tab, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import List from "@mui/material/List";
 import { Chart } from "react-google-charts";
 import { useSnackbar } from "notistack";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
+import ListArea from "./ListArea";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { getAreaLayers, getOptionChart } from "../../utils/mapUtils";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -49,6 +35,13 @@ const Map = memo(({ year }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = React.useState(false);
+  
+  useEffect(() => {
+    if (!load) {
+      getData();
+      setLoad(true);
+    }
+  }, [year]);
 
   const handleOpenConfirmDelete = () => {
     setOpenConfirmDelete(true);
@@ -62,34 +55,13 @@ const Map = memo(({ year }) => {
     setValue(newValue);
   };
 
-  useEffect(() => {
-    if (!load) {
-      getData();
-      setLoad(true);
-    }
-  }, [year]);
-
-  const options = {
-    title: "Структура посевов (га)",
-    legend: {
-      position: "right",
-      alignment: "center",
-      orientation: "vertical",
-    }, // Размещение легенды
-    chartArea: { left: 20, top: 100, width: "100%", height: "50%" }, // Управление областью рисования диаграммы
-    pieSliceText: "value",
-    pieHole: 0.4,
-    is3D: false,
-    colors: colorLayers.map((item) => item.color),
-  };
-
   const getData = () => {
     httpService
       .get(`/data/fields?year=${year}`)
       .then((res) => {
         if (res.status === 200) {
           setLayer(res.data);
-          getAreaLayers(res.data);
+          getAreaLayers(res.data, setStatistics);
           getColorLayers(res.data);
         } else {
           resetState();
@@ -108,11 +80,7 @@ const Map = memo(({ year }) => {
   };
 
   const handleFileSelection = (event) => {
-    console.log("testt");
-
     const file = event.target.files[0]; // get file
-    const ext = getFileExtension(file);
-    const reader = new FileReader();
 
     let formData = new FormData();
     formData.append("file", file);
@@ -171,35 +139,6 @@ const Map = memo(({ year }) => {
           handleCloseConfirmDelete();
         });
     }
-  };
-
-  const getFileExtension = (file) => {
-    const name = file.name;
-    const lastDot = name.lastIndexOf(".");
-    return name.substring(lastDot + 1);
-  };
-
-  const getAreaLayers = (layers) => {
-    const graphStatics = [["Поле", "Площадь"]];
-
-    layers.features.map((item, index) => {
-      if (graphStatics.find((area) => area[0] === item.properties.crop)) {
-        graphStatics.map((area) => {
-          if (area[0] === item.properties.crop) {
-            area[1] = +parseFloat(
-              area[1] + +parseFloat(item.properties.area).toFixed(1)
-            ).toFixed(1);
-          }
-        });
-      } else {
-        graphStatics.push([
-          item.properties.crop,
-          +parseFloat(item.properties.area).toFixed(1),
-        ]);
-      }
-    });
-
-    setStatistics(graphStatics);
   };
 
   const getColorLayers = (layers) => {
@@ -285,77 +224,12 @@ const Map = memo(({ year }) => {
                   overflow={"hidden"}
                 >
                   {layer ? (
-                    <List
-                      sx={{
-                        width: "100%",
-                        height: "100%",
-
-                        bgcolor: "background.paper",
-                      }}
-                    >
-                      {layer.features.map((item, index) => {
-                        const svgString = item.properties.svg.replace(
-                          'stroke-width="40"',
-                          'stroke-width="30"'
-                        );
-                        return (
-                          <ListItemButton
-                            key={index}
-                            style={{
-                              width: "100%",
-                              display: "flex",
-                              gap: "10px",
-                              height: "100px",
-                              padding: "0",
-                              justifyContent: "space-between",
-                              "&:hover": {
-                                backgroundColor: "blue",
-                                color: "white",
-                                "& .MuiListItemIcon-root": {
-                                  color: "white",
-                                },
-                              },
-                            }}
-                            onClick={() => {
-                              setActiveArea(item);
-                            }}
-                          >
-                            <svg
-                              style={{
-                                width: "100%",
-                                maxWidth: "70px",
-                                height: "70px",
-                              }}
-                              dangerouslySetInnerHTML={{ __html: svgString }}
-                            />
-                            <Box display={"flex"} flexDirection={"column"}>
-                              <Typography variant="body2">
-                                {item.properties.crop}
-                              </Typography>
-                              <Typography variant="caption">
-                                {item.properties.crop_kind}
-                              </Typography>
-                              <Typography variant="caption">
-                                {item.properties.name}
-                              </Typography>
-                            </Box>
-                            <Typography variant="caption">
-                              {item.properties.area} га
-                            </Typography>
-                            <IconButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // e.preventDefault()
-                                setDeleteIdArea(item.properties.id);
-                                handleOpenConfirmDelete();
-                              }}
-                            >
-                              <DeleteForeverIcon />
-                            </IconButton>
-                          </ListItemButton>
-                        );
-                      })}
-                    </List>
+                    <ListArea
+                      layer={layer}
+                      setActiveArea={setActiveArea}
+                      setDeleteIdArea={setDeleteIdArea}
+                      handleOpenConfirmDelete={handleOpenConfirmDelete}
+                    />
                   ) : (
                     <p>Нет данных</p>
                   )}
@@ -369,7 +243,7 @@ const Map = memo(({ year }) => {
                       width="100%"
                       height="650px"
                       data={statistics}
-                      options={options}
+                      options={getOptionChart(colorLayers)}
                       // style={{ display: "flex", justifyContent: "space-between" }}
                     />
                   ) : null}
@@ -449,33 +323,11 @@ const Map = memo(({ year }) => {
           </Box>
         ) : null}
       </div>
-      <Dialog
-        open={openConfirmDelete}
-        onClose={handleCloseConfirmDelete}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Вы уверены что хотите удалить это поле?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Поле удалится безвозвратно, вы уверены что хотите это сделать?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={handleCloseConfirmDelete}
-          >
-            Отмена
-          </Button>
-          <Button variant="contained" onClick={deletArea} autoFocus>
-            Подтвердить
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDeleteModal
+        deletArea={deletArea}
+        handleCloseConfirmDelete={handleCloseConfirmDelete}
+        openConfirmDelete={openConfirmDelete}
+      />
     </>
   );
 });

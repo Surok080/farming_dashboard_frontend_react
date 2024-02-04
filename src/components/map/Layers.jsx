@@ -7,10 +7,9 @@ import {
   LayerGroup,
   Tooltip,
 } from "react-leaflet";
-import {Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 
-
-const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
+const Layers = memo(({ layer, activeArea, setActiveArea }) => {
   const map = useMapEvents({
     // Use leaflet map event as the key and a call back with the
     // map method as the value:
@@ -38,14 +37,10 @@ const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
   useEffect(() => {
     if (activeArea) {
       map.fitBounds(
-        activeArea.geometry.coordinates[0].map((item) =>
-          item.reverse()
-        )
+        activeArea.geometry.coordinates[0].map((item) => item.reverse())
       );
-      activeArea.geometry.coordinates[0].map((item) =>
-        item.reverse()
-      );
-      setActiveArea(null)
+      activeArea.geometry.coordinates[0].map((item) => item.reverse());
+      setActiveArea(null);
     }
   }, [activeArea]);
 
@@ -58,18 +53,9 @@ const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
       hash = (hash << 5) - hash + chr;
       hash |= 0; // Convert to 32bit integer
     }
-    // console.log(hash);
     return hash;
   };
 
-  function getRandomColor() {
-    var letters = "0123456789ABCDEF";
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
 
   return (
     <>
@@ -77,7 +63,7 @@ const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
         <LayersControl.BaseLayer name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
             ext="png"
           />
         </LayersControl.BaseLayer>
@@ -90,39 +76,34 @@ const Layers = memo(({ layer, activeArea,  setActiveArea}) => {
 
         {layer &&
           layer.features.map((item, key) => {
-
             return (
-              /* <LayersControl.Overlay
-                key={key}
-                checked
-                name={item.properties.crop + " - " + item.properties.name}
-                onClick={() => console.log("item.properties")}
-              > */
-                <LayerGroup>
-                  <GeoJSON
-                    key={hashString(JSON.stringify(layer))}
-                    data={item}
-                    pathOptions={{ color: item.properties.crop_color }}
-                    eventHandlers={{
-                      click: (event, type) => {
-                        map.fitBounds(
-                          item.geometry.coordinates[0].map((item) =>
-                            item.reverse()
-                          )
-                        );
+              <LayerGroup>
+                <GeoJSON
+                  key={hashString(JSON.stringify(layer))}
+                  data={item}
+                  pathOptions={{ color: item.properties.crop_color }}
+                  eventHandlers={{
+                    click: (event, type) => {
+                      map.fitBounds(
                         item.geometry.coordinates[0].map((item) =>
                           item.reverse()
-                        );
-                      }
-                    }}
-                  >
-                    <Tooltip sticky>
-                      <Typography>{item.properties.crop.charAt(0).toUpperCase() + item.properties.crop.slice(1)}</Typography>
-                      <Typography>{item.properties.area} га</Typography>
-                    </Tooltip>
-                  </GeoJSON>
-                </LayerGroup>
-              /* </LayersControl.Overlay> */
+                        )
+                      );
+                      item.geometry.coordinates[0].map((item) =>
+                        item.reverse()
+                      );
+                    },
+                  }}
+                >
+                  <Tooltip sticky>
+                    <Typography>
+                      {item.properties.crop.charAt(0).toUpperCase() +
+                        item.properties.crop.slice(1)}
+                    </Typography>
+                    <Typography>{item.properties.area} га</Typography>
+                  </Tooltip>
+                </GeoJSON>
+              </LayerGroup>
             );
           })}
       </LayersControl>
