@@ -19,9 +19,8 @@ jobs:
         port: ${{ secrets.PORT }}
         script: | 
           cd farming_dashboard_frontend_react && \
-	        git pull origin master && \
-	        yarn && \
-	        yarn build && \
-	        sudo scp -r build/* /var/www/html/dashboard/ && \
-	        sudo rm -R build && \
-	        sudo rm -R node_modules
+          git pull origin master && \
+          yarn && \
+          yarn build && \
+          sudo scp -r build/* /var/www/html/dashboard/ && \
+          sudo rm -R node_modules
