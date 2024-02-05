@@ -1,0 +1,27 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  run_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: deploy using ssh
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.PORT }}
+        script: | 
+          cd farming_dashboard_frontend_react && \
+	  git pull origin master && \
+	  yarn && \
+	  yarn build && \
+	  sudo scp -r build/* /var/www/html/dashboard/ && \
+	  sudo rm -R build && \
+	  sudo rm -R node_modules
