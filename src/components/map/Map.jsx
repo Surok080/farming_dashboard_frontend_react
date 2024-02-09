@@ -2,7 +2,17 @@ import React, { memo, useEffect, useRef, useState } from "react";
 import Layers from "./Layers";
 import { MapContainer, ZoomControl } from "react-leaflet";
 import { httpService } from "../../api/setup";
-import { Box, Button, Tab, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tab,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Chart } from "react-google-charts";
@@ -26,6 +36,7 @@ const VisuallyHiddenInput = styled("input")({
 
 const Map = memo(({ year }) => {
   const [layer, setLayer] = useState(null);
+  const [layerSearch, setLayerSearch] = useState(null);
   const [statistics, setStatistics] = useState([]);
   const [activeArea, setActiveArea] = useState(null);
   const [deleteIdArea, setDeleteIdArea] = useState(null);
@@ -34,14 +45,32 @@ const Map = memo(({ year }) => {
   const [load, setLoad] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [value, setValue] = React.useState("1");
-  const [openConfirmDelete, setOpenConfirmDelete] = React.useState(false);
-  
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+  const [serachValue, setSerachValue] = useState(false);
+  const [grouping, setGrouping] = useState(1);
+
   useEffect(() => {
     if (!load) {
       getData();
       setLoad(true);
     }
   }, [year]);
+
+  useEffect(() => {
+    if (serachValue && layer) {
+      setLayerSearch(
+        layer.features.filter((item) =>
+          item.properties.crop.includes(serachValue)
+        )
+      );
+    } else if (layer) {
+      setLayerSearch(layer.features);
+    }
+  }, [serachValue, layer]);
+
+  const handleChangeGrouping = (event) => {
+    setGrouping(event.target.value);
+  };
 
   const handleOpenConfirmDelete = () => {
     setOpenConfirmDelete(true);
@@ -218,14 +247,40 @@ const Map = memo(({ year }) => {
                 }}
                 value="1"
               >
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">
+                    Группировка
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={grouping}
+                    label="Группировка"
+                    onChange={handleChangeGrouping}
+                  >
+                    <MenuItem value={1}>По сорту</MenuItem>
+                    <MenuItem value={2}>По группе</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  sx={{ marginTop: "20px" }}
+                  onChange={(e) => {
+                    setSerachValue(e.target.value);
+                  }}
+                  fullWidth
+                  id="outlined-basic"
+                  label="Поиск"
+                  variant="outlined"
+                />
                 <Box
                   display={"flex"}
                   flexDirection={"column"}
                   overflow={"hidden"}
                 >
-                  {layer ? (
+                  {layerSearch?.length && layerSearch ? (
                     <ListArea
-                      layer={layer}
+                      layer={layerSearch}
                       setActiveArea={setActiveArea}
                       setDeleteIdArea={setDeleteIdArea}
                       handleOpenConfirmDelete={handleOpenConfirmDelete}
@@ -300,6 +355,7 @@ const Map = memo(({ year }) => {
 
                     return (
                       <Box
+                        key={key}
                         alignItems={"center"}
                         alignContent={"center"}
                         display={"flex"}

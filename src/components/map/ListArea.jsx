@@ -3,6 +3,7 @@ import React from 'react';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelete}) => {
+  
   return (
     <>
                           <List
@@ -13,7 +14,7 @@ const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelet
                         bgcolor: "background.paper",
                       }}
                     >
-                      {layer.features.map((item, index) => {
+                      {layer.map((item, index) => {
                         const svgString = item.properties.svg.replace(
                           'stroke-width="40"',
                           'stroke-width="30"'

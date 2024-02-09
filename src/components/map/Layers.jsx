@@ -82,7 +82,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
         {layer &&
           layer.features.map((item, key) => {
             return (
-              <LayerGroup>
+              <LayerGroup key={key}>
                 <GeoJSON
                   key={hashString(JSON.stringify(layer))}
                   data={item}
