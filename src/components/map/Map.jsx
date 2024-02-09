@@ -241,10 +241,9 @@ const Map = memo(({ year }) => {
               {/* </Box> */}
               <TabPanel
                 sx={{
-                  height: "100%",
-                  overflowY: "scroll",
+                  display:'flex',
+                  flexDirection: 'column',
                   maxHeight: "100%",
-                  paddingBottom: "50px",
                 }}
                 value="1"
               >
@@ -258,6 +257,7 @@ const Map = memo(({ year }) => {
                     value={grouping}
                     label="Группировка"
                     onChange={handleChangeGrouping}
+                    size="small"
                   >
                     <MenuItem value={1}>По сорту</MenuItem>
                     <MenuItem value={2}>По группе</MenuItem>
@@ -265,6 +265,7 @@ const Map = memo(({ year }) => {
                 </FormControl>
 
                 <TextField
+                size="small"
                   sx={{ marginTop: "20px" }}
                   onChange={(e) => {
                     setSerachValue(e.target.value);
@@ -278,6 +279,7 @@ const Map = memo(({ year }) => {
                   display={"flex"}
                   flexDirection={"column"}
                   overflow={"hidden"}
+                  sx={{  overflowY: "scroll",}}
                 >
                   {layerSearch?.length && layerSearch ? (
                     <ListArea
@@ -291,13 +293,13 @@ const Map = memo(({ year }) => {
                   )}
                 </Box>
               </TabPanel>
-              <TabPanel value="2">
+              <TabPanel sx={{marginTop: '-40px'}} value="2">
                 <Box>
                   {statistics.length ? (
                     <Chart
                       chartType="PieChart"
                       width="100%"
-                      height="650px"
+                      height="350px"
                       data={statistics}
                       options={getOptionChart(colorLayers)}
                       // style={{ display: "flex", justifyContent: "space-between" }}
@@ -305,7 +307,7 @@ const Map = memo(({ year }) => {
                   ) : null}
                 </Box>
               </TabPanel>
-              <TabPanel sx={{display:'flex', flexDirection: 'column', height: '90%', paddingBottom: '0px'}} value="3">
+              <TabPanel sx={{display:'flex', flexDirection: 'column', height: '90%', paddingBottom: '0px', marginTop: '-40px'}} value="3">
                 <ReportArea/>
               </TabPanel>
             </TabContext>
