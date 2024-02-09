@@ -21,6 +21,7 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { getAreaLayers, getOptionChart } from "../../utils/mapUtils";
+import ReportArea from "./ReportArea";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -304,7 +305,9 @@ const Map = memo(({ year }) => {
                   ) : null}
                 </Box>
               </TabPanel>
-              <TabPanel value="3">Отчет скоро появится</TabPanel>
+              <TabPanel sx={{display:'flex', flexDirection: 'column', height: '90%', paddingBottom: '0px'}} value="3">
+                <ReportArea/>
+              </TabPanel>
             </TabContext>
           </Box>
         </Box>
