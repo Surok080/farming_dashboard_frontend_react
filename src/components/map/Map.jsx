@@ -187,6 +187,9 @@ const Map = memo(({ year }) => {
     setColorLayers(colorsLayers);
   };
 
+  console.log(layer);
+  
+
   return (
     <>
       <Button
@@ -321,12 +324,16 @@ const Map = memo(({ year }) => {
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
           <ZoomControl position="topright" />
-
-          <Layers
+{
+  layer && layer?.features?.length ? <Layers
             layer={layer}
             activeArea={activeArea}
             setActiveArea={setActiveArea}
           />
+          :
+          null
+}
+        
         </MapContainer>
         {layer ? (
           <Box
