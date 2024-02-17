@@ -15,7 +15,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
     // map method as the value:
     zoomend: () => {
       // Get the zoom level once zoom ended:
-      console.log(map.getZoom());
+      // console.log(map.getZoom());
     },
     moveend: () => {
       // Get bounds once move has ended:
@@ -29,7 +29,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
   });
 
   useEffect(() => {
-    if (layer) {
+    if (layer && layer.features.length) {
       map.setView([layer.center[1], layer.center[0]], map.getZoom());
     }
   }, [layer]);
@@ -86,7 +86,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
                 <GeoJSON
                   key={hashString(JSON.stringify(layer))}
                   data={item}
-                  pathOptions={{ color: item.properties.crop_color }}
+                  pathOptions={{ color: item.properties.color }}
                   eventHandlers={{
                     click: (event, type) => {
                       map.fitBounds(

@@ -48,14 +48,14 @@ const Map = memo(({ year }) => {
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
-  const [grouping, setGrouping] = useState(1);
+  const [grouping, setGrouping] = useState('crop');
 
   useEffect(() => {
     if (!load) {
       getData();
       setLoad(true);
     }
-  }, [year]);
+  }, [year, grouping]);
 
   useEffect(() => {
     if (serachValue && layer) {
@@ -87,7 +87,7 @@ const Map = memo(({ year }) => {
 
   const getData = () => {
     httpService
-      .get(`/data/fields?year=${year}`)
+      .get(`/data/fields?year=${year}&group=${grouping}`)
       .then((res) => {
         if (res.status === 200) {
           setLayer(res.data);
@@ -179,15 +179,13 @@ const Map = memo(({ year }) => {
       } else {
         colorsLayers.push({
           name: item.properties.crop,
-          color: item.properties.crop_color,
+          color: item.properties.color,
         });
       }
     });
 
     setColorLayers(colorsLayers);
   };
-
-  console.log(layer);
   
 
   return (
@@ -262,8 +260,8 @@ const Map = memo(({ year }) => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={1}>По сорту</MenuItem>
-                    <MenuItem value={2}>По группе</MenuItem>
+                    <MenuItem value={'crop'}>По сорту</MenuItem>
+                    <MenuItem value={'crop_group'}>По группе</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -325,7 +323,7 @@ const Map = memo(({ year }) => {
         >
           <ZoomControl position="topright" />
 {
-  layer && layer?.features?.length ? <Layers
+  layer ? <Layers
             layer={layer}
             activeArea={activeArea}
             setActiveArea={setActiveArea}
