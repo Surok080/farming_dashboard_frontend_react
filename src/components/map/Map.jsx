@@ -309,7 +309,7 @@ const Map = memo(({ year }) => {
                 </Box>
               </TabPanel>
               <TabPanel sx={{display:'flex', flexDirection: 'column', height: '90%', paddingBottom: '0px', marginTop: '-40px'}} value="3">
-                <ReportArea/>
+                <ReportArea year={year}/>
               </TabPanel>
             </TabContext>
           </Box>

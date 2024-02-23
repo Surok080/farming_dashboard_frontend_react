@@ -1,7 +1,9 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { httpService } from "../../api/setup";
 
-const ReportArea = () => {
+const ReportArea = ({year}) => {
+  const [yearReports, setYearReports] = useState([])
   const tempData = [
     {
       cropGroup: "Зерновые - Хлебные и крупяные культуры",
@@ -92,11 +94,26 @@ const ReportArea = () => {
       allArea: "141,6",
     },
   ];
+  useEffect(() => {
+    httpService.get(`/data/report?year=${year}`)
+    .then((res) => {
+      if (res.status && res.status === 200) {
+        setYearReports(res.data)
+      } else {
+        setYearReports([])
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+      setYearReports([])
+    })
+  }, [year])
   return (
-    <>
+      yearReports.length ?
+      <>
       <Typography>Список полей</Typography>
       <Box sx={{overflowY: 'scroll', display: 'flex', flexDirection: 'column'}}>
-        {tempData.map((item) => {
+        {yearReports.map((item) => {
           return (
             <Box
               sx={{
@@ -114,10 +131,10 @@ const ReportArea = () => {
                 textAlign={"left"}
                 alignItems={"left"}
               >
-                {item.cropGroup}
+                {item.crop_group}
               </Typography>
 
-              {item.crops.map((crop) => {
+              {item.crop.map((crop) => {
                 return (
                   <Box
                     sx={{
@@ -127,8 +144,8 @@ const ReportArea = () => {
                     display={"flex"}
                     justifyContent={"space-between"}
                   >
-                    <Typography>{crop.crop}</Typography>
-                    <Typography>{crop.area}</Typography>
+                    <Typography>{crop.crop_name}</Typography>
+                    <Typography>{crop.crop_area}</Typography>
                   </Box>
                 );
               })}
@@ -144,14 +161,16 @@ const ReportArea = () => {
                   <b>Итого</b>
                 </Typography>
                 <Typography>
-                  <b>{item.allArea}</b>
+                  <b>{item.area_group}</b>
                 </Typography>
               </Box>
             </Box>
           );
         })}
       </Box>
-    </>
+      </>
+      :
+      <Typography>Нет данных</Typography>
   );
 };
 
