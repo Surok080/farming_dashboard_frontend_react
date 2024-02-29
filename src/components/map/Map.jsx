@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -20,7 +21,11 @@ import { useSnackbar } from "notistack";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
-import { getAreaLayers, getColorLayers, getOptionChart } from "../../utils/mapUtils";
+import {
+  getAreaLayers,
+  getColorLayers,
+  getOptionChart,
+} from "../../utils/mapUtils";
 import ReportArea from "./ReportArea";
 
 const VisuallyHiddenInput = styled("input")({
@@ -35,7 +40,7 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const Map = memo(({ year }) => {
+const Map = memo(({ year, setAllArea }) => {
   const [layer, setLayer] = useState(null);
   const [layerSearch, setLayerSearch] = useState(null);
   const [statistics, setStatistics] = useState([]);
@@ -91,6 +96,7 @@ const Map = memo(({ year }) => {
       .then((res) => {
         if (res.status === 200) {
           setLayer(res.data);
+          setAllArea(res.data.total_area.toFixed(2))
           getAreaLayers(res.data, setStatistics, grouping);
           getColorLayers(res.data, setColorLayers, grouping);
         } else {
@@ -174,13 +180,19 @@ const Map = memo(({ year }) => {
   return (
     <>
       <Button
-        sx={{ position: "absolute", top: "5px", zIndex: "10000" }}
+        sx={{
+          position: "absolute",
+          top: "150px",
+          zIndex: "1000",
+          right: "10px",
+          maxWidth: "40px",
+          minWidth: '40px'
+        }}
         component="label"
         variant="contained"
-        startIcon={<CloudUploadIcon />}
         onChange={handleFileSelection}
       >
-        Загрузить файл
+        <CloudUploadIcon />
         <VisuallyHiddenInput type="file" ref={fileInputRef} />
       </Button>
       <div
@@ -365,7 +377,7 @@ const Map = memo(({ year }) => {
                             width: "10px",
                             height: "10px",
                             background: color,
-                            minWidth: '10px'
+                            minWidth: "10px",
                           }}
                         ></Box>
                         <Typography align="left" variant="caption">

@@ -34,6 +34,7 @@ export default function Dashboard() {
   const [valueTabs, setValueTabs] = React.useState("menu_fields");
   const [loading, setLoading] = React.useState(true);
   const [year, setYear] = React.useState(2023);
+  const [allArea, setAllArea] = React.useState(null);
 
   React.useEffect(() => {
     try {
@@ -55,7 +56,7 @@ export default function Dashboard() {
         return <FieldsPages />;
         break;
       case "menu_fields":
-        return <DashboardPages year={year} />;
+        return <DashboardPages setAllArea={setAllArea} year={year} />;
         break;
 
       default:
@@ -73,7 +74,7 @@ export default function Dashboard() {
       <Context.Provider value={{ valueTabs, setValueTabs }}>
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
-          <AppBarHeader valueTabs={valueTabs} year={year} user={user} setYear={setYear}/>
+          <AppBarHeader allArea={allArea} valueTabs={valueTabs} year={year} user={user} setYear={setYear}/>
           <LeftMenu/>
           <Box
             component="main"

@@ -31,7 +31,7 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const AppBarHeader = memo(({ valueTabs, year, user, setYear}) => {
+const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea}) => {
 
   const handleChangeYear = (e) => {
     setYear(e.target.value);
@@ -77,10 +77,14 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear}) => {
             variant="h5"
             color="inherit"
             noWrap
-            sx={{ flexGrow: 1, boxShadow: "none" }}
+            sx={{ flexGrow: 1, boxShadow: "none", display: 'flex', gap: '20px' }}
             textAlign={"left"}
-          >
+            alignItems={'center'}
+          > 
             {getNameTabs()}
+            {
+              (valueTabs === 'menu_fields' && allArea) ? <Typography color={'grey'}>{allArea} га</Typography> : null
+            }
           </Typography>
           <Box sx={{ minWidth: 120, marginRight: "20px" }}>
             <FormControl fullWidth>
