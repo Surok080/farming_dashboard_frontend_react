@@ -20,7 +20,7 @@ import { useSnackbar } from "notistack";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
-import { getAreaLayers, getOptionChart } from "../../utils/mapUtils";
+import { getAreaLayers, getColorLayers, getOptionChart } from "../../utils/mapUtils";
 import ReportArea from "./ReportArea";
 
 const VisuallyHiddenInput = styled("input")({
@@ -48,7 +48,7 @@ const Map = memo(({ year }) => {
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
-  const [grouping, setGrouping] = useState('crop');
+  const [grouping, setGrouping] = useState("crop");
 
   useEffect(() => {
     if (!load) {
@@ -91,8 +91,8 @@ const Map = memo(({ year }) => {
       .then((res) => {
         if (res.status === 200) {
           setLayer(res.data);
-          getAreaLayers(res.data, setStatistics);
-          getColorLayers(res.data);
+          getAreaLayers(res.data, setStatistics, grouping);
+          getColorLayers(res.data, setColorLayers, grouping);
         } else {
           resetState();
         }
@@ -171,23 +171,6 @@ const Map = memo(({ year }) => {
     }
   };
 
-  const getColorLayers = (layers) => {
-    let colorsLayers = [];
-
-    layers.features.map((item, index) => {
-      if (colorsLayers.find((layer) => layer.name === item.properties.crop)) {
-      } else {
-        colorsLayers.push({
-          name: item.properties.crop,
-          color: item.properties.color,
-        });
-      }
-    });
-
-    setColorLayers(colorsLayers);
-  };
-  
-
   return (
     <>
       <Button
@@ -242,8 +225,8 @@ const Map = memo(({ year }) => {
               {/* </Box> */}
               <TabPanel
                 sx={{
-                  display:'flex',
-                  flexDirection: 'column',
+                  display: "flex",
+                  flexDirection: "column",
                   maxHeight: "100%",
                 }}
                 value="1"
@@ -260,13 +243,13 @@ const Map = memo(({ year }) => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={'crop'}>По сорту</MenuItem>
-                    <MenuItem value={'crop_group'}>По группе</MenuItem>
+                    <MenuItem value={"crop"}>По культуре</MenuItem>
+                    <MenuItem value={"crop_group"}>По группе</MenuItem>
                   </Select>
                 </FormControl>
 
                 <TextField
-                size="small"
+                  size="small"
                   sx={{ marginTop: "20px" }}
                   onChange={(e) => {
                     setSerachValue(e.target.value);
@@ -280,7 +263,7 @@ const Map = memo(({ year }) => {
                   display={"flex"}
                   flexDirection={"column"}
                   overflow={"hidden"}
-                  sx={{  overflowY: "scroll",}}
+                  sx={{ overflowY: "scroll" }}
                 >
                   {layerSearch?.length && layerSearch ? (
                     <ListArea
@@ -294,7 +277,7 @@ const Map = memo(({ year }) => {
                   )}
                 </Box>
               </TabPanel>
-              <TabPanel sx={{marginTop: '-40px'}} value="2">
+              <TabPanel sx={{ marginTop: "-40px" }} value="2">
                 <Box>
                   {statistics.length ? (
                     <Chart
@@ -308,8 +291,17 @@ const Map = memo(({ year }) => {
                   ) : null}
                 </Box>
               </TabPanel>
-              <TabPanel sx={{display:'flex', flexDirection: 'column', height: '90%', paddingBottom: '0px', marginTop: '-40px'}} value="3">
-                <ReportArea year={year}/>
+              <TabPanel
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "90%",
+                  paddingBottom: "0px",
+                  marginTop: "-40px",
+                }}
+                value="3"
+              >
+                <ReportArea year={year} />
               </TabPanel>
             </TabContext>
           </Box>
@@ -322,16 +314,13 @@ const Map = memo(({ year }) => {
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
           <ZoomControl position="topright" />
-{
-  layer ? <Layers
-            layer={layer}
-            activeArea={activeArea}
-            setActiveArea={setActiveArea}
-          />
-          :
-          null
-}
-        
+          {layer ? (
+            <Layers
+              layer={layer}
+              activeArea={activeArea}
+              setActiveArea={setActiveArea}
+            />
+          ) : null}
         </MapContainer>
         {layer ? (
           <Box
@@ -366,7 +355,7 @@ const Map = memo(({ year }) => {
                     return (
                       <Box
                         key={key}
-                        alignItems={"center"}
+                        alignItems={"baseline"}
                         alignContent={"center"}
                         display={"flex"}
                         gap={"4px"}
@@ -376,6 +365,7 @@ const Map = memo(({ year }) => {
                             width: "10px",
                             height: "10px",
                             background: color,
+                            minWidth: '10px'
                           }}
                         ></Box>
                         <Typography align="left" variant="caption">

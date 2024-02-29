@@ -1,24 +1,42 @@
-export   const getAreaLayers = (layers, setStatistics) => {
+export   const getAreaLayers = (layers, setStatistics, grouping) => {
   const graphStatics = [["Поле", "Площадь"]];
+  const nameParams = grouping === "crop" ? "crop" : "crop_group"
 
-  layers.features.map((item, index) => {
-    if (graphStatics.find((area) => area[0] === item.properties.crop)) {
-      graphStatics.map((area) => {
-        if (area[0] === item.properties.crop) {
-          area[1] = +parseFloat(
-            area[1] + +parseFloat(item.properties.area).toFixed(1)
-          ).toFixed(1);
-        }
-      });
-    } else {
-      graphStatics.push([
-        item.properties.crop,
-        +parseFloat(item.properties.area).toFixed(1),
-      ]);
-    }
-  });
+    layers.features.map((item, index) => {
+      if (graphStatics.find((area) => area[0] === item.properties[nameParams])) {
+        graphStatics.map((area) => {
+          if (area[0] === item.properties[nameParams]) {
+            area[1] = +parseFloat(
+              area[1] + +parseFloat(item.properties.area).toFixed(1)
+            ).toFixed(1);
+          }
+        });
+      } else {
+        graphStatics.push([
+          item.properties[nameParams],
+          +parseFloat(item.properties.area).toFixed(1),
+        ]);
+      }
+    });
 
   setStatistics(graphStatics);
+};
+
+export const getColorLayers = (layers, setColorLayers, grouping) => {
+  let colorsLayers = [];
+  const nameParams = grouping === "crop" ? "crop" : "crop_group"
+  
+    layers.features.map((item, index) => {
+      if (colorsLayers.find((layer) => layer.name === item.properties[nameParams])) {
+      } else {
+        colorsLayers.push({
+          name: item.properties[nameParams],
+          color: item.properties.color,
+        });
+      }
+    });
+
+  setColorLayers(colorsLayers);
 };
 
 export const getOptionChart = (colors) => {
