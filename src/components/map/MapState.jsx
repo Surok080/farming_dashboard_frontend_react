@@ -27,6 +27,7 @@ import {
 } from "../../utils/mapUtils";
 import ReportArea from "./ReportArea";
 import LayersState from "./LayersState";
+import ReportAreaState from "./ReportAreaState";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -61,6 +62,7 @@ const MapState = memo(() => {
       setLoad(true);
     }
   }, [grouping]);
+  
 
   useEffect(() => {
     if (serachValue && layer) {
@@ -121,7 +123,7 @@ const MapState = memo(() => {
     formData.append("file", file);
 
     httpService
-      .post("/data/upload_file/", formData)
+      .post("/state_monitoring/upload_plots", formData)
       .then((res) => {
         if (res.status === 200) {
           getData();
@@ -149,7 +151,7 @@ const MapState = memo(() => {
   const deletArea = () => {
     if (deleteIdArea) {
       httpService
-        .delete(`/fields/fields/${deleteIdArea}`)
+        .delete(`/state_monitoring/plots/${deleteIdArea}`)
         .then((res) => {
           if (res.status === 200) {
             getData();
@@ -185,7 +187,7 @@ const MapState = memo(() => {
           zIndex: "1000",
           right: "10px",
           maxWidth: "40px",
-          minWidth: '40px'
+          minWidth: "40px",
         }}
         component="label"
         variant="contained"
@@ -238,7 +240,10 @@ const MapState = memo(() => {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  maxHeight: "100%",
+                  maxHeight: "97%",
+                  // padding: "20px 10px",
+                  // gap: '10px',
+                  // height: '100%'
                 }}
                 value="1"
               >
@@ -254,7 +259,9 @@ const MapState = memo(() => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={"form_owner"}>По форме собственности</MenuItem>
+                    <MenuItem value={"form_owner"}>
+                      По форме собственности
+                    </MenuItem>
                     <MenuItem value={"land_owner"}>По собственнику</MenuItem>
                   </Select>
                 </FormControl>
@@ -274,7 +281,7 @@ const MapState = memo(() => {
                   display={"flex"}
                   flexDirection={"column"}
                   overflow={"hidden"}
-                  sx={{ overflowY: "scroll" }}
+                  sx={{ overflowY: "scroll", height: '85%' }}
                 >
                   {layerSearch?.length && layerSearch ? (
                     <ListArea
@@ -289,7 +296,7 @@ const MapState = memo(() => {
                   )}
                 </Box>
               </TabPanel>
-              <TabPanel sx={{ marginTop: "-40px" }} value="2">
+              <TabPanel sx={{ marginTop: "-40px", padding: '0px 24px 24px' }} value="2">
                 <Box>
                   {statistics.length ? (
                     <Chart
@@ -313,7 +320,7 @@ const MapState = memo(() => {
                 }}
                 value="3"
               >
-                {/* <ReportArea year={year} /> */}
+                <ReportAreaState />
               </TabPanel>
             </TabContext>
           </Box>

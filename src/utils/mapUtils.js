@@ -1,8 +1,15 @@
 export   const getAreaLayers = (layers, setStatistics, grouping) => {
   const graphStatics = [["Поле", "Площадь"]];
-  const nameParams = grouping === "crop" ? "crop" : "crop_group"
+  let nameParams = grouping
+
+  if (nameParams === 'form_owner') {
+    nameParams = 'plot_form_owner'
+  } else if (nameParams === 'land_owner') {
+    nameParams = 'plot_land_owner'
+  }
 
     layers.features.map((item, index) => {
+      
       if (graphStatics.find((area) => area[0] === item.properties[nameParams])) {
         graphStatics.map((area) => {
           if (area[0] === item.properties[nameParams]) {
@@ -24,7 +31,13 @@ export   const getAreaLayers = (layers, setStatistics, grouping) => {
 
 export const getColorLayers = (layers, setColorLayers, grouping) => {
   let colorsLayers = [];
-  const nameParams = grouping === "crop" ? "crop" : "crop_group"
+  let nameParams = grouping
+
+  if (nameParams === 'form_owner') {
+    nameParams = 'plot_form_owner'
+  } else if (nameParams === 'land_owner') {
+    nameParams = 'plot_land_owner'
+  }
   
     layers.features.map((item, index) => {
       if (colorsLayers.find((layer) => layer.name === item.properties[nameParams])) {
