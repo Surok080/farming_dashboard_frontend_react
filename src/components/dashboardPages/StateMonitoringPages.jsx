@@ -1,9 +1,10 @@
 import { Box, Grid } from "@mui/material";
 import React from "react";
 import Map from "../map/Map";
+import MapState from "../map/MapState";
 
 
-const DashboardPages = ({year, setAllArea}) => {
+const StateMonitoringPages = ({year, setAllArea}) => {
   return (
     <Grid sx={{ height: "100%", }} container spacing={3}>
       <Grid height={'100%'} item xs={12}>
@@ -21,11 +22,11 @@ const DashboardPages = ({year, setAllArea}) => {
             overflow: 'hidden'
           }}
         >
-          <Map year={year} setAllArea={setAllArea}/>
+          <MapState/>
         </Box>
       </Grid>
     </Grid>
   );
 };
 
-export default DashboardPages;
+export default StateMonitoringPages;

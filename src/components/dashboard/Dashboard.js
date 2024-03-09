@@ -14,6 +14,7 @@ import { setUserFio } from "../../store/userDto";
 import { useNavigate } from "react-router-dom";
 import AppBarHeader from "../AppBarHeader";
 import LeftMenu from "../LeftMenu";
+import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
 
 export const drawerWidth = 180;
 
@@ -57,6 +58,9 @@ export default function Dashboard() {
         break;
       case "menu_fields":
         return <DashboardPages setAllArea={setAllArea} year={year} />;
+        break;
+      case "menu_gos":
+        return <StateMonitoringPages setAllArea={setAllArea} year={year} />;
         break;
 
       default:

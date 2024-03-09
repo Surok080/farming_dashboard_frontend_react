@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -27,6 +26,7 @@ import {
   getOptionChart,
 } from "../../utils/mapUtils";
 import ReportArea from "./ReportArea";
+import LayersState from "./LayersState";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -40,7 +40,7 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const Map = memo(({ year, setAllArea }) => {
+const MapState = memo(() => {
   const [layer, setLayer] = useState(null);
   const [layerSearch, setLayerSearch] = useState(null);
   const [statistics, setStatistics] = useState([]);
@@ -53,14 +53,14 @@ const Map = memo(({ year, setAllArea }) => {
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
-  const [grouping, setGrouping] = useState("crop");
+  const [grouping, setGrouping] = useState("form_owner");
 
   useEffect(() => {
     if (!load) {
       getData();
       setLoad(true);
     }
-  }, [year, grouping]);
+  }, [grouping]);
 
   useEffect(() => {
     if (serachValue && layer) {
@@ -92,11 +92,10 @@ const Map = memo(({ year, setAllArea }) => {
 
   const getData = () => {
     httpService
-      .get(`/fields/fields?year=${year}&group=${grouping}`)
+      .get(`state_monitoring/plots?group=${grouping}`)
       .then((res) => {
-        if (res.status === 200) {
+        if (res?.status === 200) {
           setLayer(res.data);
-          setAllArea(res.data.total_area.toFixed(2))
           getAreaLayers(res.data, setStatistics, grouping);
           getColorLayers(res.data, setColorLayers, grouping);
         } else {
@@ -255,8 +254,8 @@ const Map = memo(({ year, setAllArea }) => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={"crop"}>По культуре</MenuItem>
-                    <MenuItem value={"crop_group"}>По группе</MenuItem>
+                    <MenuItem value={"form_owner"}>По форме собственности</MenuItem>
+                    <MenuItem value={"land_owner"}>По собственнику</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -279,6 +278,7 @@ const Map = memo(({ year, setAllArea }) => {
                 >
                   {layerSearch?.length && layerSearch ? (
                     <ListArea
+                      state={true}
                       layer={layerSearch}
                       setActiveArea={setActiveArea}
                       setDeleteIdArea={setDeleteIdArea}
@@ -313,7 +313,7 @@ const Map = memo(({ year, setAllArea }) => {
                 }}
                 value="3"
               >
-                <ReportArea year={year} />
+                {/* <ReportArea year={year} /> */}
               </TabPanel>
             </TabContext>
           </Box>
@@ -327,7 +327,7 @@ const Map = memo(({ year, setAllArea }) => {
         >
           <ZoomControl position="topright" />
           {layer ? (
-            <Layers
+            <LayersState
               layer={layer}
               activeArea={activeArea}
               setActiveArea={setActiveArea}
@@ -400,4 +400,4 @@ const Map = memo(({ year, setAllArea }) => {
   );
 });
 
-export default Map;
+export default MapState;

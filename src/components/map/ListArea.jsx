@@ -2,7 +2,7 @@ import { Box, IconButton, List, ListItemButton, Typography } from '@mui/material
 import React from 'react';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
-const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelete}) => {
+const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelete, state = false}) => {
   
   return (
     <>
@@ -10,7 +10,9 @@ const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelet
                       sx={{
                         width: "100%",
                         height: "100%",
-
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
                         bgcolor: "background.paper",
                       }}
                     >
@@ -25,8 +27,8 @@ const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelet
                             style={{
                               width: "100%",
                               display: "flex",
-                              gap: "10px",
-                              height: "100px",
+                              gap: "5px",
+                              // height: "100px",
                               padding: "0",
                               justifyContent: "space-between",
                               "&:hover": {
@@ -50,14 +52,14 @@ const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelet
                               dangerouslySetInnerHTML={{ __html: svgString }}
                             />
                             <Box display={"flex"} flexDirection={"column"}>
-                              <Typography variant="body2">
-                                {item.properties.crop}
+                              <Typography variant="body2" sx={{fontWeight: 'bold'}}>
+                                {state ? item.properties.plot_сadastral_number : item.properties.crop}
                               </Typography>
                               <Typography variant="caption">
-                                {item.properties.crop_kind}
+                              {state ? item.properties.plot_form_owner : item.properties.crop_kind}
                               </Typography>
                               <Typography variant="caption">
-                                {item.properties.name}
+                              {state ? item.properties.plot_land_category : item.properties.name}
                               </Typography>
                             </Box>
                             <Typography variant="caption">
