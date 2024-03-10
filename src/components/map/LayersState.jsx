@@ -29,7 +29,7 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
   });
 
   useEffect(() => {
-    if (layer && layer.features.length) {
+    if (layer && layer?.features?.length) {
       map.setView([layer.center[1], layer.center[0]], map.getZoom());
     }
   }, [layer]);
@@ -79,7 +79,7 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
         </LayersControl.BaseLayer>
-        {layer &&
+        {layer.features &&
           layer.features.map((item, key) => {
             return (
               <LayerGroup key={key}>

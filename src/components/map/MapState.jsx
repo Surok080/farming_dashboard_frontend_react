@@ -94,9 +94,7 @@ const MapState = memo(() => {
 
   const getData = () => {
     httpService
-      .get(`/state_monitoring/plots?group=${grouping}`, {headers: {
-        "Content-Type": "application/json"}
-    })
+      .get(`/state_monitoring/plots?group=${grouping}`)
       .then((res) => {
         if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
@@ -112,7 +110,7 @@ const MapState = memo(() => {
   };
 
   const resetState = () => {
-    setLayer(null);
+    setLayer([]);
     setStatistics([]);
     setActiveArea(null);
     setColorLayers([]);
@@ -264,7 +262,7 @@ const MapState = memo(() => {
                     <MenuItem value={"plot_form_owner"}>
                       По форме собственности
                     </MenuItem>
-                    <MenuItem value={"plot_land_owner"}>По собственнику (v2)</MenuItem>
+                    <MenuItem value={"plot_land_owner"}>По собственнику</MenuItem>
                   </Select>
                 </FormControl>
 

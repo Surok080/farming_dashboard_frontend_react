@@ -109,7 +109,7 @@ const Map = memo(({ year, setAllArea }) => {
   };
 
   const resetState = () => {
-    setLayer(null);
+    setLayer([]);
     setStatistics([]);
     setActiveArea(null);
     setColorLayers([]);
