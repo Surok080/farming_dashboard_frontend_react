@@ -122,7 +122,7 @@ const Map = memo(({ year, setAllArea }) => {
     formData.append("file", file);
 
     httpService
-      .post("/data/upload_file/", formData)
+      .post("/fields/upload_file/", formData)
       .then((res) => {
         if (res.status === 200) {
           getData();
