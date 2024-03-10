@@ -96,7 +96,7 @@ const MapState = memo(() => {
     httpService
       .get(`state_monitoring/plots?group=${grouping}`)
       .then((res) => {
-        if (res?.status === 200) {
+        if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
           getAreaLayers(res.data, setStatistics, grouping);
           getColorLayers(res.data, setColorLayers, grouping);

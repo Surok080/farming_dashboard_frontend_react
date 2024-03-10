@@ -94,7 +94,7 @@ const Map = memo(({ year, setAllArea }) => {
     httpService
       .get(`/fields/fields?year=${year}&group=${grouping}`)
       .then((res) => {
-        if (res.status === 200) {
+        if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
           setAllArea(res.data.total_area.toFixed(2))
           getAreaLayers(res.data, setStatistics, grouping);
