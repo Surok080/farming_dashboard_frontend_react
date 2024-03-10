@@ -101,6 +101,9 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
                   }}
                 >
                   <Tooltip sticky>
+                  <Typography>
+                      {item.properties.plot_сadastral_number}
+                    </Typography>
                     <Typography>{item.properties.area} га</Typography>
                   </Tooltip>
                 </GeoJSON>

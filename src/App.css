@@ -47,6 +47,10 @@
   outline: none;
 }
 
+.leaflet-bottom {
+  display: none;
+}
+
 .svgTest svg {
   width: 100%;
 }

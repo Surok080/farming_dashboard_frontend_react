@@ -355,6 +355,7 @@ const Map = memo(({ year, setAllArea }) => {
               sx={{
                 display: "flex",
                 flexDirection: "column",
+                gap: '5px'
               }}
             >
               {statistics &&

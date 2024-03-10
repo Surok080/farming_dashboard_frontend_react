@@ -362,6 +362,7 @@ const MapState = memo(() => {
               sx={{
                 display: "flex",
                 flexDirection: "column",
+                gap: '5px'
               }}
             >
               {statistics &&
