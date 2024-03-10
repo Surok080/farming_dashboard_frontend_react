@@ -2,11 +2,6 @@ export   const getAreaLayers = (layers, setStatistics, grouping) => {
   const graphStatics = [["Поле", "Площадь"]];
   let nameParams = grouping
 
-  if (nameParams === 'form_owner') {
-    nameParams = 'plot_form_owner'
-  } else if (nameParams === 'land_owner') {
-    nameParams = 'plot_land_owner'
-  }
 
     layers.features.map((item, index) => {
       
@@ -33,11 +28,6 @@ export const getColorLayers = (layers, setColorLayers, grouping) => {
   let colorsLayers = [];
   let nameParams = grouping
 
-  if (nameParams === 'form_owner') {
-    nameParams = 'plot_form_owner'
-  } else if (nameParams === 'land_owner') {
-    nameParams = 'plot_land_owner'
-  }
   
     layers.features.map((item, index) => {
       if (colorsLayers.find((layer) => layer.name === item.properties[nameParams])) {

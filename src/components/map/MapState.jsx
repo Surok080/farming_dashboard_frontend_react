@@ -54,7 +54,7 @@ const MapState = memo(() => {
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
-  const [grouping, setGrouping] = useState("form_owner");
+  const [grouping, setGrouping] = useState("plot_form_owner");
 
   useEffect(() => {
     if (!load) {
@@ -94,7 +94,7 @@ const MapState = memo(() => {
 
   const getData = () => {
     httpService
-      .get(`state_monitoring/plots?group=${grouping}`)
+      .get(`/state_monitoring/plots?group=${grouping}`)
       .then((res) => {
         if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
@@ -259,10 +259,10 @@ const MapState = memo(() => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={"form_owner"}>
+                    <MenuItem value={"plot_form_owner"}>
                       По форме собственности
                     </MenuItem>
-                    <MenuItem value={"land_owner"}>По собственнику</MenuItem>
+                    <MenuItem value={"plot_land_owner"}>По собственнику</MenuItem>
                   </Select>
                 </FormControl>
 
