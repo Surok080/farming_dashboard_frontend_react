@@ -52,13 +52,13 @@ const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelet
                               dangerouslySetInnerHTML={{ __html: svgString }}
                             />
                             <Box display={"flex"} flexDirection={"column"}>
-                              <Typography variant="body2" sx={{fontWeight: 'bold'}}>
+                              <Typography noWrap maxWidth={140} variant="body2" sx={{fontWeight: 'bold'}}>
                                 {state ? item.properties.plot_сadastral_number : item.properties.crop}
                               </Typography>
-                              <Typography variant="caption">
+                              <Typography noWrap maxWidth={140} variant="caption">
                               {state ? item.properties.plot_form_owner : item.properties.crop_kind}
                               </Typography>
-                              <Typography variant="caption">
+                              <Typography noWrap maxWidth={140} variant="caption">
                               {state ? item.properties.plot_land_category : item.properties.name}
                               </Typography>
                             </Box>
