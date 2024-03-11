@@ -51,7 +51,7 @@ const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelet
                               }}
                               dangerouslySetInnerHTML={{ __html: svgString }}
                             />
-                            <Box display={"flex"} flexDirection={"column"}>
+                            <Box display={"flex"} flexDirection={"column"} flexGrow={1}>
                               <Typography variant="body2" sx={{fontWeight: 'bold', fontSize: '12px'}}>
                                 {state ? item.properties.plot_сadastral_number : item.properties.crop}
                               </Typography>
