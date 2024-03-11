@@ -68,7 +68,7 @@ const MapState = memo(() => {
     if (serachValue && layer) {
       setLayerSearch(
         layer.features.filter((item) =>
-          item.properties.crop.includes(serachValue)
+          item.properties.plot_сadastral_number.includes(serachValue)
         )
       );
     } else if (layer) {

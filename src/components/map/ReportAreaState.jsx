@@ -7,18 +7,18 @@ const ReportAreaState = () => {
 
   
   useEffect(() => {
-    // httpService.get(`/data/report?year=${year}`)
-    // .then((res) => {
-    //   if (res.status && res.status === 200) {
-    //     setYearReports(res.data)
-    //   } else {
-    //     setYearReports([])
-    //   }
-    // })
-    // .catch((e) => {
-    //   console.log(e);
-    //   setYearReports([])
-    // })
+    httpService.get(`/state_monitoring/report`)
+    .then((res) => {
+      if (res?.status && res?.status === 200) {
+        setYearReports(res.data)
+      } else {
+        setYearReports([])
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+      setYearReports([])
+    })
   }, [])
   return (
       yearReports.length ?
@@ -43,10 +43,10 @@ const ReportAreaState = () => {
                 textAlign={"left"}
                 alignItems={"left"}
               >
-                {item.crop_group}
+                {item.form_owner_group}
               </Typography>
 
-              {item.crop.map((crop) => {
+              {item.plots.map((plots) => {
                 return (
                   <Box
                     sx={{
@@ -56,8 +56,8 @@ const ReportAreaState = () => {
                     display={"flex"}
                     justifyContent={"space-between"}
                   >
-                    <Typography>{crop.crop_name}</Typography>
-                    <Typography>{crop.crop_area}</Typography>
+                    <Typography>{plots.plot_cadastral_number}</Typography>
+                    <Typography>{plots.plot_area}</Typography>
                   </Box>
                 );
               })}

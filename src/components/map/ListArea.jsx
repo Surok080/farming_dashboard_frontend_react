@@ -52,7 +52,7 @@ const ListArea = ({layer, setActiveArea, setDeleteIdArea, handleOpenConfirmDelet
                               dangerouslySetInnerHTML={{ __html: svgString }}
                             />
                             <Box display={"flex"} flexDirection={"column"}>
-                              <Typography noWrap maxWidth={140} variant="body2" sx={{fontWeight: 'bold'}}>
+                              <Typography variant="body2" sx={{fontWeight: 'bold', fontSize: '12px'}}>
                                 {state ? item.properties.plot_сadastral_number : item.properties.crop}
                               </Typography>
                               <Typography noWrap maxWidth={140} variant="caption">
