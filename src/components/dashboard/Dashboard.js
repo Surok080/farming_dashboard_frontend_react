@@ -34,7 +34,7 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const [valueTabs, setValueTabs] = React.useState("menu_fields");
   const [loading, setLoading] = React.useState(true);
-  const [year, setYear] = React.useState(2023);
+  const [year, setYear] = React.useState(2024);
   const [allArea, setAllArea] = React.useState(null);
 
   React.useEffect(() => {
