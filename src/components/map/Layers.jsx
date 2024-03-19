@@ -84,7 +84,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
             return (
               <LayerGroup key={key}>
                 <GeoJSON
-                  key={hashString(JSON.stringify(layer))}
+                  key={item.properties.id}
                   data={item}
                   pathOptions={{ color: item.properties.color }}
                   eventHandlers={{
