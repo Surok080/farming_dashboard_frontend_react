@@ -14,6 +14,7 @@ import { createContext } from "react";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserFio } from "../store/userDto";
+import logo from "../images/logo.svg"
 
 export const StoreContext = createContext("light");
 
@@ -79,9 +80,9 @@ export default function SignIn() {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <AgricultureIcon />
-          </Avatar>
+          {/* <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}> */}
+            <img src={logo} alt="logo" />
+          {/* </Avatar> */}
           <Typography component="h1" variant="h5">
             Авторизация Дашборд
           </Typography>
