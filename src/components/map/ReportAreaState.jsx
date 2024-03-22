@@ -25,9 +25,10 @@ const ReportAreaState = () => {
       <>
       <Typography>Список полей</Typography>
       <Box sx={{overflowY: 'scroll', display: 'flex', flexDirection: 'column'}}>
-        {yearReports.map((item) => {
+        {yearReports.map((item, index) => {
           return (
             <Box
+              key={item.area_group + index}
               sx={{
                 margin: "10px 2px 20px",
                 display: "flex",
@@ -46,9 +47,10 @@ const ReportAreaState = () => {
                 {item.form_owner_group}
               </Typography>
 
-              {item.plots.map((plots) => {
+              {item.plots.map((plots, index) => {
                 return (
                   <Box
+                    key={plots.plot_area + index}
                     sx={{
                       border: "1px solid #F0F0F0",
                       padding: "5px",

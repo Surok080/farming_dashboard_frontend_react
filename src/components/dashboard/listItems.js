@@ -7,6 +7,7 @@ import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import GridOnIcon from '@mui/icons-material/GridOn';
 
 export default function ListItems() {
   const { valueTabs, setValueTabs } = React.useContext(Context);
@@ -25,6 +26,13 @@ export default function ListItems() {
           <LayersOutlinedIcon sx={{color: valueTabs ===  "menu_fields" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Поля" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => setValueTabs("menu_сartograms")}>
+        <ListItemIcon sx={{minWidth: '36px'}}>
+          <GridOnIcon sx={{color: valueTabs ===  "menu_сartograms" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+        </ListItemIcon>
+        <ListItemText primary="Картограммы" />
       </ListItemButton>
 
       <ListItemButton onClick={() => setValueTabs("menu_gos")}>

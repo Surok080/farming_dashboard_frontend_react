@@ -25,9 +25,10 @@ const ReportArea = ({year}) => {
       <>
       <Typography>Список полей</Typography>
       <Box sx={{overflowY: 'scroll', display: 'flex', flexDirection: 'column'}}>
-        {yearReports.map((item) => {
+        {yearReports.map((item, index) => {
           return (
             <Box
+              key={index}
               sx={{
                 margin: "10px 2px 20px",
                 display: "flex",
@@ -46,9 +47,10 @@ const ReportArea = ({year}) => {
                 {item.crop_group}
               </Typography>
 
-              {item.crop.map((crop) => {
+              {item.crop.map((crop, index) => {
                 return (
                   <Box
+                  key={index}
                     sx={{
                       border: "1px solid #F0F0F0",
                       padding: "5px",

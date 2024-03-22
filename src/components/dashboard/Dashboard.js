@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import AppBarHeader from "../AppBarHeader";
 import LeftMenu from "../LeftMenu";
 import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
+import CartogramsPage from "../dashboardPages/CartogramsPage";
 
 export const drawerWidth = 180;
 
@@ -55,13 +56,12 @@ export default function Dashboard() {
     switch (valueTabs) {
       case "menu_dashboard":
         return <FieldsPages />;
-        break;
       case "menu_fields":
         return <DashboardPages setAllArea={setAllArea} year={year} />;
-        break;
       case "menu_gos":
         return <StateMonitoringPages setAllArea={setAllArea} year={year} />;
-        break;
+      case "menu_сartograms":
+        return <CartogramsPage setAllArea={setAllArea} year={year} />;
 
       default:
         break;

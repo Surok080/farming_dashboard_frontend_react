@@ -12,7 +12,6 @@ import MuiAppBar from "@mui/material/AppBar";
 import styled from "@emotion/styled";
 import { drawerWidth } from "./dashboard/Dashboard";
 
-
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -31,8 +30,7 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea}) => {
-
+const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
   const handleChangeYear = (e) => {
     setYear(e.target.value);
   };
@@ -41,17 +39,14 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea}) => {
     switch (valueTabs) {
       case "menu_dashboard":
         return "Обзор";
-        break;
       case "menu_fields":
         return "Поля";
-        break;
       case "menu_gos":
+        return "Картограммы";
+      case "menu_сartograms":
         return "Госмониторинг";
-        break;
       case "menu_settings":
         return "Настройки";
-        break;
-
       default:
         break;
     }
@@ -77,14 +72,19 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea}) => {
             variant="h5"
             color="inherit"
             noWrap
-            sx={{ flexGrow: 1, boxShadow: "none", display: 'flex', gap: '20px' }}
+            sx={{
+              flexGrow: 1,
+              boxShadow: "none",
+              display: "flex",
+              gap: "20px",
+            }}
             textAlign={"left"}
-            alignItems={'center'}
-          > 
+            alignItems={"center"}
+          >
             {getNameTabs()}
-            {
-              (valueTabs === 'menu_fields' && allArea) ? <Typography color={'grey'}>{allArea} га</Typography> : null
-            }
+            {valueTabs === "menu_fields" && allArea ? (
+              <Typography color={"grey"}>{allArea} га</Typography>
+            ) : null}
           </Typography>
           <Box sx={{ minWidth: 120, marginRight: "20px" }}>
             <FormControl fullWidth>
