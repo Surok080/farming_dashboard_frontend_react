@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   TileLayer,
   LayersControl,
@@ -7,9 +7,38 @@ import {
   LayerGroup,
   Tooltip,
 } from "react-leaflet";
-import { Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 
-const Layers = memo(({ layer, activeArea, setActiveArea }) => {
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
+const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
+  const [open, setOpen] = useState(false);
+  const [activeAreaToModal, setActiveAreaToModal] = useState(null);
+  const handleOpen = (item) => {
+    setOpen(true);
+    setActiveAreaToModal(item);
+  };
+  const handleClose = () => {
+    setOpen(false);
+    setActiveAreaToModal(null);
+  };
+
   const map = useMapEvents({
     // Use leaflet map event as the key and a call back with the
     // map method as the value:
@@ -56,7 +85,6 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
     return hash;
   };
 
-
   return (
     <>
       <LayersControl position="topright">
@@ -75,7 +103,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
         </LayersControl.BaseLayer>
         <LayersControl.BaseLayer name="WorldImagery">
           <TileLayer
-            attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
         </LayersControl.BaseLayer>
@@ -97,6 +125,8 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
                       item.geometry.coordinates[0].map((item) =>
                         item.reverse()
                       );
+                      console.log(item);
+                      handleOpen(item);
                     },
                   }}
                 >
@@ -111,6 +141,65 @@ const Layers = memo(({ layer, activeArea, setActiveArea }) => {
               </LayerGroup>
             );
           })}
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style} display={"flex"} justifyContent={"center"}>
+            {activeAreaToModal ? (
+              <Box display={"flex"} flexDirection={"column"} gap={2}>
+                <Box display={'flex'} gap={2}>
+                  <TextField
+                    disabled
+                    id="name-area"
+                    label={'Название поля'}
+                    defaultValue={activeAreaToModal.properties.name}
+                    variant="outlined"
+                  />
+                  <TextField
+                    disabled
+                    id="year-area"
+                    defaultValue={year}
+                    label={'Год'}
+                    variant="outlined"
+                  />
+                </Box>
+                <TextField
+                    disabled
+                    id="crop-area"
+                    label={'Культура'}
+                    defaultValue={activeAreaToModal.properties.crop}
+                    variant="outlined"
+                  />
+                  <TextField
+                    disabled
+                    id="crop-kind-area"
+                    label={'Сорт'}
+                    defaultValue={activeAreaToModal.properties.crop_kind}
+                    variant="outlined"
+                  />
+                  <TextField
+                    disabled
+                    id="crop-group-area"
+                    label={'Группа с/х культур'}
+                    defaultValue={activeAreaToModal.properties.crop_group}
+                    variant="outlined"
+                  />
+                  <TextField
+                    disabled
+                    id="area-area"
+                    label={'Площадь, га'}
+                    defaultValue={activeAreaToModal.properties.area}
+                    variant="outlined"
+                  />
+              </Box>
+            ) : (
+              <CircularProgress color="success" />
+            )}
+          </Box>
+        </Modal>
       </LayersControl>
     </>
   );

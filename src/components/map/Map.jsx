@@ -239,7 +239,7 @@ const Map = memo(({ year, setAllArea }) => {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  maxHeight: "100%",
+                  maxHeight: "96%",
                 }}
                 value="1"
               >
@@ -328,6 +328,7 @@ const Map = memo(({ year, setAllArea }) => {
           <ZoomControl position="topright" />
           {layer ? (
             <Layers
+              year={year}
               layer={layer}
               activeArea={activeArea}
               setActiveArea={setActiveArea}
