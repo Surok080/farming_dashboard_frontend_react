@@ -3,10 +3,11 @@ import Layers from "./Layers";
 import { MapContainer, ZoomControl } from "react-leaflet";
 import { httpService } from "../../api/setup";
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -54,6 +55,16 @@ const Map = memo(({ year, setAllArea }) => {
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
   const [grouping, setGrouping] = useState("crop");
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+
+  const handleCloseBackdrop = () => {
+    setTimeout(() => {
+      setOpenBackdrop(false);
+    }, 1000);
+  };
+  const handleOpenBackdrop = () => {
+    setOpenBackdrop(true);
+  };
 
   useEffect(() => {
     if (!load) {
@@ -91,12 +102,13 @@ const Map = memo(({ year, setAllArea }) => {
   };
 
   const getData = () => {
+    handleOpenBackdrop();
     httpService
       .get(`/fields/fields?year=${year}&group=${grouping}`)
       .then((res) => {
         if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
-          setAllArea(res.data.total_area.toFixed(2))
+          setAllArea(res.data.total_area.toFixed(2));
           getAreaLayers(res.data, setStatistics, grouping);
           getColorLayers(res.data, setColorLayers, grouping);
         } else {
@@ -105,6 +117,7 @@ const Map = memo(({ year, setAllArea }) => {
       })
       .finally(() => {
         setLoad(false);
+        handleCloseBackdrop();
       });
   };
 
@@ -120,7 +133,7 @@ const Map = memo(({ year, setAllArea }) => {
 
     let formData = new FormData();
     formData.append("file", file);
-
+    handleOpenBackdrop();
     httpService
       .post("/fields/upload_file/", formData)
       .then((res) => {
@@ -144,6 +157,7 @@ const Map = memo(({ year, setAllArea }) => {
       })
       .finally(() => {
         fileInputRef.current.value = null;
+        handleCloseBackdrop()
       });
   };
 
@@ -186,7 +200,7 @@ const Map = memo(({ year, setAllArea }) => {
           zIndex: "1000",
           right: "10px",
           maxWidth: "40px",
-          minWidth: '40px'
+          minWidth: "40px",
         }}
         component="label"
         variant="contained"
@@ -356,7 +370,7 @@ const Map = memo(({ year, setAllArea }) => {
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                gap: '5px'
+                gap: "5px",
               }}
             >
               {statistics &&
@@ -398,6 +412,13 @@ const Map = memo(({ year, setAllArea }) => {
         handleCloseConfirmDelete={handleCloseConfirmDelete}
         openConfirmDelete={openConfirmDelete}
       />
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openBackdrop}
+        onClick={handleCloseBackdrop}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </>
   );
 });
