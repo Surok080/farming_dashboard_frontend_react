@@ -28,6 +28,8 @@ import {
 import ReportArea from "./ReportArea";
 import LayersState from "./LayersState";
 import ReportAreaState from "./ReportAreaState";
+import LayersCartogram from "./LayersCartogram";
+import ReportAreaCartogram from "./ReportAreaCartogram";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -41,7 +43,7 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const MapCartograms = memo(() => {
+const MapCartogram = memo(() => {
   const [layer, setLayer] = useState([]);
   const [layerSearch, setLayerSearch] = useState(null);
   const [statistics, setStatistics] = useState([]);
@@ -54,7 +56,7 @@ const MapCartograms = memo(() => {
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
-  const [grouping, setGrouping] = useState("plot_form_owner");
+  const [grouping, setGrouping] = useState("phosphorus_group_id");
 
   useEffect(() => {
     if (!load) {
@@ -93,20 +95,20 @@ const MapCartograms = memo(() => {
   };
 
   const getData = () => {
-    // httpService
-    //   .get(`/state_monitoring/plots?group=${grouping}`)
-    //   .then((res) => {
-    //     if (res?.status === 200 && res.data?.features) {
-    //       setLayer(res.data);
-    //       getAreaLayers(res.data, setStatistics, grouping);
-    //       getColorLayers(res.data, setColorLayers, grouping);
-    //     } else {
-    //       resetState();
-    //     }
-    //   })
-    //   .finally(() => {
-    //     setLoad(false);
-    //   });
+    httpService
+      .get(`/cartogram/fields?group=phosphorus`)
+      .then((res) => {
+        if (res?.status === 200 && res.data?.features) {
+          setLayer(res.data);
+          getAreaLayers(res.data, setStatistics, grouping);
+          getColorLayers(res.data, setColorLayers, grouping);
+        } else {
+          resetState();
+        }
+      })
+      .finally(() => {
+        setLoad(false);
+      });
   };
 
   const resetState = () => {
@@ -122,30 +124,30 @@ const MapCartograms = memo(() => {
     let formData = new FormData();
     formData.append("file", file);
 
-  //   httpService
-  //     .post("/state_monitoring/upload_plots", formData)
-  //     .then((res) => {
-  //       if (res.status === 200) {
-  //         getData();
-  //         enqueueSnackbar("Данные добавлены", {
-  //           autoHideDuration: 1000,
-  //           variant: "success",
-  //         });
-  //       } else if (res.status === 422) {
-  //         enqueueSnackbar("Некорректный файл", {
-  //           autoHideDuration: 1000,
-  //           variant: "error",
-  //         });
-  //       } else {
-  //         enqueueSnackbar("Ошибка загрузки файлов", {
-  //           autoHideDuration: 1000,
-  //           variant: "error",
-  //         });
-  //       }
-  //     })
-  //     .finally(() => {
-  //       fileInputRef.current.value = null;
-  //     });
+    httpService
+      .post("/cartogram/upload_cartogram", formData)
+      .then((res) => {
+        if (res.status === 200) {
+          getData();
+          enqueueSnackbar("Данные добавлены", {
+            autoHideDuration: 1000,
+            variant: "success",
+          });
+        } else if (res.status === 422) {
+          enqueueSnackbar("Некорректный файл", {
+            autoHideDuration: 1000,
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar("Ошибка загрузки файлов", {
+            autoHideDuration: 1000,
+            variant: "error",
+          });
+        }
+      })
+      .finally(() => {
+        fileInputRef.current.value = null;
+      });
   };
 
   const deletArea = () => {
@@ -258,10 +260,10 @@ const MapCartograms = memo(() => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={"plot_form_owner"}>
+                    <MenuItem value={"phosphorus_group_id"}>
                       Подвижный фосфор
                     </MenuItem>
-                    <MenuItem value={"plot_land_owner"}>Калий</MenuItem>
+                    <MenuItem value={"phosphorus_group_id"}>Калий</MenuItem>
                   </Select>
                 </FormControl>
               </TabPanel>
@@ -275,7 +277,7 @@ const MapCartograms = memo(() => {
                 }}
                 value="2"
               >
-                <ReportAreaState />
+                <ReportAreaCartogram grouping={grouping}/>
               </TabPanel>
             </TabContext>
           </Box>
@@ -289,7 +291,7 @@ const MapCartograms = memo(() => {
         >
           <ZoomControl position="topright" />
           {layer ? (
-            <LayersState
+            <LayersCartogram
               layer={layer}
               activeArea={activeArea}
               setActiveArea={setActiveArea}
@@ -363,4 +365,4 @@ const MapCartograms = memo(() => {
   );
 });
 
-export default MapCartograms;
+export default MapCartogram;

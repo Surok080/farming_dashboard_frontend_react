@@ -1,6 +1,6 @@
 import { Box, Grid } from '@mui/material';
 import React from 'react';
-import MapCartograms from '../map/MapCartograms';
+import MapCartogram from '../map/MapCartogram';
 
 const CartogramsPage = () => {
   return (
@@ -20,7 +20,7 @@ const CartogramsPage = () => {
             overflow: 'hidden'
           }}
         >
-          <MapCartograms/>
+          <MapCartogram/>
         </Box>
       </Grid>
     </Grid>
