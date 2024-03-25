@@ -56,7 +56,7 @@ const MapCartogram = memo(() => {
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
-  const [grouping, setGrouping] = useState("phosphorus_group_id");
+  const [grouping, setGrouping] = useState("phosphorus");
 
   useEffect(() => {
     if (!load) {
@@ -96,7 +96,7 @@ const MapCartogram = memo(() => {
 
   const getData = () => {
     httpService
-      .get(`/cartogram/fields?group=phosphorus`)
+      .get(`/cartogram/fields?group=${grouping}`)
       .then((res) => {
         if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
@@ -260,10 +260,10 @@ const MapCartogram = memo(() => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={"phosphorus_group_id"}>
+                    <MenuItem value={"phosphorus"}>
                       Подвижный фосфор
                     </MenuItem>
-                    <MenuItem value={"phosphorus_group_id"}>Калий</MenuItem>
+                    <MenuItem value={"phosphorus"}>Калий</MenuItem>
                   </Select>
                 </FormControl>
               </TabPanel>
