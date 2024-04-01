@@ -79,7 +79,7 @@ const ReportAreaCartogram = ({ grouping }) => {
                   }}
                 />
                 <Typography textAlign={"left"} alignItems={"left"}>
-                  {item.group_description}
+                  {item.group_borders}
                 </Typography>
               </Box>
               <Box

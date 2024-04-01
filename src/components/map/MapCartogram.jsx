@@ -64,7 +64,7 @@ const MapCartogram = memo(() => {
       setLoad(true);
     }
   }, [grouping]);
-  
+
 
   useEffect(() => {
     if (serachValue && layer) {
@@ -260,10 +260,12 @@ const MapCartogram = memo(() => {
                     onChange={handleChangeGrouping}
                     size="small"
                   >
-                    <MenuItem value={"phosphorus"}>
-                      Подвижный фосфор
-                    </MenuItem>
-                    <MenuItem value={"phosphorus"}>Калий</MenuItem>
+                      <MenuItem value={"phosphorus"}>
+                          Подвижный фосфор
+                      </MenuItem>
+                      <MenuItem value={"potassium"}>Калий</MenuItem>
+                      <MenuItem value={"acidity"}>Кислотность</MenuItem>
+                      <MenuItem value={"hummus"}>Гумус</MenuItem>
                   </Select>
                 </FormControl>
               </TabPanel>
