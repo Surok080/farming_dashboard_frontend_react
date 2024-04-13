@@ -81,7 +81,6 @@ const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
                 </LayersControl.BaseLayer>
                 {layer.features &&
                     layer.features.map((item, key) => {
-                        console.log(item)
                         return (
                             <LayerGroup key={key}>
                                 <GeoJSON
@@ -89,7 +88,7 @@ const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
                                     data={item}
                                     pathOptions={{color: item.properties.color}}
                                     eventHandlers={{
-                                        click: (event, type) => {
+                                        click: () => {
                                             map.fitBounds(
                                                 item.geometry.coordinates[0].map((item) =>
                                                     item.reverse()
