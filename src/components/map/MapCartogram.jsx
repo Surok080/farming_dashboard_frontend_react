@@ -17,8 +17,8 @@ import { useSnackbar } from "notistack";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import {
-  getAreaLayers,
-  getColorLayers,
+    getAreaLayers, getAreaLayersCartogram,
+    getColorLayers, getColorLayersCartogram,
 } from "../../utils/mapUtils";
 import LayersCartogram from "./LayersCartogram";
 import ReportAreaCartogram from "./ReportAreaCartogram";
@@ -89,8 +89,8 @@ const MapCartogram = memo(() => {
       .then((res) => {
         if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
-          getAreaLayers(res.data, setStatistics, grouping);
-          getColorLayers(res.data, setColorLayers, grouping);
+          getAreaLayersCartogram(res.data, setStatistics, grouping);
+          getColorLayersCartogram(res.data, setColorLayers, grouping);
         } else {
           resetState();
         }

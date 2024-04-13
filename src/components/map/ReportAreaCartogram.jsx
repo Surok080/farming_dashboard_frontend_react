@@ -24,7 +24,7 @@ const ReportAreaCartogram = ({ grouping }) => {
   }, []);
   return yearReports?.groups?.length ? (
     <>
-      <Typography>Список полей</Typography>
+      <Typography mb={2}>Диапазоны значений</Typography>
       <Box
         sx={{ overflowY: "auto", display: "flex", flexDirection: "column" }}
       >
@@ -37,7 +37,7 @@ const ReportAreaCartogram = ({ grouping }) => {
           }}
         >
           <Box display={"flex"} alignItems={"center"} gap={1}>
-            <Typography ml={4} textAlign={"left"} alignItems={"left"}>
+            <Typography sx={{ fontWeight: 'bold' }} ml={4} textAlign={"left"} alignItems={"left"}>
               мк/г
             </Typography>
           </Box>
@@ -48,16 +48,15 @@ const ReportAreaCartogram = ({ grouping }) => {
             maxWidth={"120px"}
             width={"100%"}
           >
-            <Typography ml={1} textAlign={"left"} alignItems={"left"}>
+            <Typography sx={{ fontWeight: 'bold' }} ml={1} textAlign={"left"} alignItems={"left"}>
               %
             </Typography>
-            <Typography textAlign={"left"} alignItems={"left"}>
+            <Typography sx={{ fontWeight: 'bold' }} textAlign={"left"} alignItems={"left"}>
               га
             </Typography>
           </Box>
         </Box>
         {yearReports.groups.map((item, index) => {
-          console.log(item);
 
           return (
             <Box
@@ -79,7 +78,7 @@ const ReportAreaCartogram = ({ grouping }) => {
                   }}
                 />
                 <Typography textAlign={"left"} alignItems={"left"}>
-                  {item.group_borders}
+                  {item.group_description}
                 </Typography>
               </Box>
               <Box
@@ -108,7 +107,7 @@ const ReportAreaCartogram = ({ grouping }) => {
           }}
         >
           <Box display={"flex"} alignItems={"center"} gap={1}>
-            <Typography ml={4} textAlign={"left"} alignItems={"left"}>
+            <Typography sx={{ fontWeight: 'bold' }} ml={4} textAlign={"left"} alignItems={"left"}>
               Итого
             </Typography>
           </Box>
@@ -119,10 +118,10 @@ const ReportAreaCartogram = ({ grouping }) => {
             maxWidth={"120px"}
             width={"100%"}
           >
-            <Typography ml={1} textAlign={"left"} alignItems={"left"}>
+            <Typography sx={{ fontWeight: 'bold' }} ml={1} textAlign={"left"} alignItems={"left"}>
               {yearReports.total_percents}
             </Typography>
-            <Typography textAlign={"left"} alignItems={"left"}>
+            <Typography sx={{ fontWeight: 'bold' }} textAlign={"left"} alignItems={"left"}>
             {yearReports.total_area}
             </Typography>
           </Box>
