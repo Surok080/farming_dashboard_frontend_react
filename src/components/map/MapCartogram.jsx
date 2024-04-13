@@ -1,5 +1,4 @@
 import React, { memo, useEffect, useRef, useState } from "react";
-import Layers from "./Layers";
 import { MapContainer, ZoomControl } from "react-leaflet";
 import { httpService } from "../../api/setup";
 import {
@@ -10,24 +9,17 @@ import {
   MenuItem,
   Select,
   Tab,
-  TextField,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { Chart } from "react-google-charts";
 import { useSnackbar } from "notistack";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import {
   getAreaLayers,
   getColorLayers,
-  getOptionChart,
 } from "../../utils/mapUtils";
-import ReportArea from "./ReportArea";
-import LayersState from "./LayersState";
-import ReportAreaState from "./ReportAreaState";
 import LayersCartogram from "./LayersCartogram";
 import ReportAreaCartogram from "./ReportAreaCartogram";
 
@@ -82,9 +74,6 @@ const MapCartogram = memo(() => {
     setGrouping(event.target.value);
   };
 
-  const handleOpenConfirmDelete = () => {
-    setOpenConfirmDelete(true);
-  };
 
   const handleCloseConfirmDelete = () => {
     setOpenConfirmDelete(false);
@@ -250,22 +239,22 @@ const MapCartogram = memo(() => {
               >
                 <FormControl fullWidth>
                   <InputLabel id="demo-simple-select-label">
-                    По типу
+                    По свойству почвы
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     value={grouping}
-                    label="По типу"
+                    label="По свойству почвы"
                     onChange={handleChangeGrouping}
                     size="small"
                   >
                       <MenuItem value={"phosphorus"}>
                           Подвижный фосфор
                       </MenuItem>
-                      <MenuItem value={"potassium"}>Калий</MenuItem>
-                      <MenuItem value={"acidity"}>Кислотность</MenuItem>
-                      <MenuItem value={"hummus"}>Гумус</MenuItem>
+                      <MenuItem value={"potassium"}>Обменный калий</MenuItem>
+                      <MenuItem value={"acidity"}>pH кислотность</MenuItem>
+                      <MenuItem value={"hummus"}>Органический гумус</MenuItem>
                   </Select>
                 </FormControl>
               </TabPanel>

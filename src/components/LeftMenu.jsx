@@ -18,6 +18,7 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MuiDrawer from "@mui/material/Drawer";
 import styled from "@emotion/styled";
 import { drawerWidth } from "./dashboard/Dashboard";
+import logo from "../images/logo.svg"
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -82,10 +83,12 @@ const LeftMenu = () => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "flex-end",
+                justifyContent: "center",
                 px: [1],
               }}
-            ></Toolbar>
+            >
+              <img src={logo} width={34} height={27} alt="logo" />
+            </Toolbar>
             <Divider />
             <List sx={{ paddingTop: "10px" }} component="nav">
               <Box height={"50px"}>

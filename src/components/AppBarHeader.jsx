@@ -42,9 +42,9 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
       case "menu_fields":
         return "Поля";
       case "menu_gos":
-        return "Картограммы";
-      case "menu_сartograms":
         return "Госмониторинг";
+      case "menu_сartograms":
+        return "Картограммы";
       case "menu_settings":
         return "Настройки";
       default:
