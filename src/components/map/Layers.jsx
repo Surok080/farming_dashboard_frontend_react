@@ -14,6 +14,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
 
 const style = {
   position: "absolute",
@@ -150,11 +153,24 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
           <Box sx={style} display={"flex"} justifyContent={"center"}>
             {activeAreaToModal ? (
               <Box display={"flex"} flexDirection={"column"} gap={2}>
-                <Box display={'flex'} gap={2}>
+                <Typography variant="h5" mb={2}>Паспорт поля</Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleClose}
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+                <Box display={"flex"} gap={2}>
                   <TextField
                     disabled
                     id="name-area"
-                    label={'Название поля'}
+                    label={"Название поля"}
                     defaultValue={activeAreaToModal.properties.name}
                     variant="outlined"
                   />
@@ -162,38 +178,38 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                     disabled
                     id="year-area"
                     defaultValue={year}
-                    label={'Год'}
+                    label={"Год"}
                     variant="outlined"
                   />
                 </Box>
                 <TextField
-                    disabled
-                    id="crop-area"
-                    label={'Культура'}
-                    defaultValue={activeAreaToModal.properties.crop}
-                    variant="outlined"
-                  />
-                  <TextField
-                    disabled
-                    id="crop-kind-area"
-                    label={'Сорт'}
-                    defaultValue={activeAreaToModal.properties.crop_kind}
-                    variant="outlined"
-                  />
-                  <TextField
-                    disabled
-                    id="crop-group-area"
-                    label={'Группа с/х культур'}
-                    defaultValue={activeAreaToModal.properties.crop_group}
-                    variant="outlined"
-                  />
-                  <TextField
-                    disabled
-                    id="area-area"
-                    label={'Площадь, га'}
-                    defaultValue={activeAreaToModal.properties.area}
-                    variant="outlined"
-                  />
+                  disabled
+                  id="crop-area"
+                  label={"Культура"}
+                  defaultValue={activeAreaToModal.properties.crop}
+                  variant="outlined"
+                />
+                <TextField
+                  disabled
+                  id="crop-kind-area"
+                  label={"Сорт"}
+                  defaultValue={activeAreaToModal.properties.crop_kind}
+                  variant="outlined"
+                />
+                <TextField
+                  disabled
+                  id="crop-group-area"
+                  label={"Группа с/х культур"}
+                  defaultValue={activeAreaToModal.properties.crop_group}
+                  variant="outlined"
+                />
+                <TextField
+                  disabled
+                  id="area-area"
+                  label={"Площадь, га"}
+                  defaultValue={activeAreaToModal.properties.area}
+                  variant="outlined"
+                />
               </Box>
             ) : (
               <CircularProgress color="success" />
