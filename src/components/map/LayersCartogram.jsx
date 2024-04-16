@@ -84,6 +84,16 @@ const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
                         return (
                             <LayerGroup key={key}>
                                 <GeoJSON
+                                    onEachFeature={(feature, layer) => {
+                                        layer.on({
+                                            mouseover: (e) => {
+                                                e.target.setStyle({ fillColor: 'yellow'});
+                                            },
+                                            mouseout: (e) => {
+                                                e.target.setStyle({ fillColor: item.properties.color });
+                                            },
+                                        });
+                                    }}
                                     key={hashString(JSON.stringify(layer))}
                                     data={item}
                                     pathOptions={{color: item.properties.color}}
