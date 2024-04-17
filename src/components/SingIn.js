@@ -81,10 +81,10 @@ export default function SignIn() {
           }}
         >
           {/* <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}> */}
-            <img src={logo} alt="logo" />
+            <img width={80} src={logo} alt="logo" />
           {/* </Avatar> */}
-          <Typography component="h1" variant="h5">
-            Авторизация Дашборд
+          <Typography mt={2} component="h1" variant="h5">
+            Авторизация
           </Typography>
           <Box
             component="form"
@@ -128,6 +128,9 @@ export default function SignIn() {
           >
             Авторизоваться
           </Button> */}
+            <Typography mt={4} component="h2" variant="subtitle1">
+              Система управления сельским хозяйством
+            </Typography>
           </Box>
         </Box>
       </Container>
