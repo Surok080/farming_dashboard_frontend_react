@@ -62,6 +62,7 @@ const Map = memo(({ year, setAllArea }) => {
       setOpenBackdrop(false);
     }, 1000);
   };
+
   const handleOpenBackdrop = () => {
     setOpenBackdrop(true);
   };
@@ -69,7 +70,6 @@ const Map = memo(({ year, setAllArea }) => {
   useEffect(() => {
     if (!load) {
       getData();
-      setLoad(true);
     }
   }, [year, grouping]);
 
@@ -103,6 +103,7 @@ const Map = memo(({ year, setAllArea }) => {
 
   const getData = () => {
     handleOpenBackdrop();
+    setLoad(true);
     httpService
       .get(`/fields/fields?year=${year}&group=${grouping}`)
       .then((res) => {

@@ -2,14 +2,15 @@ import React, { memo, useEffect, useRef, useState } from "react";
 import { MapContainer, ZoomControl } from "react-leaflet";
 import { httpService } from "../../api/setup";
 import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tab,
-  Typography,
+    Backdrop,
+    Box,
+    Button, CircularProgress,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Tab,
+    Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -49,8 +50,19 @@ const MapCartogram = memo(() => {
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [serachValue, setSerachValue] = useState(false);
   const [grouping, setGrouping] = useState("phosphorus");
+    const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
-  useEffect(() => {
+    const handleCloseBackdrop = () => {
+        setTimeout(() => {
+            setOpenBackdrop(false);
+        }, 1000);
+    };
+
+    const handleOpenBackdrop = () => {
+        setOpenBackdrop(true);
+    };
+
+    useEffect(() => {
     if (!load) {
       getData();
       setLoad(true);
@@ -84,6 +96,7 @@ const MapCartogram = memo(() => {
   };
 
   const getData = () => {
+      handleOpenBackdrop();
     httpService
       .get(`/cartogram/fields?group=${grouping}`)
       .then((res) => {
@@ -97,6 +110,7 @@ const MapCartogram = memo(() => {
       })
       .finally(() => {
         setLoad(false);
+          handleCloseBackdrop();
       });
   };
 
@@ -112,7 +126,7 @@ const MapCartogram = memo(() => {
 
     let formData = new FormData();
     formData.append("file", file);
-
+      handleOpenBackdrop();
     httpService
       .post("/cartogram/upload_cartogram", formData)
       .then((res) => {
@@ -136,6 +150,7 @@ const MapCartogram = memo(() => {
       })
       .finally(() => {
         fileInputRef.current.value = null;
+          handleCloseBackdrop();
       });
   };
 
@@ -352,6 +367,13 @@ const MapCartogram = memo(() => {
         handleCloseConfirmDelete={handleCloseConfirmDelete}
         openConfirmDelete={openConfirmDelete}
       />
+        <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={openBackdrop}
+            onClick={handleCloseBackdrop}
+        >
+            <CircularProgress color="inherit" />
+        </Backdrop>
     </>
   );
 });
