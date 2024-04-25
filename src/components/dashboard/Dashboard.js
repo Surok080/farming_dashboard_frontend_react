@@ -16,6 +16,7 @@ import AppBarHeader from "../AppBarHeader";
 import LeftMenu from "../LeftMenu";
 import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
 import CartogramsPage from "../dashboardPages/CartogramsPage";
+import PageDevelopment from "../PageDevolopment";
 
 export const drawerWidth = 180;
 
@@ -56,6 +57,8 @@ export default function Dashboard() {
     switch (valueTabs) {
       case "menu_dashboard":
         return <FieldsPages />;
+      case "menu_tehcart":
+        return <PageDevelopment />;
       case "menu_fields":
         return <DashboardPages setAllArea={setAllArea} year={year} />;
       case "menu_gos":

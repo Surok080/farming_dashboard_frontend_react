@@ -8,6 +8,7 @@ import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import GridOnIcon from '@mui/icons-material/GridOn';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 export default function ListItems() {
   const { valueTabs, setValueTabs } = React.useContext(Context);
@@ -19,6 +20,13 @@ export default function ListItems() {
           <GridViewOutlinedIcon sx={{color: valueTabs ===  "menu_dashboard" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Обзор" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => setValueTabs("menu_tehcart")}>
+        <ListItemIcon sx={{minWidth: '36px'}}>
+          <DescriptionOutlinedIcon sx={{color: valueTabs ===  "menu_tehcart" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+        </ListItemIcon>
+        <ListItemText primary="ТехКарта" />
       </ListItemButton>
 
       <ListItemButton onClick={() => setValueTabs("menu_fields")}>

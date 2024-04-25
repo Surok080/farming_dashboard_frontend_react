@@ -39,6 +39,8 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
     switch (valueTabs) {
       case "menu_dashboard":
         return "Обзор";
+        case "menu_tehcart":
+        return "ТехКарта";
       case "menu_fields":
         return "Поля";
       case "menu_gos":
