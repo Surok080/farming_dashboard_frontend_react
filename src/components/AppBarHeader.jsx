@@ -53,6 +53,8 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
         break;
     }
   }
+  console.log(' test ');
+  
 
   return (
     <>
