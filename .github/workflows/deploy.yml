@@ -1,5 +1,3 @@
-name: Deployment
-
 on:
   push:
     branches:
@@ -10,24 +8,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Setup Node.js
+      
+    - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14' # Вы можете выбрать нужную вам версию Node.js
+        node-version: '14' # Выберите желаемую версию Node.js
 
     - name: Install Yarn
       run: npm install -g yarn
 
-    - name: Install dependencies
-      run: yarn
-
-    - name: Build
-      run: yarn build
-
-    - name: Deploy using SSH
+    - name: deploy using ssh
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_IP }}
@@ -37,6 +29,7 @@ jobs:
         script: |
           cd farming_dashboard_frontend_react && \
           git pull origin develop && \
+          yarn && \
           yarn build && \
           sudo scp -r build/* /var/www/html/dashboard/ && \
           sudo rm -R node_modules
