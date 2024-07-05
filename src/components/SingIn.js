@@ -37,7 +37,9 @@ export default function SignIn() {
     setLoad(true);
     try {
       SignInApi.auth(userDto).then((res) => {
-        if (res.status === 200) {
+        console.log(res);
+        
+        if (res?.status === 200) {
           SignInApi.getMe().then((user) => {
             setLoad(false);
             setUserDto(user.data);
@@ -49,7 +51,7 @@ export default function SignIn() {
 
             navigate("/dashboard");
           });
-        } else if (res.status === 403) {
+        } else if (res?.status === 403) {
           enqueueSnackbar("Доступ запрещен", {
             autoHideDuration: 3000,
             variant: "warning",

@@ -1,7 +1,6 @@
 import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
@@ -16,11 +15,10 @@ import AppBarHeader from "../AppBarHeader";
 import LeftMenu from "../LeftMenu";
 import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
 import CartogramsPage from "../dashboardPages/CartogramsPage";
-import PageDevelopment from "../PageDevolopment";
+import TechcartPage from "../dashboardPages/TechcartPage";
+import { Hidden } from "@mui/material";
 
 export const drawerWidth = 180;
-
-
 
 const defaultTheme = createTheme({
   palette: {
@@ -34,7 +32,7 @@ export default function Dashboard() {
   const user = useSelector((state) => state.user.fio);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [valueTabs, setValueTabs] = React.useState("menu_fields");
+  const [valueTabs, setValueTabs] = React.useState("menu_tehcart");
   const [loading, setLoading] = React.useState(true);
   const [year, setYear] = React.useState(2024);
   const [allArea, setAllArea] = React.useState(null);
@@ -52,13 +50,12 @@ export default function Dashboard() {
     }
   }, []);
 
-
   function getPagesDashboard() {
     switch (valueTabs) {
       case "menu_dashboard":
         return <FieldsPages />;
       case "menu_tehcart":
-        return <PageDevelopment />;
+        return <TechcartPage year={year}/>;
       case "menu_fields":
         return <DashboardPages setAllArea={setAllArea} year={year} />;
       case "menu_gos":
@@ -71,7 +68,6 @@ export default function Dashboard() {
     }
   }
 
-
   if (loading) {
     return <>loading</>;
   }
@@ -81,8 +77,14 @@ export default function Dashboard() {
       <Context.Provider value={{ valueTabs, setValueTabs }}>
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
-          <AppBarHeader allArea={allArea} valueTabs={valueTabs} year={year} user={user} setYear={setYear}/>
-          <LeftMenu/>
+          <AppBarHeader
+            allArea={allArea}
+            valueTabs={valueTabs}
+            year={year}
+            user={user}
+            setYear={setYear}
+          />
+          <LeftMenu />
           <Box
             component="main"
             sx={{
@@ -106,6 +108,7 @@ export default function Dashboard() {
                 height: "calc(100% - 96px)",
                 width: "calc(100% - 220px)",
                 padding: "0",
+                overflow: 'hidden'
               }}
             >
               {getPagesDashboard()}
