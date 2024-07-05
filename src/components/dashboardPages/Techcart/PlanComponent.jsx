@@ -1,6 +1,7 @@
 import { Box, Grid, Paper, styled, Typography } from "@mui/material";
 import React from "react";
 import PlanTitle from "./PlanTitle";
+import LeftBlockPlan from "./LeftBlockPlan";
 
 
 
@@ -17,13 +18,15 @@ const PlanComponent = ({ year }) => {
       <PlanTitle year={year} />
       <Grid sx={{height: '100%', paddingBottom:'20px'}} mt={1} columns={12} container spacing={2}>
         <Grid item xs={4}>
-          <Box sx={{border: '1px solid black', height: '100%'}}>xs=1</Box>
+          <Box sx={{height: '100%'}}>
+            <LeftBlockPlan/>
+          </Box>
         </Grid>
         <Grid item xs={4}>
-          <Box  sx={{border: '1px solid black', height: '100%'}}>xs=2</Box>
+          <Box  sx={{ height: '100%'}}>xs=2</Box>
         </Grid>
         <Grid item xs={4}>
-          <Box sx={{border: '1px solid black', height: '100%'}}>xs=3</Box>
+          <Box sx={{ height: '100%'}}>xs=3</Box>
         </Grid>
       </Grid>
     </Box>

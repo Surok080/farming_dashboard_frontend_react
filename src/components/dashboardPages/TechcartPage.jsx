@@ -15,8 +15,8 @@ const TechcartPage = ({year}) => {
       <TabContext value={value} >
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <TabList onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Плановый" value="1" />
-            <Tab label="Фактический" value="2" />
+            <Tab sx={{color: 'black !important'}} label="Плановый" value="1" />
+            <Tab sx={{color: 'black !important'}} label="Фактический" value="2" />
           </TabList>
         </Box>
         <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="1">
