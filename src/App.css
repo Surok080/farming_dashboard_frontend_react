@@ -58,3 +58,11 @@
 #patch_1 path {
   fill: transparent !important;
 }
+
+.truncat {
+  margin: 0;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

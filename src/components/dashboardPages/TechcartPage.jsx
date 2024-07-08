@@ -20,9 +20,9 @@ const TechcartPage = ({year}) => {
           </TabList>
         </Box>
         <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="1">
-          <PlanComponent year={year}/>
+          <PlanComponent year={year} fact={value === '2'}/>
         </TabPanel>
-        <TabPanel value="2">Item Two</TabPanel>
+        <TabPanel value="2">Фактический</TabPanel>
       </TabContext>
     </Box>
   );
