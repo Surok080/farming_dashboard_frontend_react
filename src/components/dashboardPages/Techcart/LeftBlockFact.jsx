@@ -10,13 +10,14 @@ import {
 import React, { useEffect, useState } from "react";
 import { TehMapApi } from "../../../api/tehMap";
 
-const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
+const LeftBlockFact = ({ crops, year, fact, data, setData }) => {
   const [crop, setCrop] = useState("");
 
   useEffect(() => {
     if (crop) {
       try {
         TehMapApi.getDataCrop(year, fact, crop).then((res) => {
+          console.log(res.data);
           setData(res.data);
         });
       } catch (e) {
@@ -95,43 +96,15 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
             sx={{ fontWeight: "bold", color: "white" }}
             variant="body"
           >
-            Технологические операции
+            
           </Typography>
         </Box>
-        <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>
-          {data.works.map((item, index) => (
-            <Box
-              key={index + item.work_type}
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-            >
-              <Tooltip title="Обработка зяби">
-                <Typography
-                  className="truncat"
-                  textAlign={"left"}
-                  width={"60%"}
-                  variant="body1"
-                >
-                  {item.work_type}
-                </Typography>
-              </Tooltip>
-              <Typography textAlign={"right"} width={"40%"} variant="caption">
-                {new Date(item.date_start).toLocaleDateString("ru-RU", {
-                  day: "numeric",
-                  month: "long",
-                })}{" - "}
-                {new Date(item.date_end).toLocaleDateString("ru-RU", {
-                  day: "numeric",
-                  month: "long",
-                })}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
+        {/* <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>
+ 
+        </Box> */}
       </Box>
     </Box>
   );
 };
 
-export default LeftBlockPlan;
+export default LeftBlockFact;

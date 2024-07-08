@@ -1,12 +1,14 @@
-import { Box, Grid, Paper, styled, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import PlanTitle from "./PlanTitle";
-import LeftBlockPlan from "./LeftBlockPlan";
-import CenterBlockPlan from "./CenterBlockPlan";
-import { TehMapApi } from "../../../api/tehMap";
-import { dataCrop } from "../../../types";
+import React, { useEffect, useState } from 'react';
+import { dataCrop } from '../../../types';
+import { TehMapApi } from '../../../api/tehMap';
+import { Box, Grid } from '@mui/material';
+import LeftBlockPlan from './LeftBlockPlan';
+import CenterBlockPlan from './CenterBlockPlan';
+import FactTitle from './FactTitle';
+import LeftBlockFact from './LeftBlockFact';
+import CenterBlockFackt from './CenterBlockFackt';
 
-const PlanComponent = ({ year, fact }) => {
+const FactComponent = ({ year, fact }) => {
   const [crops, setCrops] = useState([]);
   const [data, setData] = useState(dataCrop);
 
@@ -31,7 +33,7 @@ const PlanComponent = ({ year, fact }) => {
         padding: "10px 10px 18px 10px",
       }}
     >
-      <PlanTitle year={year} />
+      <FactTitle year={year} />
       <Grid
         sx={{ height: "100%", paddingBottom: "20px", overflow: "hidden" }}
         mt={1}
@@ -40,14 +42,14 @@ const PlanComponent = ({ year, fact }) => {
         spacing={2}
       >
         <Grid sx={{ height: "100%", overflow: "hidden" }} item xs={4}>
-          <LeftBlockPlan crops={crops} year={year} fact={fact} data={data} setData={setData}/>
+          <LeftBlockFact crops={crops} year={year} fact={fact} data={data} setData={setData}/>
         </Grid>
         <Grid item xs={8}>
-          <CenterBlockPlan data={data}/>
+          <CenterBlockFackt data={data}/>
         </Grid>
       </Grid>
     </Box>
   );
 };
 
-export default PlanComponent;
+export default FactComponent;

@@ -39,7 +39,7 @@ const CenterBlockPlan = ({ data }) => {
           display={"flex"}
           width={"50%"}
         >
-          <Box p={2} sx={{ background: "#62A65D" }} width={"100%"}>
+          <Box p={2} sx={{ background: "#62A65D" }} textAlign={'start'} width={"100%"}>
             <Typography
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
@@ -92,7 +92,7 @@ const CenterBlockPlan = ({ data }) => {
           display={"flex"}
           width={"50%"}
         >
-          <Box p={2} sx={{ background: "#62A65D" }} width={"100%"}>
+          <Box p={2} sx={{ background: "#62A65D" }} textAlign={'start'} width={"100%"}>
             <Typography
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
@@ -207,7 +207,7 @@ const CenterBlockPlan = ({ data }) => {
           display={"flex"}
           width={"100%"}
         >
-          <Box p={2} sx={{ background: "#62A65D" }} width={"100%"}>
+          <Box p={2} textAlign={'start'} sx={{ background: "#62A65D" }} width={"100%"}>
             <Typography
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"

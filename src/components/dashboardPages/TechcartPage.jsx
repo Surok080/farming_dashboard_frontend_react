@@ -2,6 +2,7 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Tab } from "@mui/material";
 import React, { useState } from "react";
 import PlanComponent from "./Techcart/PlanComponent";
+import FactComponent from "./Techcart/FactComponent";
 
 const TechcartPage = ({year}) => {
   const [value, setValue] = useState('1');
@@ -22,7 +23,9 @@ const TechcartPage = ({year}) => {
         <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="1">
           <PlanComponent year={year} fact={value === '2'}/>
         </TabPanel>
-        <TabPanel value="2">Фактический</TabPanel>
+        <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="2">
+          <FactComponent year={year} fact={value === '2'}/>
+        </TabPanel>
       </TabContext>
     </Box>
   );
