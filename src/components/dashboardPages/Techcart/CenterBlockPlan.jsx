@@ -32,7 +32,6 @@ const CenterBlockPlan = ({ data }) => {
             background: "#F9F9F9",
             border: "1px solid #bfbfbf",
             borderRadius: "4px",
-            overflowY: "scroll",
             padding: 0,
             flexDirection: "column",
           }}
@@ -85,7 +84,6 @@ const CenterBlockPlan = ({ data }) => {
             background: "#F9F9F9",
             border: "1px solid #bfbfbf",
             borderRadius: "4px",
-            overflowY: "scroll",
             padding: 0,
             flexDirection: "column",
           }}
@@ -200,7 +198,6 @@ const CenterBlockPlan = ({ data }) => {
             background: "#F9F9F9",
             border: "1px solid #bfbfbf",
             borderRadius: "4px",
-            overflowY: "scroll",
             padding: 0,
             flexDirection: "column",
           }}
