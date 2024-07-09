@@ -42,7 +42,7 @@ const PlanComponent = ({ year, fact }) => {
         <Grid sx={{ height: "100%", overflow: "hidden" }} item xs={4}>
           <LeftBlockPlan crops={crops} year={year} fact={fact} data={data} setData={setData}/>
         </Grid>
-        <Grid item xs={8}>
+        <Grid sx={{height: '100%', overflowY: 'scroll'}} item xs={8}>
           <CenterBlockPlan data={data}/>
         </Grid>
       </Grid>
