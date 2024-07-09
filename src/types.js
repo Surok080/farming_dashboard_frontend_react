@@ -20,14 +20,14 @@ export const dataCrop = {
     "other_expenses": 0 //Прочие затраты
   },
   "consumption": { // Распределение потребности
-    "seeds_kg": 0, // Семена, кг
-    "fertilizers_kg": 0, // Удобрения, кг
-    "fertilizers_l": 0, // Удобрения, л
-    "shzr_kg": 0, // СХЗР, кг
-    "shzr_l": 0, // СХЗР, л
-    "fuel_l": 0, // Топливо, л
-    "products_kg": 0, // Продукция, кг
-    "other_expenses": 0 // Прочие затраты
+    "seeds_kg": 120, // Семена, кг
+    "fertilizers_kg": 240, // Удобрения, кг
+    "fertilizers_l": 460, // Удобрения, л
+    "shzr_kg": 330, // СХЗР, кг
+    "shzr_l": 110, // СХЗР, л
+    "fuel_l": 360, // Топливо, л
+    "products_kg": 310, // Продукция, кг
+    "other_expenses": 240 // Прочие затраты
   },
   "total_costs": { // Итого затрат
     "total_costs": 0, // Итого затрат

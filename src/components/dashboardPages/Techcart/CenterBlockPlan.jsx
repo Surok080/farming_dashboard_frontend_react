@@ -100,11 +100,11 @@ const CenterBlockPlan = ({ data }) => {
               Планируемый бюджет
             </Typography>
           </Box>
-          <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>
+          <Box p={2} display={"flex"} flexDirection={"column"} gap={1}>
             <Box display={"flex"}>
               <Box
                 width={"50%"}
-                gap={2}
+                gap={1}
                 display={"flex"}
                 flexDirection={"column"}
               >
@@ -118,7 +118,7 @@ const CenterBlockPlan = ({ data }) => {
               </Box>
               <Box
                 width={"50%"}
-                gap={2}
+                gap={1}
                 display={"flex"}
                 flexDirection={"column"}
               >
@@ -134,7 +134,7 @@ const CenterBlockPlan = ({ data }) => {
             <Box display={"flex"}>
               <Box
                 width={"50%"}
-                gap={2}
+                gap={1}
                 display={"flex"}
                 flexDirection={"column"}
               >
@@ -148,7 +148,7 @@ const CenterBlockPlan = ({ data }) => {
               </Box>
               <Box
                 width={"50%"}
-                gap={2}
+                gap={1}
                 display={"flex"}
                 flexDirection={"column"}
               >
@@ -164,7 +164,7 @@ const CenterBlockPlan = ({ data }) => {
             <Box display={"flex"}>
               <Box
                 width={"50%"}
-                gap={2}
+                gap={1}
                 display={"flex"}
                 flexDirection={"column"}
               >
@@ -178,7 +178,7 @@ const CenterBlockPlan = ({ data }) => {
               </Box>
               <Box
                 width={"50%"}
-                gap={2}
+                gap={1}
                 display={"flex"}
                 flexDirection={"column"}
               >
@@ -216,7 +216,7 @@ const CenterBlockPlan = ({ data }) => {
             </Typography>
           </Box>
 
-          <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>
+          <Box p={2} display={"flex"} flexDirection={"column"} gap={1}>
             <BarChart
               height={300}
               series={[

@@ -58,7 +58,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
         display={"flex"}
         p={2}
       >
-        <Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>
+        <Box width={"50%"} gap={1} display={"flex"} flexDirection={"column"}>
           <Typography variant="body1">Площадь</Typography>
           <Typography
             sx={{ fontWeight: "bold", color: "#62A65D" }}
@@ -67,7 +67,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
             {data.crop.total_area}
           </Typography>
         </Box>
-        <Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>
+        <Box width={"50%"} gap={1} display={"flex"} flexDirection={"column"}>
           <Typography variant="body1">Кол-во полей</Typography>
           <Typography
             sx={{ fontWeight: "bold", color: "#62A65D" }}
@@ -98,7 +98,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
             Технологические операции
           </Typography>
         </Box>
-        <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>
+        <Box p={2} display={"flex"} flexDirection={"column"} gap={1}>
           {data.works.map((item, index) => (
             <Box
               key={index + item.work_type}
