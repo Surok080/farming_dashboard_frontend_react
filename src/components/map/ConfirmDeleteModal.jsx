@@ -1,7 +1,9 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import React from 'react';
 
-const ConfirmDeleteModal = ({openConfirmDelete, handleCloseConfirmDelete, deletArea}) => {
+const ConfirmDeleteModal = ({openConfirmDelete, handleCloseConfirmDelete, deletArea, deleteIdArea}) => {
+  console.log(deleteIdArea);
+  
   return (
     <Dialog
         open={openConfirmDelete}
@@ -10,11 +12,11 @@ const ConfirmDeleteModal = ({openConfirmDelete, handleCloseConfirmDelete, deletA
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Вы уверены что хотите удалить это поле?"}
+          {"Вы уверены что хотите удалить"} {Array.isArray(deleteIdArea) ? 'эти поля?' : 'это поле?'}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Поле удалится безвозвратно, вы уверены что хотите это сделать?
+            {Array.isArray(deleteIdArea) ? 'Выбранные поля удалятся' : 'Поле удалится'}  безвозвратно, вы уверены что хотите это сделать?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

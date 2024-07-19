@@ -165,7 +165,13 @@ const Map = memo(({ year, setAllArea }) => {
   const deletArea = () => {
     if (deleteIdArea) {
       httpService
-        .delete(`/fields/fields/${deleteIdArea}`)
+        .delete(`/fields/fields/`, {
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          data: Array.isArray(deleteIdArea) ? deleteIdArea : [deleteIdArea]
+        })
         .then((res) => {
           if (res.status === 200) {
             getData();
@@ -412,6 +418,7 @@ const Map = memo(({ year, setAllArea }) => {
         deletArea={deletArea}
         handleCloseConfirmDelete={handleCloseConfirmDelete}
         openConfirmDelete={openConfirmDelete}
+        deleteIdArea={deleteIdArea}
       />
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
