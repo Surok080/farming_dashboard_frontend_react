@@ -56,9 +56,9 @@ const ListArea = ({
           p: 0,
         }}
       >
-        <Box display={"flex"} gap={4} alignItems={'center'}>
+        <Box display={"flex"} gap={4} alignItems={"center"}>
           <Checkbox
-          sx={{padding: 0, marginLeft: '-2px'}}
+            sx={{ padding: 0, marginLeft: "-2px" }}
             edge="end"
             onChange={handleSelectAll}
             checked={isAllSelected}
@@ -67,15 +67,15 @@ const ListArea = ({
           <Typography variant="body">Выбрать все</Typography>
         </Box>
         <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // e.preventDefault()
-                    setDeleteIdArea(selectedItems);
-                    handleOpenConfirmDelete();
-                  }}
-                >
-                  <DeleteForeverIcon />
-                </IconButton>
+          onClick={(e) => {
+            e.stopPropagation();
+            // e.preventDefault()
+            setDeleteIdArea(selectedItems);
+            handleOpenConfirmDelete();
+          }}
+        >
+          <DeleteForeverIcon />
+        </IconButton>
       </Box>
       <List
         sx={{
@@ -104,14 +104,6 @@ const ListArea = ({
                 inputProps={{ "aria-labelledby": labelId }}
                 onChange={() => handleToggle(item.properties.id)}
               />
-              <svg
-                style={{
-                  width: "100%",
-                  maxWidth: "70px",
-                  height: "70px",
-                }}
-                dangerouslySetInnerHTML={{ __html: svgString }}
-              />
               <ListItemButton
                 key={index}
                 style={{
@@ -133,6 +125,14 @@ const ListArea = ({
                   setActiveArea(item);
                 }}
               >
+                <svg
+                  style={{
+                    width: "100%",
+                    maxWidth: "70px",
+                    height: "70px",
+                  }}
+                  dangerouslySetInnerHTML={{ __html: svgString }}
+                />
                 <Box display={"flex"} flexDirection={"column"} flexGrow={1}>
                   <Typography
                     variant="body2"
