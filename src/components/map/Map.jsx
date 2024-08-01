@@ -205,7 +205,7 @@ const Map = memo(({ year, setAllArea }) => {
           position: "absolute",
           top: "150px",
           zIndex: "1000",
-          right: "10px",
+          left: "410px",
           maxWidth: "40px",
           minWidth: "40px",
         }}
@@ -346,7 +346,7 @@ const Map = memo(({ year, setAllArea }) => {
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
-          <ZoomControl position="topright" />
+          <ZoomControl position="topleft" />
           {layer ? (
             <Layers
               year={year}
@@ -360,13 +360,13 @@ const Map = memo(({ year, setAllArea }) => {
           <Box
             sx={{
               position: "absolute",
-              right: "5px",
-              bottom: "20px",
+              right: "0px",
+              bottom: "0px",
               width: "170px",
-              height: "180px",
+              height: "100%",
               zIndex: "1000",
               background: "#ffffffed",
-              borderRadius: "10px",
+              borderRadius: "0px",
               overflowX: "hidden",
               overflowY: "scroll",
               padding: "10px",
@@ -377,11 +377,13 @@ const Map = memo(({ year, setAllArea }) => {
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "5px",
+                gap: "10px",
               }}
             >
               {statistics &&
                 statistics.map((item, key) => {
+
+                  
                   if (key > 0) {
                     const color =
                       colorLayers.find((layer) => layer.name === item[0])
@@ -390,21 +392,25 @@ const Map = memo(({ year, setAllArea }) => {
                     return (
                       <Box
                         key={key}
-                        alignItems={"baseline"}
+                        alignItems={"center"}
                         alignContent={"center"}
                         display={"flex"}
                         gap={"4px"}
                       >
                         <Box
                           sx={{
-                            width: "10px",
-                            height: "10px",
+                            width: "5px",
+                            height: "30px",
                             background: color,
-                            minWidth: "10px",
+                            minWidth: "5px",
+                            minHeight: '100%'
                           }}
                         ></Box>
                         <Typography align="left" variant="caption">
                           {item[0]}
+                        </Typography>
+                        <Typography sx={{marginLeft: 'auto'}} variant="caption">
+                          {item[1]}
                         </Typography>
                       </Box>
                     );

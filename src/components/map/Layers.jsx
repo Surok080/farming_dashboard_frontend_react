@@ -90,7 +90,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
 
   return (
     <>
-      <LayersControl position="topright">
+      <LayersControl position="topleft">
         <LayersControl.BaseLayer name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -128,7 +128,6 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                       item.geometry.coordinates[0].map((item) =>
                         item.reverse()
                       );
-                      console.log(item);
                       handleOpen(item);
                     },
                   }}
