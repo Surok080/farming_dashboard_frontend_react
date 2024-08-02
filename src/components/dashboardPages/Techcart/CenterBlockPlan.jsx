@@ -4,21 +4,21 @@ import { BarChart } from "@mui/x-charts/BarChart";
 
 const CenterBlockPlan = ({ data }) => {
   const uData = [
-    data.consumption.seeds.kg,
-    data.consumption.fertilizers.kg,
-    data.consumption.shzr.kg,
-    data.consumption.fuel.kg,
-    data.consumption.products.kg,
-    data.consumption.other_expenses.kg,
+    data?.consumption?.seeds?.kg,
+    data?.consumption?.fertilizers?.kg,
+    data?.consumption?.shzr?.kg,
+    data?.consumption?.fuel?.kg,
+    data?.consumption?.products?.kg,
+    data?.consumption?.other_expenses?.kg,
   ];
 
   const xData = [
-    data.consumption.seeds.liter,
-    data.consumption.fertilizers.liter,
-    data.consumption.shzr.liter,
-    data.consumption.fuel.liter,
-    data.consumption.products.liter,
-    data.consumption.other_expenses.liter,
+    data?.consumption?.seeds?.liter,
+    data?.consumption?.fertilizers?.liter,
+    data?.consumption?.shzr?.liter,
+    data?.consumption?.fuel?.liter,
+    data?.consumption?.products?.liter,
+    data?.consumption?.other_expenses?.liter,
   ];
 
   console.log(data);
