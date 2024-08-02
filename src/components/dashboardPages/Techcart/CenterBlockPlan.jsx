@@ -1,26 +1,35 @@
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 
 const CenterBlockPlan = ({ data }) => {
   const uData = [
-    data.consumption.seeds_kg,
-    data.consumption.fertilizers_kg,
-    data.consumption.fertilizers_l,
-    data.consumption.shzr_kg,
-    data.consumption.shzr_l,
-    data.consumption.fuel_l,
-    data.consumption.products_kg,
-    data.consumption.other_expenses,
+    data.consumption.seeds.kg,
+    data.consumption.fertilizers.kg,
+    data.consumption.shzr.kg,
+    data.consumption.fuel.kg,
+    data.consumption.products.kg,
+    data.consumption.other_expenses.kg,
   ];
+
+  const xData = [
+    data.consumption.seeds.liter,
+    data.consumption.fertilizers.liter,
+    data.consumption.shzr.liter,
+    data.consumption.fuel.liter,
+    data.consumption.products.liter,
+    data.consumption.other_expenses.liter,
+  ];
+
+  console.log(data);
+  
+
   const xLabels = [
-    "Семена, кг",
-    "Мин.удобрения, кг",
-    "Удобрения, л",
-    "СХЗР, кг",
-    "СХЗР, л",
-    "ГСМ, л",
-    "Продукция, кг",
+    "Семена",
+    "Удобрения",
+    "СХЗР",
+    "ГСМ",
+    "Продукция",
     "Прочие затраты",
   ];
 
@@ -219,18 +228,18 @@ const CenterBlockPlan = ({ data }) => {
               series={[
                 {
                   data: uData,
-                  // label: "План",
+                  label: "кг",
                   id: "pvId",
                   stack: "total",
                   color: "#82F865", // измените цвет этой серии на зеленый
                 },
-                // {
-                //   data: pData,
-                //   label: "Факт",
-                //   id: "uvId",
-                //   stack: "total",
-                //   color: "#D9D9D9", // измените цвет этой серии на фиолетовый
-                // },
+                {
+                  data: xData,
+                  label: "литры",
+                  id: "uvId",
+                  stack: "total",
+                  color: "#D9D9D9", // измените цвет этой серии на фиолетовый
+                },
               ]}
               xAxis={[{ data: xLabels, scaleType: "band" }]}
             />
