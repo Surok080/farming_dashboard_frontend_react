@@ -29,8 +29,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "build": "node --max_old_space_size=4096 node_modules/.bin/yarn build",
     "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -54,4 +54,3 @@
     ]
   }
 }
-
