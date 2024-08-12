@@ -6,7 +6,7 @@ class TehMapService {
 	 * Получение полей
 	 */
 	getCrops(year,fact){
-		return httpService.get(`/tech_map/list_crop/?year=${year}&fact=${fact}`)
+		return httpService.get(`/tech_map/list_crop?year=${year}&fact=${fact}`)
 	}
 
   	/**
