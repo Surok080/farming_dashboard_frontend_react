@@ -37,7 +37,6 @@ export default function SignIn() {
     setLoad(true);
     try {
       SignInApi.auth(userDto).then((res) => {
-        
         if (res?.status === 200) {
           SignInApi.getMe().then((user) => {
             setLoad(false);

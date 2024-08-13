@@ -24,10 +24,10 @@ class SignInService {
   getMe() {
     return httpService.get("/auth/get_me/")
       .then(response => {
-        if (!response.ok) {
+        if (!response.status && response.status !== 200) {
           throw new Error(`Ошибка: ${response.statusText}`);
         }
-        return response.data;
+        return response;
       })
       .catch(error => {
         throw error;
