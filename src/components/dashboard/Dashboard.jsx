@@ -40,10 +40,13 @@ export default function Dashboard() {
   React.useEffect(() => {
       SignInApi.getMe()
       .then((user) => {
-        setLoading(false);
         dispatch(
           setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
         );
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      
       })
       .catch((error) => {
         console.error('Ошибка запроса:', error);
