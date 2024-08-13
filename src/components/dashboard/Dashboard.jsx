@@ -40,6 +40,8 @@ export default function Dashboard() {
   React.useEffect(() => {
       SignInApi.getMe()
       .then((user) => {
+        console.log(' .then((user) => {');
+        
         dispatch(
           setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
         );
