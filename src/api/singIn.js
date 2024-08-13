@@ -22,7 +22,16 @@ class SignInService {
   }
 
   getMe() {
-    return httpService.get("/auth/get_me/");
+    return httpService.get("/auth/get_me/")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Ошибка: ${response.statusText}`);
+        }
+        return response.data;
+      })
+      .catch(error => {
+        throw error;
+      });
   }
 }
 

@@ -38,16 +38,17 @@ export default function Dashboard() {
   const [allArea, setAllArea] = React.useState(null);
 
   React.useEffect(() => {
-    try {
-      SignInApi.getMe().then((user) => {
+      SignInApi.getMe()
+      .then((user) => {
         setLoading(false);
         dispatch(
           setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
         );
+      })
+      .catch((error) => {
+        console.error('Ошибка запроса:', error);
+        navigate("/");
       });
-    } catch (error) {
-      navigate("/");
-    }
   }, []);
 
   function getPagesDashboard() {
