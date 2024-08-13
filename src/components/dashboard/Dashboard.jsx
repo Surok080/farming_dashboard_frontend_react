@@ -45,7 +45,7 @@ export default function Dashboard() {
         );
         setTimeout(() => {
           setLoading(false);
-        }, 500);
+        }, 1500);
       
       })
       .catch((error) => {
