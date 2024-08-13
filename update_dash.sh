@@ -4,8 +4,6 @@ echo "###GIT PULL###"
 git pull
 
 echo "###yarn###"
-yarn cache clean
-rm -rf node_modules
 yarn install
 
 echo "###yarn build###"

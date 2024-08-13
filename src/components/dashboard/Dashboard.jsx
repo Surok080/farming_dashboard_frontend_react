@@ -43,6 +43,8 @@ export default function Dashboard() {
         dispatch(
           setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
         );
+        console.log('SignInApi.getMe()then((user)  ----------', user);
+        
         setTimeout(() => {
           setLoading(false);
         }, 1500);
