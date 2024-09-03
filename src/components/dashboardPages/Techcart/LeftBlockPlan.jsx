@@ -34,60 +34,6 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
     setCrop(event.target.value.culture);
   };
 
-    const temp = [
-        {
-            "culture": "Люцерна",
-            "tech_cultivation": []
-        },
-        {
-            "culture": "Пшеница озимая",
-            "tech_cultivation": []
-        },
-        {
-            "culture": "Пшеница яровая",
-            "tech_cultivation": [
-                1,
-                2
-            ]
-        },
-        {
-            "culture": "Рапс яровой",
-            "tech_cultivation": [
-                1,
-                2
-            ]
-        },
-        {
-            "culture": "Горох",
-            "tech_cultivation": []
-        },
-        {
-            "culture": "Горчица",
-            "tech_cultivation": [
-                1,
-                2
-            ]
-        },
-        {
-            "culture": "Чистый пар",
-            "tech_cultivation": []
-        },
-        {
-            "culture": "Ячмень яровой",
-            "tech_cultivation": [
-                1,
-                2
-            ]
-        },
-        {
-            "culture": "Лен",
-            "tech_cultivation": [
-                1,
-                2
-            ]
-        }
-    ]
-
   return (
     <Box display={"flex"} flexDirection={"column"} gap={1} maxHeight={"100%"}>
       <FormControl
@@ -102,7 +48,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
           label="Выберите культуру"
           onChange={handleChange}
         >
-          {temp.map((item) => (
+          {crops.map((item) => (
             <MenuItem key={item} value={item}>
               {item.culture}
             </MenuItem>
@@ -124,7 +70,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
             sx={{ fontWeight: "bold", color: "#62A65D" }}
             variant="h5"
           >
-            {data.culture.total_area}
+            {data.crop.total_area}
           </Typography>
         </Box>
         <Box width={"50%"} gap={1} display={"flex"} flexDirection={"column"}>
