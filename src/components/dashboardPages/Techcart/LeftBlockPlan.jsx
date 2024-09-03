@@ -12,11 +12,12 @@ import { TehMapApi } from "../../../api/tehMap";
 
 const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
   const [crop, setCrop] = useState("");
+  const [tech, setTech] = useState(0);
 
   useEffect(() => {
     if (crop) {
       try {
-        TehMapApi.getDataCrop(year, fact, crop).then((res) => {
+        TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
           setData(res.data);
         })
             .catch((err) => {
@@ -30,8 +31,63 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
   }, [crop]);
 
   const handleChange = (event) => {
-    setCrop(event.target.value);
+    setCrop(event.target.value.culture);
   };
+
+    const temp = [
+        {
+            "culture": "Люцерна",
+            "tech_cultivation": []
+        },
+        {
+            "culture": "Пшеница озимая",
+            "tech_cultivation": []
+        },
+        {
+            "culture": "Пшеница яровая",
+            "tech_cultivation": [
+                1,
+                2
+            ]
+        },
+        {
+            "culture": "Рапс яровой",
+            "tech_cultivation": [
+                1,
+                2
+            ]
+        },
+        {
+            "culture": "Горох",
+            "tech_cultivation": []
+        },
+        {
+            "culture": "Горчица",
+            "tech_cultivation": [
+                1,
+                2
+            ]
+        },
+        {
+            "culture": "Чистый пар",
+            "tech_cultivation": []
+        },
+        {
+            "culture": "Ячмень яровой",
+            "tech_cultivation": [
+                1,
+                2
+            ]
+        },
+        {
+            "culture": "Лен",
+            "tech_cultivation": [
+                1,
+                2
+            ]
+        }
+    ]
+
   return (
     <Box display={"flex"} flexDirection={"column"} gap={1} maxHeight={"100%"}>
       <FormControl
@@ -46,9 +102,9 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
           label="Выберите культуру"
           onChange={handleChange}
         >
-          {crops.map((item) => (
+          {temp.map((item) => (
             <MenuItem key={item} value={item}>
-              {item}
+              {item.culture}
             </MenuItem>
           ))}
         </Select>

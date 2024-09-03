@@ -12,8 +12,8 @@ class TehMapService {
   	/**
 	 * Получение полей
 	 */
-	getDataCrop(year,fact, crop){
-		return httpService.get(`/tech_map?culture=${crop}&year=${year}&fact=${fact}`)
+	getDataCrop(year,fact, crop, tech = 0){
+		return httpService.get(`/tech_map?culture=${crop}&year=${year}&fact=${fact}&tech_cultivation=${tech}`)
 	}
 
 }
