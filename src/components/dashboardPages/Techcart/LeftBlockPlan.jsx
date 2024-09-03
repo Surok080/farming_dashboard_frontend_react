@@ -18,6 +18,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
         if (crop) {
             try {
                 TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
+                    console.log(res, 'res.data TehMapApi.getDataCrop');
                     setData(res.data);
                 })
                     .catch((err) => {
@@ -27,6 +28,8 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
             } catch (e) {
                 console.log(e);
             }
+            setTech(crops.filter((item) => item.culture === crop).tech_cultivation[0]);
+
         }
     }, [crop]);
 
