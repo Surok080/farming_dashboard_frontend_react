@@ -13,11 +13,13 @@ import {TehMapApi} from "../../../api/tehMap";
 const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [crop, setCrop] = useState("");
     const [tech, setTech] = useState(null);
+    const [arrTech, setArrTech] = useState([]);
+
 
     function getTechCultivationValue() {
         const foundItem = crops.find(item => item.culture === crop);
         if (foundItem) {
-            return foundItem.tech_cultivation.length > 0 ? foundItem.tech_cultivation[0] : 0;
+            return foundItem.tech_cultivation.length > 0 ? foundItem.tech_cultivation[0] : null;
         }
         return null; // Если не найдено соответствие, возвращаем null
     }
@@ -35,13 +37,18 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
 
     useEffect(() => {
             if (crop) {
-                setTech(`${getTechCultivationValue()}`)
+                setArrTech(checkTechItems())
+                setTimeout(() => {
+                    setTech(getTechCultivationValue())
+                }, 0);
+
             }
         }
         , [crop]);
 
     useEffect(() => {
         if (crop && crops.some(item => item.culture === crop)) {
+
             TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
                 if (!!res?.status && res?.status !== 200) {
                     throw new Error(`HTTP error! Status: ${res.status}`);
@@ -54,6 +61,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                     console.log(err)
                 })
         }
+        console.log(tech)
     }, [tech])
 
     const handleChange = (event) => {
@@ -93,20 +101,22 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 </Select>
             </FormControl>
             <FormControl
+                key={tech}
                 sx={{background: "#F9F9F9", borderRadius: "4px"}}
                 fullWidth
             >
-                <InputLabel id="demo-simple-select-label">Выберите операцию</InputLabel>
+                <InputLabel id="demo-simple-select-label2">Выберите операцию</InputLabel>
                 <Select
                     disabled={checkDisabled()}
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
+
+                    labelId="demo-simple-select-label2"
+                    id="demo-simple-select2"
                     value={tech}
                     label="Выберите операцию"
                     onChange={handleChangeTech}
                 >
                     {
-                        checkTechItems().map((item) => (
+                        arrTech.map((item) => (
                             <MenuItem key={item} value={item}>
                                 {item}
                             </MenuItem>
