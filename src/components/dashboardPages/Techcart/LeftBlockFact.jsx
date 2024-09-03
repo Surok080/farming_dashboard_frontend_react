@@ -82,7 +82,7 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                         sx={{fontWeight: "bold", color: "#62A65D"}}
                         variant="h5"
                     >
-                        {data.crop.total_count}
+                        {data.culture.total_count}
                     </Typography>
                 </Box>
             </Box>
