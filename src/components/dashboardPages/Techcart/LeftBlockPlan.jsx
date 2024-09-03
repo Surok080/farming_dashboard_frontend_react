@@ -17,22 +17,39 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     useEffect(() => {
         if (crop) {
             try {
-
-                TehMapApi.getDataCrop(year, fact, crop, crops.filter((item) => item.culture === crop)?.tech_cultivation[0] || tech).then((res) => {
-                    console.log(res, 'res.data TehMapApi.getDataCrop');
-                    setData(res.data);
-                })
-                    .catch((err) => {
-                        console.log(err)
+                let operation = crops.some(item => item.culture === crop) ? crops.filter((item) => item.culture === crop).tech_cultivation[0] : 0
+                if (crops.some(item => item.culture === crop)) {
+                    setTech(crops.filter((item) => item.culture === crop).tech_cultivation[0]);
+                } else {
+                    TehMapApi.getDataCrop(year, fact, crop).then((res) => {
+                        console.log(res, 'res.data TehMapApi.getDataCrop - 0');
+                        setData(res.data);
                     })
+                        .catch((err) => {
+                            console.log(err)
+                        })
+                }
+
 
             } catch (e) {
                 console.log(e);
             }
-            setTech(crops.filter((item) => item.culture === crop).tech_cultivation[0]);
+
 
         }
     }, [crop]);
+
+    useEffect(() => {
+        if (crop && crops.some(item => item.culture === crop)) {
+            TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
+                console.log(res, 'res.data TehMapApi.getDataCrop - tech');
+                setData(res.data);
+            })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
+    }, [tech])
 
     const handleChange = (event) => {
         setCrop(event.target.value);
