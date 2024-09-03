@@ -35,7 +35,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
 
     useEffect(() => {
             if (crop) {
-                setTech(getTechCultivationValue())
+                setTech(`${getTechCultivationValue()}`)
             }
         }
         , [crop]);
