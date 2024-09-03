@@ -12,30 +12,29 @@ import {TehMapApi} from "../../../api/tehMap";
 
 const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [crop, setCrop] = useState("");
-    const [tech, setTech] = useState(0);
+    const [tech, setTech] = useState(null);
+
+    function getTechCultivationValue() {
+        const foundItem = temp.find(item => item.culture === crop);
+        if (foundItem) {
+            return foundItem.tech_cultivation.length > 0 ? foundItem.tech_cultivation[0] : 0;
+        }
+        return null; // Если не найдено соответствие, возвращаем null
+    }
 
     useEffect(() => {
         if (crop) {
             try {
-                let operation = crops.some(item => item.culture === crop) ? crops.filter((item) => item.culture === crop).tech_cultivation[0] : 0
-                if (crops.some(item => item.culture === crop)) {
-                    setTech(crops.filter((item) => item.culture === crop).tech_cultivation[0]);
-                } else {
-                    TehMapApi.getDataCrop(year, fact, crop).then((res) => {
-                        console.log(res, 'res.data TehMapApi.getDataCrop - 0');
-                        setData(res.data);
+                TehMapApi.getDataCrop(year, fact, crop, getTechCultivationValue()).then((res) => {
+                    console.log(res, 'res.data TehMapApi.getDataCrop - 0');
+                    setData(res.data);
+                })
+                    .catch((err) => {
+                        console.log(err)
                     })
-                        .catch((err) => {
-                            console.log(err)
-                        })
-                }
-
-
             } catch (e) {
                 console.log(e);
             }
-
-
         }
     }, [crop]);
 
@@ -57,6 +56,14 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const handleChangeTech = (event) => {
         setTech(event.target.value);
     };
+
+    const checkDisabled = () => {
+        if (crop) {
+            return crops.filter(item => item.culture === crop)[0].tech_cultivation?.length <= 0 ? true : false
+        } else {
+            return true;
+        }
+    }
 
     return (
         <Box display={"flex"} flexDirection={"column"} gap={1} maxHeight={"100%"}>
@@ -85,12 +92,13 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
             >
                 <InputLabel id="demo-simple-select-label">Выберите операцию</InputLabel>
                 <Select
-                    disabled={!crops.some(item => item.culture === crop)}
+                    disabled={checkDisabled()}
+                    // disabled={crops.some(item => item.culture === crop).tech_cultivation?.length < 0 ? true : false}
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={crops.some(item => item.culture === crop) ? crops.filter((item) => item.culture === crop) : 0}
+                    value={tech}
                     label="Выберите операцию"
-                    onChange={handleChange}
+                    onChange={handleChangeTech}
                 >
                     {crops.some(item => item.culture === crop) ? crops.filter((item) => item.culture === crop).map((item) => (
                             <MenuItem key={item} value={item.tech_cultivation}>
