@@ -35,22 +35,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
 
     useEffect(() => {
             if (crop) {
-                try {
-                    TehMapApi.getDataCrop(year, fact, crop, getTechCultivationValue())
-                        .then((res) => {
-                            if (!!res?.status && res?.status !== 200) {
-                                throw new Error(`HTTP error! Status: ${res.status}`);
-                            } else {
-                                console.log(res, 'res.data TehMapApi.getDataCrop - 0');
-                                setData(res.data);
-                            }
-                        })
-                        .catch((err) => {
-                            console.log(err)
-                        })
-                } catch (e) {
-                    console.log(e);
-                }
+                setTech(getTechCultivationValue())
             }
         }
         , [crop]);
