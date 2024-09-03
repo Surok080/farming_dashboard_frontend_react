@@ -27,11 +27,13 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
             try {
                 TehMapApi.getDataCrop(year, fact, crop, getTechCultivationValue())
                     .then((res) => {
-                        if (!res?.status && res?.status !== 200) {
+                        debugger
+                        if (!!res?.status && res?.status !== 200) {
                             throw new Error(`HTTP error! Status: ${res.status}`);
+                        } else {
+                            console.log(res, 'res.data TehMapApi.getDataCrop - 0');
+                            // setData(res.data);
                         }
-                        console.log(res, 'res.data TehMapApi.getDataCrop - 0');
-                        setData(res.data);
                     })
                     .catch((err) => {
                         console.log(err)
@@ -45,11 +47,12 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     useEffect(() => {
         if (crop && crops.some(item => item.culture === crop)) {
             TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
-                if (!res?.status && res?.status !== 200) {
+                if (!!res?.status && res?.status !== 200) {
                     throw new Error(`HTTP error! Status: ${res.status}`);
+                } else {
+                    console.log(res, 'res.data TehMapApi.getDataCrop - tech');
+                    setData(res.data);
                 }
-                console.log(res, 'res.data TehMapApi.getDataCrop - tech');
-                setData(res.data);
             })
                 .catch((err) => {
                     console.log(err)

@@ -19,7 +19,7 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
         if (crop) {
             try {
                 TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
-                    if (!res?.status && res?.status !== 200) {
+                    if (!!res?.status && res?.status !== 200) {
                         throw new Error(`HTTP error! Status: ${res.status}`);
                     }
                     setData(res.data);
