@@ -18,7 +18,11 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
       try {
         TehMapApi.getDataCrop(year, fact, crop).then((res) => {
           setData(res.data);
-        });
+        })
+            .catch((err) => {
+                console.log(err)
+            })
+
       } catch (e) {
         console.log(e);
       }

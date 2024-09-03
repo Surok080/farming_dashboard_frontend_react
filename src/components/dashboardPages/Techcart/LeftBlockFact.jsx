@@ -17,9 +17,11 @@ const LeftBlockFact = ({ crops, year, fact, data, setData }) => {
     if (crop) {
       try {
         TehMapApi.getDataCrop(year, fact, crop).then((res) => {
-          console.log(res.data);
           setData(res.data);
-        });
+        })
+            .catch((err) => {
+                console.log(err)
+            })
       } catch (e) {
         console.log(e);
       }
@@ -45,7 +47,7 @@ const LeftBlockFact = ({ crops, year, fact, data, setData }) => {
         >
           {crops.map((item) => (
             <MenuItem key={item} value={item}>
-              {item}
+              {item.culture}
             </MenuItem>
           ))}
         </Select>
