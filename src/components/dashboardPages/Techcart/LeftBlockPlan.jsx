@@ -15,7 +15,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [tech, setTech] = useState(null);
 
     function getTechCultivationValue() {
-        const foundItem = temp.find(item => item.culture === crop);
+        const foundItem = crops.find(item => item.culture === crop);
         if (foundItem) {
             return foundItem.tech_cultivation.length > 0 ? foundItem.tech_cultivation[0] : 0;
         }
@@ -25,10 +25,14 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     useEffect(() => {
         if (crop) {
             try {
-                TehMapApi.getDataCrop(year, fact, crop, getTechCultivationValue()).then((res) => {
-                    console.log(res, 'res.data TehMapApi.getDataCrop - 0');
-                    setData(res.data);
-                })
+                TehMapApi.getDataCrop(year, fact, crop, getTechCultivationValue())
+                    .then((res) => {
+                        if (!res?.status && res?.status !== 200) {
+                            throw new Error(`HTTP error! Status: ${res.status}`);
+                        }
+                        console.log(res, 'res.data TehMapApi.getDataCrop - 0');
+                        setData(res.data);
+                    })
                     .catch((err) => {
                         console.log(err)
                     })
@@ -41,6 +45,9 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     useEffect(() => {
         if (crop && crops.some(item => item.culture === crop)) {
             TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
+                if (!res?.status && res?.status !== 200) {
+                    throw new Error(`HTTP error! Status: ${res.status}`);
+                }
                 console.log(res, 'res.data TehMapApi.getDataCrop - tech');
                 setData(res.data);
             })

@@ -68,8 +68,11 @@ const PlanComponent = ({ year, fact }) => {
     try {
       TehMapApi.getCrops(year, fact) 
       .then((res) => {
-        setCrops(temp)
-        // setCrops(res.data)
+        if (!res?.status && res?.status !== 200) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        // setCrops(temp)
+        setCrops(res.data)
       })
     } catch (e) {
       console.log(e);
