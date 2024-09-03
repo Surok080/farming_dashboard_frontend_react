@@ -17,7 +17,8 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     useEffect(() => {
         if (crop) {
             try {
-                TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
+
+                TehMapApi.getDataCrop(year, fact, crop, crops.filter((item) => item.culture === crop)?.tech_cultivation[0] || tech).then((res) => {
                     console.log(res, 'res.data TehMapApi.getDataCrop');
                     setData(res.data);
                 })
