@@ -31,9 +31,8 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
   }, [crop]);
 
   const handleChange = (event) => {
-    setCrop(event.target.value.culture);
+    setCrop(event.target.value);
   };
-
   return (
     <Box display={"flex"} flexDirection={"column"} gap={1} maxHeight={"100%"}>
       <FormControl
@@ -49,7 +48,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
           onChange={handleChange}
         >
           {crops.map((item) => (
-            <MenuItem key={item} value={item}>
+            <MenuItem key={item} value={item.culture}>
               {item.culture}
             </MenuItem>
           ))}
@@ -70,7 +69,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
             sx={{ fontWeight: "bold", color: "#62A65D" }}
             variant="h5"
           >
-            {data.crop.total_area}
+            {data.culture.total_area}
           </Typography>
         </Box>
         <Box width={"50%"} gap={1} display={"flex"} flexDirection={"column"}>
@@ -79,7 +78,7 @@ const LeftBlockPlan = ({ crops, year, fact, data, setData }) => {
             sx={{ fontWeight: "bold", color: "#62A65D" }}
             variant="h5"
           >
-            {data.crop.total_count}
+            {data.culture.total_count}
           </Typography>
         </Box>
       </Box>

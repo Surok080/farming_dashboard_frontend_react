@@ -2,8 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import React from 'react';
 
 const ConfirmDeleteModal = ({openConfirmDelete, handleCloseConfirmDelete, deletArea, deleteIdArea}) => {
-  console.log(deleteIdArea);
-  
+
   return (
     <Dialog
         open={openConfirmDelete}

@@ -10,8 +10,6 @@ const ReportAreaCartogram = ({ grouping }) => {
       .get(`/cartogram/report?group=${grouping}`)
       .then((res) => {
         if (res?.status && res?.status === 200) {
-          console.log(res.data);
-
           setYearReports(res.data);
         } else {
           setYearReports([]);

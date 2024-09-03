@@ -1,5 +1,5 @@
 export const dataCrop = {
-  "crop": {
+  "culture": {
     "crop": "Картофель", // наименование культуры
     "total_area": 0, // площадь
     "total_count": 0 // Кол-во полей
