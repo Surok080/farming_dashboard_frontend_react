@@ -22,27 +22,38 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
         return null; // Если не найдено соответствие, возвращаем null
     }
 
+
+    const checkTechItems = () => {
+        const foundItem = crops.find(item => item.culture === crop);
+        if (foundItem?.tech_cultivation.length > 0) {
+            return foundItem?.tech_cultivation;
+        } else {
+            return []
+        }
+    }
+
+
     useEffect(() => {
-        if (crop) {
-            try {
-                TehMapApi.getDataCrop(year, fact, crop, getTechCultivationValue())
-                    .then((res) => {
-                        debugger
-                        if (!!res?.status && res?.status !== 200) {
-                            throw new Error(`HTTP error! Status: ${res.status}`);
-                        } else {
-                            console.log(res, 'res.data TehMapApi.getDataCrop - 0');
-                            // setData(res.data);
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                    })
-            } catch (e) {
-                console.log(e);
+            if (crop) {
+                try {
+                    TehMapApi.getDataCrop(year, fact, crop, getTechCultivationValue())
+                        .then((res) => {
+                            if (!!res?.status && res?.status !== 200) {
+                                throw new Error(`HTTP error! Status: ${res.status}`);
+                            } else {
+                                console.log(res, 'res.data TehMapApi.getDataCrop - 0');
+                                setData(res.data);
+                            }
+                        })
+                        .catch((err) => {
+                            console.log(err)
+                        })
+                } catch (e) {
+                    console.log(e);
+                }
             }
         }
-    }, [crop]);
+        , [crop]);
 
     useEffect(() => {
         if (crop && crops.some(item => item.culture === crop)) {
@@ -103,20 +114,18 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 <InputLabel id="demo-simple-select-label">Выберите операцию</InputLabel>
                 <Select
                     disabled={checkDisabled()}
-                    // disabled={crops.some(item => item.culture === crop).tech_cultivation?.length < 0 ? true : false}
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     value={tech}
                     label="Выберите операцию"
                     onChange={handleChangeTech}
                 >
-                    {crops.some(item => item.culture === crop) ? crops.filter((item) => item.culture === crop).map((item) => (
-                            <MenuItem key={item} value={item.tech_cultivation}>
-                                {item.tech_cultivation}
+                    {
+                        checkTechItems().map((item) => (
+                            <MenuItem key={item} value={item}>
+                                {item}
                             </MenuItem>
                         ))
-                        :
-                        null
                     }
                 </Select>
             </FormControl>

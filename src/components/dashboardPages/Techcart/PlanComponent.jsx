@@ -71,8 +71,8 @@ const PlanComponent = ({ year, fact }) => {
         if (!!res?.status && res?.status !== 200) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
-        setCrops(temp)
-        // setCrops(res.data)
+        // setCrops(temp)
+        setCrops(res.data)
       })
     } catch (e) {
       console.log(e);
