@@ -19,7 +19,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     function getTechCultivationValue() {
         const foundItem = crops.find(item => item.culture === crop);
         if (foundItem) {
-            return foundItem.tech_cultivation.length > 0 ? foundItem.tech_cultivation[0] : null;
+            return foundItem.tech_cultivation.length > 0 ? foundItem.tech_cultivation[0] : 0;
         }
         return null; // Если не найдено соответствие, возвращаем null
     }
