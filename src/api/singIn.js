@@ -24,8 +24,6 @@ class SignInService {
   getMe() {
     return httpService.get("/auth/get_me/")
       .then(response => {
-        console.log(response, '---response');
-        
         if (response?.status !== 200) {
           console.log(response, '---!response.status && response.status !== 200');
           throw new Error(`Ошибка: ${response.statusText}`);

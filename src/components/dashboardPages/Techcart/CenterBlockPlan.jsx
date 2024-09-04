@@ -21,8 +21,6 @@ const CenterBlockPlan = ({ data }) => {
     data?.consumption?.other_expenses?.liter,
   ];
 
-  console.log(data);
-  
 
   const xLabels = [
     "Семена",
