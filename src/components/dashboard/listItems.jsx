@@ -13,37 +13,42 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 export default function ListItems() {
   const { valueTabs, setValueTabs } = React.useContext(Context);
 
+  const setTabs = (value) => {
+      localStorage.setItem('tabs', value);
+      setValueTabs(value)
+  }
+
   return (
     <>
-      <ListItemButton onClick={() => setValueTabs("menu_dashboard")}>
+      <ListItemButton onClick={() => setTabs("menu_dashboard")}>
         <ListItemIcon sx={{minWidth: '36px'}}>
           <GridViewOutlinedIcon sx={{color: valueTabs ===  "menu_dashboard" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Обзор" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => setValueTabs("menu_tehcart")}>
+      <ListItemButton onClick={() => setTabs("menu_tehcart")}>
         <ListItemIcon sx={{minWidth: '36px'}}>
           <DescriptionOutlinedIcon sx={{color: valueTabs ===  "menu_tehcart" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="ТехКарта" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => setValueTabs("menu_fields")}>
+      <ListItemButton onClick={() => setTabs("menu_fields")}>
         <ListItemIcon sx={{minWidth: '36px'}}>
           <LayersOutlinedIcon sx={{color: valueTabs ===  "menu_fields" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Поля" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => setValueTabs("menu_сartograms")}>
+      <ListItemButton onClick={() => setTabs("menu_сartograms")}>
         <ListItemIcon sx={{minWidth: '36px'}}>
           <GridOnIcon sx={{color: valueTabs ===  "menu_сartograms" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
         <ListItemText primary="Картограммы" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => setValueTabs("menu_gos")}>
+      <ListItemButton onClick={() => setTabs("menu_gos")}>
         <ListItemIcon sx={{minWidth: '36px'}}>
           <DashboardOutlinedIcon sx={{color: valueTabs ===  "menu_gos" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>
@@ -57,7 +62,7 @@ export default function ListItems() {
         <ListItemText primary="Пользователи" />
       </ListItemButton> */}
 
-      <ListItemButton onClick={() => setValueTabs("menu_settings")}>
+      <ListItemButton onClick={() => setTabs("menu_settings")}>
         <ListItemIcon sx={{minWidth: '36px'}}>
           <SettingsOutlinedIcon sx={{color: valueTabs ===  "menu_settings" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
         </ListItemIcon>

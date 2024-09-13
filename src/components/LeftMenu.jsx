@@ -109,24 +109,6 @@ const LeftMenu = () => {
             </List>
           </Box>
           <Box>
-            <ListItemButton onClick={() => console.log("Вопрос")}>
-              <ListItemIcon sx={{ minWidth: "36px" }}>
-                <HelpOutlineOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText primary="Вопросы" />
-            </ListItemButton>
-            <ListItemButton onClick={() => console.log("Пользователи")}>
-              <ListItemIcon sx={{ minWidth: "36px" }}>
-                <PersonOutlineOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText primary="Пользователи" />
-            </ListItemButton>
-            <ListItemButton onClick={() => console.log("Уведомления")}>
-              <ListItemIcon sx={{ minWidth: "36px" }}>
-                <NotificationsOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText primary="Уведомления" />
-            </ListItemButton>
             <ListItemButton
               onClick={() => {
                 localStorage.removeItem("access_token");

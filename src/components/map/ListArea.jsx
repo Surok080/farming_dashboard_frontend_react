@@ -67,6 +67,7 @@ const ListArea = ({
           <Typography variant="body">Выбрать все</Typography>
         </Box>
         <IconButton
+            disabled={selectedItems?.length === 0}
           onClick={(e) => {
             e.stopPropagation();
             // e.preventDefault()

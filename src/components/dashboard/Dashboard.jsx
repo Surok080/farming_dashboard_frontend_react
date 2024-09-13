@@ -1,22 +1,21 @@
 import * as React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {createTheme, ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
-import { Context } from "../../store/context";
+import {Context} from "../../store/context";
 import DashboardPages from "../dashboardPages/dashboardPages";
 import FieldsPages from "../dashboardPages/fieldsPages";
-import { useDispatch, useSelector } from "react-redux";
-import { SignInApi } from "../../api/singIn";
-import { setUserFio } from "../../store/userDto";
-import { useNavigate } from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {SignInApi} from "../../api/singIn";
+import {setUserFio} from "../../store/userDto";
+import {useNavigate} from "react-router-dom";
 import AppBarHeader from "../AppBarHeader";
 import LeftMenu from "../LeftMenu";
 import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
 import CartogramsPage from "../dashboardPages/CartogramsPage";
 import TechcartPage from "../dashboardPages/TechcartPage";
-import { Hidden } from "@mui/material";
 
 export const drawerWidth = 180;
 
@@ -32,7 +31,7 @@ export default function Dashboard() {
   const user = useSelector((state) => state.user.fio);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [valueTabs, setValueTabs] = React.useState("menu_tehcart");
+  const [valueTabs, setValueTabs] = React.useState(localStorage.getItem('tabs') ?? "menu_tehcart");
   const [loading, setLoading] = React.useState(true);
   const [year, setYear] = React.useState(2024);
   const [allArea, setAllArea] = React.useState(null);

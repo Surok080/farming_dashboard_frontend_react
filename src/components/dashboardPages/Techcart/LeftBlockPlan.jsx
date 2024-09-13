@@ -107,14 +107,14 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 sx={{background: "#F9F9F9", borderRadius: "4px"}}
                 fullWidth
             >
-                <InputLabel id="demo-simple-select-label2">Выберите операцию</InputLabel>
+                <InputLabel id="demo-simple-select-label2">Технология возделывания</InputLabel>
                 <Select
                     disabled={checkDisabled()}
 
                     labelId="demo-simple-select-label2"
                     id="demo-simple-select2"
                     value={tech}
-                    label="Выберите операцию"
+                    label="Технология возделывания"
                     onChange={handleChangeTech}
                 >
                     {
