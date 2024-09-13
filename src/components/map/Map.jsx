@@ -165,7 +165,7 @@ const Map = memo(({ year, setAllArea }) => {
   const deletArea = () => {
     if (deleteIdArea) {
       httpService
-        .delete(`/fields/fields`, {
+        .delete(`/fields/fields/`, {
           headers: {
             'accept': 'application/json',
             'Content-Type': 'application/json'
