@@ -136,7 +136,7 @@ const Map = memo(({ year, setAllArea }) => {
     formData.append("file", file);
     handleOpenBackdrop();
     httpService
-      .post("/fields/upload_file/", formData)
+      .post("/fields/upload_file", formData)
       .then((res) => {
         if (res.status === 200) {
           getData();
@@ -165,7 +165,7 @@ const Map = memo(({ year, setAllArea }) => {
   const deletArea = () => {
     if (deleteIdArea) {
       httpService
-        .delete(`/fields/fields/`, {
+        .delete(`/fields/fields`, {
           headers: {
             'accept': 'application/json',
             'Content-Type': 'application/json'
@@ -186,7 +186,7 @@ const Map = memo(({ year, setAllArea }) => {
             });
           }
         })
-        .catch((e) => {
+        .catch(() => {
           enqueueSnackbar("Ошибка удаления поля", {
             autoHideDuration: 1000,
             variant: "error",
