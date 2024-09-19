@@ -53,7 +53,7 @@ const Map = memo(({ year, setAllArea }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [value, setValue] = React.useState("1");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-  const [serachValue, setSerachValue] = useState(false);
+  const [searchValue, setSearchValue] = useState(false);
   const [grouping, setGrouping] = useState("crop");
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
@@ -73,17 +73,17 @@ const Map = memo(({ year, setAllArea }) => {
     }
   }, [year, grouping]);
 
-  useEffect(() => {
-    if (serachValue && layer) {
-      setLayerSearch(
-        layer.features.filter((item) =>
-          item.properties.crop.includes(serachValue)
-        )
-      );
-    } else if (layer) {
-      setLayerSearch(layer.features);
-    }
-  }, [serachValue, layer]);
+    useEffect(() => {
+        if (searchValue && layer) {
+            setLayerSearch(
+                layer.features.filter((item) =>
+                    item.properties.crop.toLowerCase().includes(searchValue.toLowerCase())
+                )
+            );
+        } else if (layer) {
+            setLayerSearch(layer.features);
+        }
+    }, [searchValue, layer]);
 
   const handleChangeGrouping = (event) => {
     setGrouping(event.target.value);
@@ -285,7 +285,7 @@ const Map = memo(({ year, setAllArea }) => {
                   size="small"
                   sx={{ marginTop: "20px" }}
                   onChange={(e) => {
-                    setSerachValue(e.target.value);
+                    setSearchValue(e.target.value);
                   }}
                   fullWidth
                   id="outlined-basic"
