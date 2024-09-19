@@ -33,7 +33,7 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const [valueTabs, setValueTabs] = React.useState(localStorage.getItem('tabs') ?? "menu_tehcart");
   const [loading, setLoading] = React.useState(true);
-  const [year, setYear] = React.useState(2024);
+  const [year, setYear] = React.useState(localStorage.getItem('year') ?? 2024);
   const [allArea, setAllArea] = React.useState(null);
 
   React.useEffect(() => {
