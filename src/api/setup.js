@@ -2,13 +2,13 @@ import axios from "axios";
 
 export const httpService = axios.create({
 	baseURL: process.env.NODE_ENV === "development" ? 'http://127.0.0.1:8000' : `https://xn--80acqgarss0k.online/`,
+	withCredentials: true,
 	headers: {
 		accept: 'application/json',
 	},
 })
 
 const authInterceptor = (config) => {
-
   if (localStorage.getItem('access_token')) {
     config.headers.Authorization = `Bearer ${localStorage.getItem('access_token')}`
   }
