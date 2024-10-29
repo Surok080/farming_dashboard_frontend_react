@@ -63,7 +63,7 @@ const CenterBlockFackt = ({data}) => {
                             </Box>
                         </Box>
                         {
-                            data.map((item, index) => {
+                            data?.cultures.map((item, index) => {
                                 return (
                                     <Accordion key={index}>
                                         <AccordionSummary

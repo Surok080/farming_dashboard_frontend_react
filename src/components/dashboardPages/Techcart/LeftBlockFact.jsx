@@ -60,59 +60,59 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                     ))}
                 </Select>
             </FormControl>
-            {/*<Box*/}
-            {/*    sx={{*/}
-            {/*        background: "#F9F9F9",*/}
-            {/*        border: "1px solid #bfbfbf",*/}
-            {/*        borderRadius: "4px",*/}
-            {/*    }}*/}
-            {/*    display={"flex"}*/}
-            {/*    p={2}*/}
-            {/*>*/}
-                {/*<Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>*/}
-                {/*    <Typography variant="body1">Площадь</Typography>*/}
-                {/*    <Typography*/}
-                {/*        sx={{fontWeight: "bold", color: "#62A65D"}}*/}
-                {/*        variant="h5"*/}
-                {/*    >*/}
-                {/*        {data.culture.total_area}*/}
-                {/*    </Typography>*/}
-                {/*</Box>*/}
-                {/*<Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>*/}
-                {/*    <Typography variant="body1">Кол-во полей</Typography>*/}
-                {/*    <Typography*/}
-                {/*        sx={{fontWeight: "bold", color: "#62A65D"}}*/}
-                {/*        variant="h5"*/}
-                {/*    >*/}
-                {/*        {data.culture.total_count}*/}
-                {/*    </Typography>*/}
-                {/*</Box>*/}
-            {/*</Box>*/}
-        {/*    <Box*/}
-        {/*        sx={{*/}
-        {/*            background: "#F9F9F9",*/}
-        {/*            border: "1px solid #bfbfbf",*/}
-        {/*            borderRadius: "4px",*/}
-        {/*            height: "100%",*/}
-        {/*            overflowY: "scroll",*/}
-        {/*            padding: 0,*/}
-        {/*            flexDirection: "column",*/}
-        {/*        }}*/}
-        {/*        display={"flex"}*/}
-        {/*        p={2}*/}
-        {/*    >*/}
-        {/*        <Box p={2} sx={{background: "#62A65D"}} width={"100%"}>*/}
-        {/*            <Typography*/}
-        {/*                sx={{fontWeight: "bold", color: "white"}}*/}
-        {/*                variant="body"*/}
-        {/*            >*/}
+            <Box
+                sx={{
+                    background: "#F9F9F9",
+                    border: "1px solid #bfbfbf",
+                    borderRadius: "4px",
+                }}
+                display={"flex"}
+                p={2}
+            >
+                <Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>
+                    <Typography variant="body1">Площадь</Typography>
+                    <Typography
+                        sx={{fontWeight: "bold", color: "#62A65D"}}
+                        variant="h5"
+                    >
+                        {data?.total_area_culters}
+                    </Typography>
+                </Box>
+                <Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>
+                    <Typography variant="body1">Кол-во полей</Typography>
+                    <Typography
+                        sx={{fontWeight: "bold", color: "#62A65D"}}
+                        variant="h5"
+                    >
+                        {data?.total_counts_cultures}
+                    </Typography>
+                </Box>
+            </Box>
+            <Box
+                sx={{
+                    background: "#F9F9F9",
+                    border: "1px solid #bfbfbf",
+                    borderRadius: "4px",
+                    height: "100%",
+                    overflowY: "scroll",
+                    padding: 0,
+                    flexDirection: "column",
+                }}
+                display={"flex"}
+                p={2}
+            >
+                <Box p={2} sx={{background: "#62A65D"}} width={"100%"}>
+                    <Typography
+                        sx={{fontWeight: "bold", color: "white"}}
+                        variant="body"
+                    >
 
-        {/*            </Typography>*/}
-        {/*        </Box>*/}
-        {/*        /!* <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>*/}
+                    </Typography>
+                </Box>
+                {/* <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>
 
-        {/*</Box> *!/*/}
-        {/*    </Box>*/}
+        </Box> */}
+            </Box>
         </Box>
     );
 };
