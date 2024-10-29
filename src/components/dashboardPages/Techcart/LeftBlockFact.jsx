@@ -53,11 +53,13 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                     label="Выберите культуру"
                     onChange={handleChange}
                 >
-                    {crops.map((item) => (
+                    {crops ??
+                        crops.map((item) => (
                         <MenuItem key={item.tech_cultivation_id} value={item.tech_cultivation_id}>
                             {item.tech_cultivation_name}
                         </MenuItem>
-                    ))}
+                    ))
+                    }
                 </Select>
             </FormControl>
             <Box
