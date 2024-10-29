@@ -62,7 +62,7 @@ const CenterBlockFackt = ({data}) => {
                                 </Typography>
                             </Box>
                         </Box>
-                        {data ??
+                        {data && data.cultures && data.cultures.length > 0 ?
                             data?.cultures.map((item, index) => {
                                 return (
                                     <Accordion key={index}>
@@ -134,6 +134,8 @@ const CenterBlockFackt = ({data}) => {
                                     </Accordion>
                                 )
                             })
+                            :
+                            null
                         }
                     </Box>
                 </Box>

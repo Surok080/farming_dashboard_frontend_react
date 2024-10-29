@@ -53,12 +53,12 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                     label="Выберите культуру"
                     onChange={handleChange}
                 >
-                    {crops ??
+                    {crops && crops.length > 0 ?
                         crops.map((item) => (
-                        <MenuItem key={item.tech_cultivation_id} value={item.tech_cultivation_id}>
-                            {item.tech_cultivation_name}
-                        </MenuItem>
-                    ))
+                            <MenuItem key={item.tech_cultivation_id} value={item.tech_cultivation_id}>
+                                {item.tech_cultivation_name}
+                            </MenuItem>
+                        )) : null // или что-то другое, например, сообщение о том, что нет данных
                     }
                 </Select>
             </FormControl>
