@@ -79,7 +79,7 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                     </Typography>
                 </Box>
                 <Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>
-                    <Typography variant="body1">Кол-во полей</Typography>
+                    <Typography variant="body1">Кол-во культур</Typography>
                     <Typography
                         sx={{fontWeight: "bold", color: "#62A65D"}}
                         variant="h5"
