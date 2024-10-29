@@ -10,11 +10,11 @@ import CenterBlockFackt from './CenterBlockFackt';
 
 const FactComponent = ({ year, fact }) => {
   const [crops, setCrops] = useState([]);
-  const [data, setData] = useState(dataCrop);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     try {
-      TehMapApi.getCrops(year, fact) 
+      TehMapApi.getOperation()
       .then((res) => {
         if (!!res?.status && res?.status !== 200) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -28,6 +28,7 @@ const FactComponent = ({ year, fact }) => {
 
   }, [year, fact]);
 
+
   return (
     <Box
       sx={{
@@ -35,11 +36,12 @@ const FactComponent = ({ year, fact }) => {
         height: "100%",
         background: "#f0f0f0",
         padding: "10px 10px 18px 10px",
+        overflowY: 'scroll',
       }}
     >
       <FactTitle year={year} />
       <Grid
-        sx={{ height: "100%", paddingBottom: "20px", overflow: "hidden" }}
+        sx={{ height: "100%", paddingBottom: "20px", overflow: "hidden" , overflowY: 'scroll' }}
         mt={1}
         columns={12}
         container

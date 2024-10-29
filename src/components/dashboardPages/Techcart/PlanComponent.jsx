@@ -67,9 +67,8 @@ const PlanComponent = ({ year, fact }) => {
 
   useEffect(() => {
     try {
-      fetchData()
 
-      TehMapApi.getCrops(year, fact) 
+      TehMapApi.getCrops(year, fact)
       .then((res) => {
         if (!!res?.status && res?.status !== 200) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -82,20 +81,6 @@ const PlanComponent = ({ year, fact }) => {
     }
 
   }, [year, fact]);
-
-  async function fetchData() {
-    try {
-      const sessionResponse = await SignInApi.getSessionToken();
-      console.log(sessionResponse)
-      // Здесь можно проверить наличие куки, если нужно убедиться, что они установлены
-      // например, с помощью document.cookie в браузере
-
-      const listObjects = await TehMapApi.getListObject();
-      console.log('Данные:', listObjects);
-    } catch (error) {
-      console.error('Общая ошибка:', error);
-    }
-  }
 
   return (
     <Box

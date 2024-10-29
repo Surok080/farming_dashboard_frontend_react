@@ -9,6 +9,20 @@ class TehMapService {
 		return httpService.get(`/tech_map/list_crop?year=${year}&fact=${fact}`)
 	}
 
+	/**
+	 * Получение операций
+	 */
+	getOperation(){
+		return httpService.get(`/api_smsr/list_tech_cultivation`)
+	}
+
+	/**
+	 * Получение отчета по id операции
+	 */
+	getReports(idOperation){
+		return httpService.get(`/api_smsr/get_data?tech_cultivation_id=${idOperation}`)
+	}
+
   	/**
 	 * Получение полей
 	 */

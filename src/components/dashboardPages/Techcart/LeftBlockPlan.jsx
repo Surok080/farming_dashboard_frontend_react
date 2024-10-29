@@ -12,7 +12,7 @@ import {TehMapApi} from "../../../api/tehMap";
 
 const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [crop, setCrop] = useState("");
-    const [tech, setTech] = useState(null);
+    const [tech, setTech] = useState('');
     const [arrTech, setArrTech] = useState([]);
     const [updateId, setUpdateId] = useState(0);
 
@@ -95,11 +95,15 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                     label="Выберите культуру"
                     onChange={handleChange}
                 >
-                    {crops.map((item) => (
-                        <MenuItem key={item} value={item.culture}>
-                            {item.culture}
-                        </MenuItem>
-                    ))}
+                    {crops.length > 0 ? (
+                        crops.map((item) => (
+                            <MenuItem key={item} value={item.culture}>
+                                {item.culture}
+                            </MenuItem>
+                        ))
+                    ) : (
+                        <MenuItem disabled>Нет доступных культур</MenuItem>
+                    )}
                 </Select>
             </FormControl>
             <FormControl
@@ -117,13 +121,15 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                     label="Технология возделывания"
                     onChange={handleChangeTech}
                 >
-                    {
+                    {arrTech.length > 0 ? (
                         arrTech.map((item) => (
                             <MenuItem key={item} value={item}>
                                 {item}
                             </MenuItem>
                         ))
-                    }
+                    ) : (
+                        <MenuItem disabled>Нет доступных культур</MenuItem>
+                    )}
                 </Select>
             </FormControl>
             <Box
