@@ -77,7 +77,7 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                         sx={{fontWeight: "bold", color: "#62A65D"}}
                         variant="h5"
                     >
-                        {data?.total_area_culters}
+                        {data?.total_area_cultures}
                     </Typography>
                 </Box>
                 <Box width={"50%"} gap={2} display={"flex"} flexDirection={"column"}>
