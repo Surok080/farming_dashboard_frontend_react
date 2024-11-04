@@ -45,12 +45,12 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                 sx={{background: "#F9F9F9", borderRadius: "4px"}}
                 fullWidth
             >
-                <InputLabel id="demo-simple-select-label">Выберите культуру</InputLabel>
+                <InputLabel id="demo-simple-select-label">Выберите тех.операцию</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     value={crop}
-                    label="Выберите культуру"
+                    label="Выберите тех.операцию"
                     onChange={handleChange}
                 >
                     {crops && crops.length > 0 ?
