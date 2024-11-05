@@ -19,6 +19,7 @@ import MuiDrawer from "@mui/material/Drawer";
 import styled from "@emotion/styled";
 import { drawerWidth } from "./dashboard/Dashboard";
 import logo from "../images/logo.svg"
+import Meteo from "./Meteo";
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -73,12 +74,11 @@ const LeftMenu = () => {
             flexDirection: "column",
             justifyContent: "space-between",
             height: "100%",
-            paddingBottom: "50px",
             background: "#F0F0F0",
             overflow: "hidden",
           }}
         >
-          <Box>
+          <Box display="flex" flexDirection={"column"} height={"100%"}>
             <Toolbar
               sx={{
                 display: "flex",
@@ -107,6 +107,7 @@ const LeftMenu = () => {
               <ListItems />
               <Divider sx={{ my: 1 }} />
             </List>
+              <Meteo/>
           </Box>
           <Box>
             <ListItemButton
