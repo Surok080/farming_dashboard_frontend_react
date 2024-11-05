@@ -55,7 +55,7 @@ const Meteo = () => {
                                 {`Температура: `}
                             </Typography>
                             <Typography variant={"caption"}>
-                                {`${weatherData.main.temp}° C`}
+                                {`${Math.round(weatherData.main.temp)}° C`}
                             </Typography>
                         </Box>
 
@@ -66,7 +66,7 @@ const Meteo = () => {
                                 {`По ощущениям: `}
                             </Typography>
                             <Typography variant={"caption"}>
-                                {`${weatherData.main.feels_like}° C`}
+                                {`${Math.round(weatherData.main.feels_like)}° C`}
                             </Typography>
                         </Box>
                     </ListItem>
@@ -77,6 +77,17 @@ const Meteo = () => {
                             </Typography>
                             <Typography variant={"caption"}>
                                 {`${weatherData.main.humidity}%`}
+                            </Typography>
+                        </Box>
+                    </ListItem>
+                    {/*primary={`Скорость ветра: ${weatherData.wind.speed} м/с`}*/}
+                    <ListItem sx={{padding: '0 16px'}}>
+                        <Box display="flex" justifyContent="space-between" width={"100%"}>
+                            <Typography variant={"caption"}>
+                                {`Скорость ветра: `}
+                            </Typography>
+                            <Typography variant={"caption"}>
+                                {`${Math.round(weatherData.wind.speed)} м/с`}
                             </Typography>
                         </Box>
                     </ListItem>
