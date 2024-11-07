@@ -45,6 +45,7 @@ const Meteo = () => {
             justifyContent: "center",
             borderRadius: "20px",
             margin: "0 auto",
+            padding: "10px 0"
         }}>
             <Typography variant="h6">{city}</Typography>
             {weatherData && (
@@ -99,7 +100,7 @@ const Meteo = () => {
                         </Box>
                     </ListItem>
                     <ListItem sx={{padding: '0 16px'}}>
-                        <Box display="flex" justifyContent="space-between" width={"100%"}>
+                        <Box display="flex" justifyContent="space-between" width={"100%"} overflow={"hidden"} flexWrap={"wrap"}>
                             <Typography variant={"caption"}>
                                 {`Описание: `}
                             </Typography>
