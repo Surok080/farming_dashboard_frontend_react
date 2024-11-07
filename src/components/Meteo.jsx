@@ -40,7 +40,7 @@ const Meteo = () => {
     return (
         <Box sx={{
             overflowY: 'scroll',
-            background: white,
+            background: "white",
             width: "90%",
             justifyContent: "center",
             borderRadius: "20px",
