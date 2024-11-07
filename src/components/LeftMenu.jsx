@@ -1,25 +1,12 @@
-import {
-  Box,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import {Box, Divider, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography,} from "@mui/material";
 import React from "react";
 import ListItems from "./dashboard/listItems";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import { useNavigate } from "react-router-dom";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import {useNavigate} from "react-router-dom";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MuiDrawer from "@mui/material/Drawer";
 import styled from "@emotion/styled";
-import { drawerWidth } from "./dashboard/Dashboard";
+import {drawerWidth} from "./dashboard/Dashboard";
 import logo from "../images/logo.svg"
-import Meteo from "./Meteo";
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -107,7 +94,7 @@ const LeftMenu = () => {
               <ListItems />
               <Divider sx={{ my: 1 }} />
             </List>
-              <Meteo/>
+              {/*<Meteo/>*/}
           </Box>
           <Box>
             <ListItemButton
