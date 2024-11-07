@@ -38,7 +38,14 @@ const Meteo = () => {
     }
 
     return (
-        <Box sx={{overflowY: 'scroll'}}>
+        <Box sx={{
+            overflowY: 'scroll',
+            background: white,
+            width: "90%",
+            justifyContent: "center",
+            borderRadius: "20px",
+            margin: "0 auto",
+        }}>
             <Typography variant="h6">{city}</Typography>
             {weatherData && (
                 <List sx={{ width: "100%" }}>
