@@ -166,7 +166,13 @@ const MapState = memo(() => {
     const deletArea = () => {
         if (deleteIdArea) {
             httpService
-                .delete(`/state_monitoring/plots/${deleteIdArea}`)
+                .delete(`/state_monitoring/plots/`,{
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    data: Array.isArray(deleteIdArea) ? deleteIdArea : [deleteIdArea]
+                })
                 .then((res) => {
                     if (res.status === 200) {
                         getData();
