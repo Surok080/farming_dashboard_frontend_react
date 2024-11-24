@@ -11,6 +11,7 @@ import React, { memo } from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import styled from "@emotion/styled";
 import { drawerWidth } from "./dashboard/Dashboard";
+import {useNavigate} from "react-router-dom";
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -31,9 +32,16 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
+  const navigate = useNavigate();
+
+  const refreshPage = () => {
+    navigate(0);
+  }
+
   const handleChangeYear = (e) => {
     setYear(e.target.value);
     localStorage.setItem('year', e.target.value);
+    // refreshPage();
   };
 
   function getNameTabs() {
