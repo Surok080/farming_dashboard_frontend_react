@@ -5,7 +5,6 @@ import LeftBlockPlan from "./LeftBlockPlan";
 import CenterBlockPlan from "./CenterBlockPlan";
 import {TehMapApi} from "../../../api/tehMap";
 import {dataCrop} from "../../../types";
-import {SignInApi} from "../../../api/singIn";
 
 const PlanComponent = ({ year, fact }) => {
   const [crops, setCrops] = useState([]);
@@ -19,7 +18,7 @@ const PlanComponent = ({ year, fact }) => {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
         setCrops(res.data)
-        // setData(dataCrop)
+        setData(dataCrop)
       })
     } catch (e) {
       console.log(e);
