@@ -278,6 +278,7 @@ const Map = memo(({ year, setAllArea }) => {
                   >
                     <MenuItem value={"crop"}>По культуре</MenuItem>
                     <MenuItem value={"crop_group"}>По группе</MenuItem>
+                    <MenuItem value={"productivity"}>По урожайности</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -334,7 +335,7 @@ const Map = memo(({ year, setAllArea }) => {
                 }}
                 value="3"
               >
-                <ReportArea year={year} />
+                <ReportArea grouping={grouping} year={year} />
               </TabPanel>
             </TabContext>
           </Box>
@@ -362,7 +363,7 @@ const Map = memo(({ year, setAllArea }) => {
               position: "absolute",
               right: "0px",
               bottom: "0px",
-              width: "170px",
+              width: "200px",
               height: "100%",
               zIndex: "1000",
               background: "#ffffffed",
@@ -410,7 +411,7 @@ const Map = memo(({ year, setAllArea }) => {
                           {item[0]}
                         </Typography>
                         <Typography sx={{marginLeft: 'auto'}} variant="caption">
-                          {item[1]}
+                          {item[1]}га
                         </Typography>
                       </Box>
                     );

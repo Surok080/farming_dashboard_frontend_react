@@ -96,7 +96,7 @@ const ListArea = ({
           const labelId = `checkbox-list-label-${item.properties.id}`;
 
           return (
-            <Box display={"flex"}>
+            <Box display={"flex"} key={index}>
               <Checkbox
                 edge="start"
                 checked={selectedItems.indexOf(item.properties.id) !== -1}

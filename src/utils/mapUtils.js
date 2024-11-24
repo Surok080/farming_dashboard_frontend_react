@@ -2,7 +2,6 @@ export const getAreaLayers = (layers, setStatistics, grouping) => {
     const graphStatics = [["Поле", "Площадь"]];
     let nameParams = grouping
 
-
     layers.features.map((item, index) => {
 
         if (graphStatics.find((area) => area[0] === item.properties[nameParams])) {
@@ -53,7 +52,7 @@ export const getAreaLayersCartogram = (layers, setStatistics, grouping) => {
 export const getColorLayers = (layers, setColorLayers, grouping) => {
     let colorsLayers = [];
     let nameParams = grouping
-
+    console.log(grouping)
 
     layers.features.map((item, index) => {
         if (colorsLayers.find((layer) => layer.name === item.properties[nameParams])) {
