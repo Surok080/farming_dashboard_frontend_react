@@ -64,7 +64,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                     console.log(err)
                 })
         }
-    }, [tech, updateId])
+    }, [tech, updateId, crops])
 
     const handleChange = (event) => {
         setCrop(event.target.value);

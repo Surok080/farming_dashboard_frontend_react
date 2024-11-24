@@ -19,6 +19,7 @@ const PlanComponent = ({ year, fact }) => {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
         setCrops(res.data)
+        // setData(dataCrop)
       })
     } catch (e) {
       console.log(e);
