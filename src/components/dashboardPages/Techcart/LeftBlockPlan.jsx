@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {TehMapApi} from "../../../api/tehMap";
+import {dataCrop} from "../../../types";
 
 const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [crop, setCrop] = useState("");
@@ -40,6 +41,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
             setTech("")
             setArrTech([])
             setUpdateId(0)
+            setData(dataCrop)
         }
     },[crops])
 
