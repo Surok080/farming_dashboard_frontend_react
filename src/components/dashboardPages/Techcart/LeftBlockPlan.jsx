@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {TehMapApi} from "../../../api/tehMap";
-import {dataCrop} from "../../../types";
 
 const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [crop, setCrop] = useState("");
@@ -19,8 +18,8 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
 
     function getTechCultivationValue() {
         const foundItem = crops.find(item => item.culture === crop);
-        if (foundItem?.tech_cultivation.length > 0) {
-            return foundItem.tech_cultivation.length > 0 ? foundItem.tech_cultivation[0] : 0;
+        if (foundItem) {
+            return foundItem?.tech_cultivation?.length > 0 ? foundItem.tech_cultivation[0] : 0;
         }
         return null; // Если не найдено соответствие, возвращаем null
     }
@@ -35,15 +34,6 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
         }
     }
 
-    useEffect(() => {
-        if (crops && crops.length === 0) {
-            setCrop("")
-            setTech("")
-            setArrTech([])
-            setUpdateId(0)
-            setData(dataCrop)
-        }
-    },[crops])
 
     useEffect(() => {
         if (crop && crops.length > 0) {
@@ -59,12 +49,11 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 });
             }, 0);
         }
-
     }, [crop]);
 
     useEffect(() => {
         if (crop &&  crops.some(item => item.culture === crop) && crops.length > 0) {
-            TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
+            TehMapApi.getDataCrop(year, fact, crop, tech || 0).then((res) => {
                 if (!!res?.status && res?.status !== 200) {
                     throw new Error(`HTTP error! Status: ${res.status}`);
                 } else {
