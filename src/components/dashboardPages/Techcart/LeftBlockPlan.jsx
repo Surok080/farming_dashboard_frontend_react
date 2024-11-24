@@ -9,12 +9,25 @@ import {
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {TehMapApi} from "../../../api/tehMap";
+import {dataCrop} from "../../../types";
 
 const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [crop, setCrop] = useState("");
     const [tech, setTech] = useState('');
     const [arrTech, setArrTech] = useState([]);
     const [updateId, setUpdateId] = useState(0);
+
+    useEffect(() => {
+        try {
+            setCrop("")
+            setTech("")
+            setArrTech([])
+            setUpdateId(0)
+        } catch (e) {
+            console.log(e);
+        }
+
+    }, [crops]);
 
     function getTechCultivationValue() {
         const foundItem = crops.find(item => item.culture === crop);

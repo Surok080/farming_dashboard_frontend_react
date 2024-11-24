@@ -12,13 +12,14 @@ const PlanComponent = ({ year, fact }) => {
 
   useEffect(() => {
     try {
+      setData(dataCrop)
+      setCrops([])
       TehMapApi.getCrops(year, fact)
       .then((res) => {
         if (!!res?.status && res?.status !== 200) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
         setCrops(res.data)
-        setData(dataCrop)
       })
     } catch (e) {
       console.log(e);
