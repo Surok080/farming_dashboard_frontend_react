@@ -41,15 +41,18 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
             setTimeout(() => {
                 const newTechValue = getTechCultivationValue();
                 setTech(prevTech => {
-                    setUpdateId(prev => prev + 1);
+                    if (prevTech === newTechValue) {
+                        // Если значение не изменилось, обновляем updateId
+                        setUpdateId(prev => prev + 1);
+                    }
                     return newTechValue;
                 });
             }, 0);
         }
-    }, [crop, year]);
+    }, [crop]);
 
     useEffect(() => {
-        if (crop && crops.some(item => item.culture === crop) && crops.length > 0) {
+        if (crop &&  crops.some(item => item.culture === crop) && crops.length > 0) {
             TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
                 if (!!res?.status && res?.status !== 200) {
                     throw new Error(`HTTP error! Status: ${res.status}`);
@@ -61,7 +64,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                     console.log(err)
                 })
         }
-    }, [tech, updateId, year])
+    }, [tech, updateId])
 
     const handleChange = (event) => {
         setCrop(event.target.value);
@@ -88,7 +91,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    d value={crop}
+                    value={crop}
                     label="Выберите культуру"
                     onChange={handleChange}
                 >

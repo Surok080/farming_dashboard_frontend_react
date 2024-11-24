@@ -41,7 +41,7 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
   const handleChangeYear = (e) => {
     setYear(e.target.value);
     localStorage.setItem('year', e.target.value);
-    // refreshPage();
+    refreshPage();
   };
 
   function getNameTabs() {
