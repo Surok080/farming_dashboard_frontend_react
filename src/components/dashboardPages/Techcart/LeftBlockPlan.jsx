@@ -15,7 +15,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     const [tech, setTech] = useState('');
     const [arrTech, setArrTech] = useState([]);
     const [updateId, setUpdateId] = useState(0);
-    console.log(crops)
+
     function getTechCultivationValue() {
         const foundItem = crops.find(item => item.culture === crop);
         if (foundItem) {
@@ -34,6 +34,14 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
         }
     }
 
+    useEffect(() => {
+        if (crops.latlng === 0) {
+            setCrop("")
+            setTech("")
+            setArrTech([])
+            setUpdateId(0)
+        }
+    },[crops])
 
     useEffect(() => {
         if (crop && crops.length > 0) {
@@ -49,6 +57,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 });
             }, 0);
         }
+
     }, [crop]);
 
     useEffect(() => {
