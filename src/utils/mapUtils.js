@@ -52,7 +52,6 @@ export const getAreaLayersCartogram = (layers, setStatistics, grouping) => {
 export const getColorLayers = (layers, setColorLayers, grouping) => {
     let colorsLayers = [];
     let nameParams = grouping
-    console.log(grouping)
 
     layers.features.map((item, index) => {
         if (colorsLayers.find((layer) => layer.name === item.properties[nameParams])) {
