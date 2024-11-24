@@ -49,11 +49,11 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 });
             }, 0);
         }
-    }, [crop]);
+    }, [crop, year]);
 
     useEffect(() => {
         if (crop &&  crops.some(item => item.culture === crop) && crops.length > 0) {
-            TehMapApi.getDataCrop(year, fact, crop, tech || 0).then((res) => {
+            TehMapApi.getDataCrop(year, fact, crop, tech).then((res) => {
                 if (!!res?.status && res?.status !== 200) {
                     throw new Error(`HTTP error! Status: ${res.status}`);
                 } else {
