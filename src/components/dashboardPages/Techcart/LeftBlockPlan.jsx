@@ -35,7 +35,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
     }
 
     useEffect(() => {
-        if (crops.length === 0) {
+        if (crops && crops.length === 0) {
             setCrop("")
             setTech("")
             setArrTech([])
