@@ -75,7 +75,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
 
     const checkDisabled = () => {
         if (crop && crops.length > 0) {
-            return crops.filter(item => item.culture === crop)[0]?.tech_cultivation?.length <= 0 ? true : false
+            return crops.filter(item => item.culture === crop)[0]?.tech_cultivation?.length <= 0
         } else {
             return true;
         }
@@ -91,7 +91,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={crop}
+               d     value={crop}
                     label="Выберите культуру"
                     onChange={handleChange}
                 >
