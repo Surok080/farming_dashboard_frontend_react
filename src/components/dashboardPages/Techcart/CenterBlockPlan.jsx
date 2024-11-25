@@ -220,9 +220,14 @@ const CenterBlockPlan = ({ data }) => {
             </Typography>
           </Box>
 
-          <Box p={2} display={"flex"} flexDirection={"column"} gap={1}>
+          <Box sx={{
+            padding: "0 16px"
+          }} display={"flex"} flexDirection={"column"} gap={1}>
             <BarChart
               height={300}
+              sx={{
+                padding: "5px 0"
+              }}
               series={[
                 {
                   data: uData,
