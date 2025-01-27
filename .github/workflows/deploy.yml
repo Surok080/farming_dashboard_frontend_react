@@ -13,13 +13,12 @@ jobs:
     - name: deploy using ssh
       uses: appleboy/ssh-action@master
       with:
-        node-version: 22
         host: ${{ secrets.SERVER_IP }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
-         
         script: | 
+          n latest
           cd farming_dashboard_frontend_react && \
           git pull origin develop && \
           node -v && \
