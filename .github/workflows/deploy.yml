@@ -10,13 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '22'  # Укажите нужную версию Node.js
-
-    - name: Check Node.js version
-      run: node -v
+        node-version: 14
 
     - name: deploy using ssh
       uses: appleboy/ssh-action@master
@@ -26,15 +23,12 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
         script: | 
-          # Установите n, если он еще не установлен
-          npm install -g n
-          # Установите последнюю версию Node.js
-          sudo n latest
-          # Перейдите в папку проекта
+          # Установите Node.js версии 14 или выше на сервере
+          # ...
+
           cd farming_dashboard_frontend_react && \
           git pull origin develop && \
-          node -v && \
-          yarn && \
+          yarn install && \
           yarn build && \
           sudo scp -r build/* /var/www/html/dashboard/ && \
           sudo rm -R node_modules
