@@ -27,7 +27,6 @@ export const getAreaLayers = (layers, setStatistics, grouping) => {
 
 // Возвращаем заголовок на место
     const sortedData = [header, ...rows];
-    console.log(sortedData)
     setStatistics(sortedData);
 };
 
