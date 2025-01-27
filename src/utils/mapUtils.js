@@ -87,9 +87,9 @@ export const getColorLayersCartogram = (layers, setColorLayers, grouping) => {
     setColorLayers(colorsLayers);
 };
 
-export const getOptionChart = (colors) => {
+export const getOptionChart = (colors, text = null) => {
     return {
-        title: "Структура посевов (га)",
+        title: text ? text : "Структура посевов (га)",
         legend: {
             position: "right",
             alignment: "center",

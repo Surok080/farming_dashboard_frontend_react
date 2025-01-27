@@ -23,7 +23,7 @@ const ReportAreaState = () => {
   return (
       yearReports.length ?
       <>
-      <Typography>Список полей</Typography>
+      <Typography>Список участков</Typography>
       <Box sx={{overflowY: 'scroll', display: 'flex', flexDirection: 'column'}}>
         {yearReports.map((item, index) => {
           return (

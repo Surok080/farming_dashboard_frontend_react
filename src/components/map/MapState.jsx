@@ -252,7 +252,7 @@ const MapState = memo(() => {
                                 onChange={handleChange}
                                 aria-label="lab API tabs example"
                             >
-                                <Tab label="Поля" value="1"/>
+                                <Tab label="Участки" value="1"/>
                                 <Tab label="Структура" value="2"/>
                                 <Tab label="Отчет" value="3"/>
                             </TabList>
@@ -325,7 +325,7 @@ const MapState = memo(() => {
                                             width="100%"
                                             height="350px"
                                             data={statistics}
-                                            options={getOptionChart(colorLayers)}
+                                            options={getOptionChart(colorLayers, 'Распределение форм собственности (га)')}
                                             // style={{ display: "flex", justifyContent: "space-between" }}
                                         />
                                     ) : null}
