@@ -19,8 +19,16 @@ export const getAreaLayers = (layers, setStatistics, grouping) => {
             ]);
         }
     });
+    const header = graphStatics[0];
+    const rows = graphStatics.slice(1);
 
-    setStatistics(graphStatics);
+// Сортируем по площади (второй элемент массива)
+    rows.sort((a, b) => b[1] - a[1]);
+
+// Возвращаем заголовок на место
+    const sortedData = [header, ...rows];
+    console.log(sortedData)
+    setStatistics(sortedData);
 };
 
 export const getAreaLayersCartogram = (layers, setStatistics, grouping) => {
