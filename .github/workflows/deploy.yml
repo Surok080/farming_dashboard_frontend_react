@@ -13,7 +13,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '22'
+        node-version: '22'  # Укажите нужную версию Node.js
 
     - name: Check Node.js version
       run: node -v
@@ -26,7 +26,11 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
         script: | 
-          sudo n latest  # Убедитесь, что у вас есть права на установку
+          # Установите n, если он еще не установлен
+          npm install -g n
+          # Установите последнюю версию Node.js
+          sudo n latest
+          # Перейдите в папку проекта
           cd farming_dashboard_frontend_react && \
           git pull origin develop && \
           node -v && \
