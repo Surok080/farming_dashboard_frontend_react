@@ -328,7 +328,7 @@ const MapState = memo(() => {
                                             options={getOptionChart(colorLayers, 'Распределение форм собственности (га)')}
                                             // style={{ display: "flex", justifyContent: "space-between" }}
                                         />
-                                    ) : null}
+                                    ) : <p>Нет данных</p>}
                                 </Box>
                             </TabPanel>
                             <TabPanel
