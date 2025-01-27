@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '22'
+
+    - name: Check Node.js version
+      run: node -v
+
     - name: deploy using ssh
       uses: appleboy/ssh-action@master
       with:
@@ -18,7 +26,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
         script: | 
-          n latest
+          sudo n latest  # Убедитесь, что у вас есть права на установку
           cd farming_dashboard_frontend_react && \
           git pull origin develop && \
           node -v && \
