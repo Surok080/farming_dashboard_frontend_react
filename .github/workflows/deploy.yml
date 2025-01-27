@@ -24,7 +24,8 @@ jobs:
         port: ${{ secrets.PORT }}
         script: | 
           # Установите Node.js версии 14 или выше на сервере
-          # ...
+          sudo apt update
+          sudo apt install nodejs npm
 
           cd farming_dashboard_frontend_react && \
           git pull origin develop && \
