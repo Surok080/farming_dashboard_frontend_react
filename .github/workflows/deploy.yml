@@ -21,18 +21,16 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          # Проверяем текущую версию Node.js
+          # Убедитесь, что правильная версия Node.js активирована
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm use 22 || nvm install 22
           node -v
-          # Если нужно, переключаемся на нужную версию через nvm
-          if command -v nvm > /dev/null; then
-            nvm use 22 || nvm install 22
-          fi
-          # Проверяем версию ещё раз
-          node -v
-          # Выполняем деплой
-          cd farming_dashboard_frontend_react && \
-          git pull origin develop && \
-          yarn && \
-          yarn build && \
-          sudo scp -r build/* /var/www/html/dashboard/ && \
+          
+          # Деплой приложения
+          cd farming_dashboard_frontend_react
+          git pull origin develop
+          yarn
+          yarn build
+          sudo scp -r build/* /var/www/html/dashboard/
           sudo rm -R node_modules
