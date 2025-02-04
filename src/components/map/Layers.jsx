@@ -138,6 +138,9 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                         item.properties.crop.slice(1)}
                     </Typography>
                     <Typography>{item.properties.area} га</Typography>
+                    {
+                      item.properties?.productivity_value && <Typography>Урожайность (физ.вес) - {Math.round(item.properties?.productivity_value)} ц/га</Typography>
+                    }
                   </Tooltip>
                 </GeoJSON>
               </LayerGroup>
