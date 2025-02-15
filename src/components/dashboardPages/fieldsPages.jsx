@@ -1,61 +1,62 @@
-import { Box } from "@mui/material";
-import React, { useEffect } from "react";
+import {Box, Typography} from "@mui/material";
+import React, {useEffect} from "react";
 import Grid from "@mui/material/Grid";
-import { styled } from "@mui/material/styles";
+import {styled} from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
+import logo from "../../images/agro_logo.svg";
+import hello_bg from "../../images/hello_bg.jpg";
 
 const FieldsPages = () => {
-  const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: "center",
-    color: theme.palette.text.secondary,
-    width: '100%'
-  }));
+    const Item = styled(Paper)(({theme}) => ({
+        backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+        ...theme.typography.body2,
+        padding: theme.spacing(1),
+        textAlign: "center",
+        color: theme.palette.text.secondary,
+        width: '100%'
+    }));
 
-  return (
-    <Box sx={{ height: '100%' }}>
+    return (
+        <Box sx={{height: '100%'}}>
 
-      <Grid spacing={2} sx={{ marginBottom: "20px" }} container xs={12}>
-        <Grid item xs={12}>
-          <Item>xs=14 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Saepe nesciunt natus ex quasi id atque animi, officia corporis provident quae maiores, fugit beatae adipisci, quod iure at sint? Omnis, consequuntur? Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aperiam vero architecto perspiciatis? Porro incidunt unde odio odit est atque aut modi, iure assumenda nisi perspiciatis in quis a, fugiat id. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Distinctio, est officia laborum aliquid veritatis voluptas error optio ab hic magnam. Aliquid voluptatibus eos eaque culpa blanditiis harum tempore praesentium nihil. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Temporibus, officia repellat! Velit fugiat reprehenderit assumenda quibusdam illum! Necessitatibus numquam nostrum, ipsam eius architecto, illum itaque cum, eos quos sunt aperiam?</Item>
-        </Grid>
-      </Grid>
+            <Paper sx={{padding: '26px', height: '100%'}}>
+                <Box display="flex" justifyContent="center" alignItems="center" margin={'0 auto'}>
+                    <img src={logo} width={34} height={27} alt="logo"/>
+                    <Typography variant={'h6'}>Агро-Коннект</Typography>
+                </Box>
+                <Box
+                    width={'100%'}
+                    maxWidth={'640px'}
+                    display={'flex'}
+                    flexDirection={'column'}
+                    margin={'20px auto'}
+                    justifyContent={'center'}
+                    gap={2}
+                >
+                    <img width={'100%'} src={hello_bg} alt="Ферма"/>
+                    <Typography>
+                        Добро пожаловать в Агро-Коннект!
+                    </Typography>
+                    <Typography>Агро-Коннект — это совместный научный проект, разработанный с целью улучшить доступ
+                        сельхозтоваропроизводителям, а также фермерских сообществ
+                        к цифровым сельскохозяйственным технологиям.</Typography>
 
-      <Grid xs={12} container alignItems="stretch" spacing={2} sx={{ height: 'calc(100% - 118px)' }}>
+                    <Typography>Агро-Коннект стремится помочь сельхозтоваропроизводителям управлять своими фермами
+                        более прибыльными, (экологически) и социально устойчивыми способами.</Typography>
 
-        <Grid sx={{ width: "100%" }} item xs={4} display="flex">
-          <Item>xs=1221321</Item>
-        </Grid>
-        
+                    <Typography>Команда Агро-Коннект — это междисциплинарная группа ученых, исследователей,
+                        сельхозтоваропроизводителей, и специалистов по программному обеспечению.</Typography>
 
-        <Grid item xs={6} display="flex">
-          <Grid rowSpacing={2} container xs={12} alignItems="stretch">
-            <Grid item xs={12} display="flex">
-              <Item>xs=12</Item>
-            </Grid>
-            <Grid item xs={12} display="flex">
-              <Item>xs=12</Item>
-            </Grid>
-          </Grid>
-        </Grid>
 
-        <Grid item xs={2} display="flex">
-        <Grid rowSpacing={2} container xs={12} alignItems="stretch">
-            <Grid item xs={12} display="flex">
-              <Item>xs=12</Item>
-            </Grid>
-            <Grid item xs={12} display="flex">
-              <Item>xs=12</Item>
-            </Grid>
-          </Grid>
-        </Grid>
+                    <Typography mt={4}>Если у вас возникнут трудности с использованием Агро-Коннект,
+                        Вы всегда можете обратиться в нашу тех.поддержку или пройти обучение.</Typography>
+                    <Typography>По всем вопросам можете обращаться по адресу: <a href="mailto:sof-it.tech@yandex.ru">sof-it.tech@yandex.ru</a> sof-it.tech@yandex.ru</Typography>
+                </Box>
 
-      </Grid>
 
-    </Box>
-  );
+            </Paper>
+        </Box>
+    );
 };
 
 export default FieldsPages;

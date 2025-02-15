@@ -1,20 +1,17 @@
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
+import {createContext, useState} from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import AgricultureIcon from "@mui/icons-material/Agriculture";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { useNavigate } from "react-router-dom";
-import { SignInApi } from "../api/singIn";
-import { useState } from "react";
+import {useNavigate} from "react-router-dom";
+import {SignInApi} from "../api/singIn";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { createContext } from "react";
-import { useSnackbar } from "notistack";
-import { useDispatch, useSelector } from "react-redux";
-import { setUserFio } from "../store/userDto";
-import logo from "../images/logo.svg"
+import {useSnackbar} from "notistack";
+import {useDispatch, useSelector} from "react-redux";
+import {setUserFio} from "../store/userDto";
+import logo from "../images/agro_logo.svg"
 
 export const StoreContext = createContext("light");
 

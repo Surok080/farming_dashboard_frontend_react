@@ -6,7 +6,7 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MuiDrawer from "@mui/material/Drawer";
 import styled from "@emotion/styled";
 import {drawerWidth} from "./dashboard/Dashboard";
-import logo from "../images/logo.svg"
+import logo from "../images/agro_logo.svg"
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -87,7 +87,7 @@ const LeftMenu = () => {
                   sx={{ flexGrow: 1 }}
                   textAlign={"center"}
                 >
-                  ЗАО «БИРЮЛИ»
+                    Агро-Коннект
                 </Typography>
               </Box>
 
