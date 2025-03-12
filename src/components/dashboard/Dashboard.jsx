@@ -10,115 +10,120 @@ import FieldsPages from "../dashboardPages/fieldsPages";
 import {useDispatch, useSelector} from "react-redux";
 import {SignInApi} from "../../api/singIn";
 import {setUserFio} from "../../store/userDto";
+import {setUserInfo} from "../../store/userDto";
 import {useNavigate} from "react-router-dom";
 import AppBarHeader from "../AppBarHeader";
 import LeftMenu from "../LeftMenu";
 import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
 import CartogramsPage from "../dashboardPages/CartogramsPage";
 import TechcartPage from "../dashboardPages/TechcartPage";
+import SettingsPage from "../dashboardPages/SettingsPage";
 
 export const drawerWidth = 180;
 
 const defaultTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#82F865",
+    palette: {
+        primary: {
+            main: "#82F865",
+        },
     },
-  },
 });
 
 export default function Dashboard() {
-  const user = useSelector((state) => state.user.fio);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [valueTabs, setValueTabs] = React.useState(localStorage.getItem('tabs') ?? "menu_tehcart");
-  const [loading, setLoading] = React.useState(true);
-  const [year, setYear] = React.useState(localStorage.getItem('year') ?? 2024);
-  const [allArea, setAllArea] = React.useState(null);
+    const user = useSelector((state) => state.user.fio);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const [valueTabs, setValueTabs] = React.useState(localStorage.getItem('tabs') ?? "menu_tehcart");
+    const [loading, setLoading] = React.useState(true);
+    const [year, setYear] = React.useState(localStorage.getItem('year') ?? 2024);
+    const [allArea, setAllArea] = React.useState(null);
 
-  React.useEffect(() => {
-      SignInApi.getMe()
-      .then((user) => {
-        dispatch(
-          setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
-        );
-        setTimeout(() => {
-          setLoading(false);
-        }, 100);
-      
-      })
-      .catch((error) => {
-        console.error('Ошибка запроса:', error);
-        navigate("/");
-      });
-  }, []);
+    React.useEffect(() => {
+        SignInApi.getMe()
+            .then((user) => {
+                dispatch(
+                    setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
+                );
+                dispatch(setUserInfo(user?.data));
+                setTimeout(() => {
+                    setLoading(false);
+                }, 100);
 
-  function getPagesDashboard() {
-    switch (valueTabs) {
-      case "menu_dashboard":
-        return <FieldsPages />;
-      case "menu_tehcart":
-        return <TechcartPage year={year}/>;
-      case "menu_fields":
-        return <DashboardPages setAllArea={setAllArea} year={year} />;
-      case "menu_gos":
-        return <StateMonitoringPages setAllArea={setAllArea} year={year} />;
-      case "menu_сartograms":
-        return <CartogramsPage setAllArea={setAllArea} year={year} />;
+            })
+            .catch((error) => {
+                console.error('Ошибка запроса:', error);
+                navigate("/");
+            });
+    }, []);
 
-      default:
-        break;
+    function getPagesDashboard() {
+        switch (valueTabs) {
+            case "menu_dashboard":
+                return <FieldsPages/>;
+            case "menu_tehcart":
+                return <TechcartPage year={year}/>;
+            case "menu_fields":
+                return <DashboardPages setAllArea={setAllArea} year={year}/>;
+            case "menu_gos":
+                return <StateMonitoringPages setAllArea={setAllArea} year={year}/>;
+            case "menu_сartograms":
+                return <CartogramsPage setAllArea={setAllArea} year={year}/>;
+            case "menu_settings":
+                return <SettingsPage setAllArea={setAllArea} year={year}/>;
+
+            default:
+                break;
+        }
     }
-  }
 
-  if (loading) {
-    return <>loading</>;
-  }
+    if (loading) {
+        return <>loading</>;
+    }
 
-  return (
-    <ThemeProvider theme={defaultTheme}>
-      <Context.Provider value={{ valueTabs, setValueTabs }}>
-        <Box sx={{ display: "flex" }}>
-          <CssBaseline />
-          <AppBarHeader
-            allArea={allArea}
-            valueTabs={valueTabs}
-            year={year}
-            user={user}
-            setYear={setYear}
-          />
-          <LeftMenu />
-          <Box
-            component="main"
-            sx={{
-              backgroundColor: (theme) =>
-                theme.palette.mode === "light"
-                  ? theme.palette.grey[100]
-                  : theme.palette.grey[900],
-              flexGrow: 1,
-              height: "100vh",
-              overflow: "auto",
-            }}
-          >
-            <Toolbar />
-            <Container
-              maxWidth={false}
-              style={{ padding: "0" }}
-              sx={{
-                maxWidth: "100%",
-                marginTop: "20px",
-                marginLeft: "200px",
-                height: "calc(100% - 96px)",
-                width: "calc(100% - 220px)",
-                padding: "0",
-                overflow: 'hidden'
-              }}
-            >
-              {getPagesDashboard()}
-            </Container>
-          </Box>
-        </Box>
-      </Context.Provider>
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider theme={defaultTheme}>
+            <Context.Provider value={{valueTabs, setValueTabs}}>
+                <Box sx={{display: "flex"}}>
+                    <CssBaseline/>
+                    <AppBarHeader
+                        allArea={allArea}
+                        valueTabs={valueTabs}
+                        year={year}
+                        user={user}
+                        setYear={setYear}
+                    />
+                    <LeftMenu/>
+                    <Box
+                        component="main"
+                        sx={{
+                            backgroundColor: (theme) =>
+                                theme.palette.mode === "light"
+                                    ? theme.palette.grey[100]
+                                    : theme.palette.grey[900],
+                            flexGrow: 1,
+                            height: "100vh",
+                            overflow: "auto",
+                        }}
+                    >
+                        <Toolbar/>
+                        <Container
+                            maxWidth={false}
+                            style={{padding: "0"}}
+                            sx={{
+                                maxWidth: "100%",
+                                marginTop: "20px",
+                                marginLeft: "200px",
+                                height: "calc(100% - 96px)",
+                                width: "calc(100% - 220px)",
+                                padding: "0",
+                                overflow: 'hidden'
+                            }}
+                        >
+                            {getPagesDashboard()}
+                        </Container>
+                    </Box>
+                </Box>
+            </Context.Provider>
+        </ThemeProvider>
+    );
 }

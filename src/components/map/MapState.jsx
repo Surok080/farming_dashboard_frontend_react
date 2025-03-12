@@ -1,11 +1,10 @@
-import React, {memo, useEffect, useRef, useState} from "react";
-import Layers from "./Layers";
+import React, {memo, useEffect, useState} from "react";
 import {MapContainer, ZoomControl} from "react-leaflet";
 import {httpService} from "../../api/setup";
 import {
     Backdrop,
     Box,
-    Button, CircularProgress,
+    CircularProgress,
     FormControl,
     InputLabel,
     MenuItem,
@@ -14,33 +13,15 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {styled} from "@mui/material/styles";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {Chart} from "react-google-charts";
 import {useSnackbar} from "notistack";
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
-import {
-    getAreaLayers,
-    getColorLayers,
-    getOptionChart,
-} from "../../utils/mapUtils";
-import ReportArea from "./ReportArea";
+import {getAreaLayers, getColorLayers, getOptionChart,} from "../../utils/mapUtils";
 import LayersState from "./LayersState";
 import ReportAreaState from "./ReportAreaState";
 
-const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
-});
 
 const MapState = memo(() => {
     const [layer, setLayer] = useState(null);
@@ -49,7 +30,6 @@ const MapState = memo(() => {
     const [activeArea, setActiveArea] = useState(null);
     const [deleteIdArea, setDeleteIdArea] = useState(null);
     const [colorLayers, setColorLayers] = useState([]);
-    const fileInputRef = useRef(null);
     const [load, setLoad] = useState(false);
     const {enqueueSnackbar} = useSnackbar();
     const [value, setValue] = useState("1");
@@ -130,38 +110,6 @@ const MapState = memo(() => {
         setColorLayers([]);
     };
 
-    const handleFileSelection = (event) => {
-        const file = event.target.files[0]; // get file
-
-        let formData = new FormData();
-        formData.append("file", file);
-
-        httpService
-            .post("/state_monitoring/upload_plots", formData)
-            .then((res) => {
-                if (res.status === 200) {
-                    getData();
-                    enqueueSnackbar("Данные добавлены", {
-                        autoHideDuration: 1000,
-                        variant: "success",
-                    });
-                } else if (res.status === 422) {
-                    enqueueSnackbar("Некорректный файл", {
-                        autoHideDuration: 1000,
-                        variant: "error",
-                    });
-                } else {
-                    enqueueSnackbar("Ошибка загрузки файлов", {
-                        autoHideDuration: 1000,
-                        variant: "error",
-                    });
-                }
-            })
-            .finally(() => {
-                fileInputRef.current.value = null;
-                handleCloseBackdrop();
-            });
-    };
 
     const deletArea = () => {
         if (deleteIdArea) {
@@ -201,22 +149,6 @@ const MapState = memo(() => {
 
     return (
         <>
-            <Button
-                sx={{
-                    position: "absolute",
-                    top: "150px",
-                    zIndex: "1000",
-                    left: "410px",
-                    maxWidth: "40px",
-                    minWidth: "40px",
-                }}
-                component="label"
-                variant="contained"
-                onChange={handleFileSelection}
-            >
-                <CloudUploadIcon/>
-                <VisuallyHiddenInput type="file" ref={fileInputRef}/>
-            </Button>
             <div
                 style={{
                     display: "flex",

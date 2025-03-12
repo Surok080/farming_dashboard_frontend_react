@@ -1,10 +1,10 @@
-import React, {memo, useEffect, useRef, useState} from "react";
+import React, {memo, useEffect, useState} from "react";
 import {MapContainer, ZoomControl} from "react-leaflet";
 import {httpService} from "../../api/setup";
 import {
     Backdrop,
     Box,
-    Button, CircularProgress,
+    CircularProgress,
     FormControl,
     InputLabel,
     MenuItem,
@@ -12,29 +12,12 @@ import {
     Tab,
     Typography,
 } from "@mui/material";
-import {styled} from "@mui/material/styles";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {useSnackbar} from "notistack";
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
-import {
-    getAreaLayers, getAreaLayersCartogram,
-    getColorLayers, getColorLayersCartogram,
-} from "../../utils/mapUtils";
+import {getAreaLayersCartogram, getColorLayersCartogram,} from "../../utils/mapUtils";
 import LayersCartogram from "./LayersCartogram";
 import ReportAreaCartogram from "./ReportAreaCartogram";
-
-const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
-});
 
 const MapCartogram = memo(() => {
     const [layer, setLayer] = useState([]);
@@ -43,7 +26,6 @@ const MapCartogram = memo(() => {
     const [activeArea, setActiveArea] = useState(null);
     const [deleteIdArea, setDeleteIdArea] = useState(null);
     const [colorLayers, setColorLayers] = useState([]);
-    const fileInputRef = useRef(null);
     const [load, setLoad] = useState(false);
     const {enqueueSnackbar} = useSnackbar();
     const [value, setValue] = React.useState("1");
@@ -121,38 +103,6 @@ const MapCartogram = memo(() => {
         setColorLayers([]);
     };
 
-    const handleFileSelection = (event) => {
-        const file = event.target.files[0]; // get file
-
-        let formData = new FormData();
-        formData.append("file", file);
-        handleOpenBackdrop();
-        httpService
-            .post("/cartogram/upload_cartogram", formData)
-            .then((res) => {
-                if (res.status === 200) {
-                    getData();
-                    enqueueSnackbar("Данные добавлены", {
-                        autoHideDuration: 1000,
-                        variant: "success",
-                    });
-                } else if (res.status === 422) {
-                    enqueueSnackbar("Некорректный файл", {
-                        autoHideDuration: 1000,
-                        variant: "error",
-                    });
-                } else {
-                    enqueueSnackbar("Ошибка загрузки файлов", {
-                        autoHideDuration: 1000,
-                        variant: "error",
-                    });
-                }
-            })
-            .finally(() => {
-                fileInputRef.current.value = null;
-                handleCloseBackdrop();
-            });
-    };
 
     const deletArea = () => {
         if (deleteIdArea) {
@@ -186,22 +136,6 @@ const MapCartogram = memo(() => {
 
     return (
         <>
-            <Button
-                sx={{
-                    position: "absolute",
-                    top: "150px",
-                    zIndex: "1000",
-                    left: "410px",
-                    maxWidth: "40px",
-                    minWidth: "40px",
-                }}
-                component="label"
-                variant="contained"
-                onChange={handleFileSelection}
-            >
-                <CloudUploadIcon/>
-                <VisuallyHiddenInput type="file" ref={fileInputRef}/>
-            </Button>
             <div
                 style={{
                     display: "flex",
