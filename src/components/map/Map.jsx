@@ -86,7 +86,7 @@ const Map = memo(({ year, setAllArea }) => {
     handleOpenBackdrop();
     setLoad(true);
     httpService
-      .get(`/fields/fields?year=${year}&group=${grouping}`)
+      .get(`/fields?year=${year}&group=${grouping}`)
       .then((res) => {
         if (res?.status === 200 && res.data?.features) {
           setLayer(res.data);
@@ -113,7 +113,7 @@ const Map = memo(({ year, setAllArea }) => {
   const deletArea = () => {
     if (deleteIdArea) {
       httpService
-        .delete(`/fields/fields/`, {
+        .delete(`/fields`, {
           headers: {
             'accept': 'application/json',
             'Content-Type': 'application/json'
@@ -273,7 +273,7 @@ const Map = memo(({ year, setAllArea }) => {
           </Box>
         </Box>
         <MapContainer
-          center={[56.66163543086128, 54.6566711425781]}
+          center={[56.66163543086128, 54.6566711425781]}  // TODO Координаты захардокрежы
           zoom={12}
           zoomControl={false}
           scrollWheelZoom={true}

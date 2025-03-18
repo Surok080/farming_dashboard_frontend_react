@@ -21,21 +21,21 @@ const MapSettings = () => {
                     <Typography variant="h6" color="textSecondary">
                         Слой “Поля”
                     </Typography>
-                    <UploadFiles url={"/fields/upload_file"}/>
+                    <UploadFiles url={"/fields"}/>
                 </Box>
 
                 <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
                     <Typography variant="h6" color="textSecondary">
                         Слой “Картограммы”
                     </Typography>
-                    <UploadFiles url={"/cartogram/upload_cartogram"}/>
+                    <UploadFiles url={"/cartogram"}/>
                 </Box>
 
                 <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
                     <Typography variant="h6" color="textSecondary">
                         Слой “Госмониторинг”
                     </Typography>
-                    <UploadFiles url={"/state_monitoring/upload_plots"}/>
+                    <UploadFiles url={"/state_monitoring"}/>
                 </Box>
             </Box>
 

@@ -80,7 +80,7 @@ const MapCartogram = memo(() => {
     const getData = () => {
         handleOpenBackdrop();
         httpService
-            .get(`/cartogram/fields?group=${grouping}`)
+            .get(`/cartogram?group=${grouping}`)
             .then((res) => {
                 if (res?.status === 200 && res.data?.features) {
                     setLayer(res.data);
@@ -107,7 +107,7 @@ const MapCartogram = memo(() => {
     const deletArea = () => {
         if (deleteIdArea) {
             httpService
-                .delete(`/state_monitoring/plots/${deleteIdArea}`)
+                .delete(`/state_monitoring/${deleteIdArea}`)
                 .then((res) => {
                     if (res.status === 200) {
                         getData();

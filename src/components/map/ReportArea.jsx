@@ -7,7 +7,7 @@ const ReportArea = ({year, grouping}) => {
 
 
     useEffect(() => {
-        httpService.get(`/fields/${grouping === 'productivity' ? 'report_productivity' : 'report'}?year=${year}`)
+        httpService.get(`/fields/${grouping === 'productivity' ? 'report/productivity' : 'report'}?year=${year}`)
             .then((res) => {
                 if (res.status && res.status === 200) {
                     setYearReports(res.data)

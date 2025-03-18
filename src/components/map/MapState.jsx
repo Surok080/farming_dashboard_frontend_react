@@ -87,7 +87,7 @@ const MapState = memo(() => {
     const getData = () => {
         handleOpenBackdrop();
         httpService
-            .get(`/state_monitoring/plots?group=${grouping}`)
+            .get(`/state_monitoring?group=${grouping}`)
             .then((res) => {
                 if (res?.status === 200 && res.data?.features) {
                     setLayer(res.data);
@@ -114,7 +114,7 @@ const MapState = memo(() => {
     const deletArea = () => {
         if (deleteIdArea) {
             httpService
-                .delete(`/state_monitoring/plots/`,{
+                .delete(`/state_monitoring`,{
                     headers: {
                         'accept': 'application/json',
                         'Content-Type': 'application/json',

@@ -6,21 +6,21 @@ class TehMapService {
 	 * Получение полей
 	 */
 	getCrops(year,fact){
-		return httpService.get(`/tech_map/list_crop?year=${year}&fact=${fact}`)
+		return httpService.get(`/tech_map/list?year=${year}&fact=${fact}`)
 	}
 
 	/**
 	 * Получение операций
 	 */
 	getOperation(){
-		return httpService.get(`/api_smsr/list_tech_cultivation`)
+		return httpService.get(`/api_smsr/list`)
 	}
 
 	/**
 	 * Получение отчета по id операции
 	 */
 	getReports(idOperation){
-		return httpService.get(`/api_smsr/get_data?tech_cultivation_id=${idOperation}`)
+		return httpService.get(`/api_smsr?tech_cultivation_id=${idOperation}`)
 	}
 
   	/**
@@ -32,7 +32,7 @@ class TehMapService {
 
 	async getListObject() {
 		try {
-			const response = await httpService.get('https://smsr.online/api/integration/v1/getobjectslist?companyId=114');
+			const response = await httpService.get('https://smsr.online/api/integration/v1/getobjectslist?companyId=114');  // TODO Это как будто тоже самое что и я делаю?
 			if (!response.status.toString().startsWith('2')) {
 				throw new Error(`Ошибка получения списка объектов: ${response.status} ${response.statusText}`);
 			}
