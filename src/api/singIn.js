@@ -22,7 +22,7 @@ class SignInService {
   }
 
   getMe() {
-    return httpService.get("/auth/get_me/")
+    return httpService.get("/auth/get_me")
       .then(response => {
         if (response?.status !== 200) {
           console.log(response, '---!response.status && response.status !== 200');
@@ -38,7 +38,7 @@ class SignInService {
 
     async getSessionToken() {
         try {
-            const response = await httpService.get('https://smsr.online/api/integration/v1/connect?login=bir&password=542297&lang=ru-ru',);
+            const response = await httpService.get('https://smsr.online/api/integration/v1/connect?login=bir&password=542297&lang=ru-ru',);  // TODO возможно тоже не нужна тут
             if (!response.status.toString().startsWith('2')) {
                 throw new Error(`Ошибка получения токена: ${response.status} ${response.statusText}`);
             }
