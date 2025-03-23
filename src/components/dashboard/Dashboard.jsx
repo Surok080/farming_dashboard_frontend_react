@@ -49,21 +49,27 @@ export default function Dashboard() {
     }, [user]);
 
     React.useEffect(() => {
-        SignInApi.getMe()
-            .then((user) => {
-                dispatch(
-                    setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
-                );
-                dispatch(setUserInfo(user?.data));
-                setTimeout(() => {
-                    setLoading(false);
-                }, 100);
 
-            })
-            .catch((error) => {
-                console.error('Ошибка запроса:', error);
-                navigate("/");
-            });
+        if (Object.keys(user.userInfo).length === 0) {
+            SignInApi.getMe()
+                .then((user) => {
+                    dispatch(
+                        setUserFio(`${user?.data.first_name + " " + user?.data.last_name}`)
+                    );
+                    dispatch(setUserInfo(user?.data));
+                    setTimeout(() => {
+                        setLoading(false);
+                    }, 100);
+
+                })
+                .catch((error) => {
+                    console.error('Ошибка запроса:', error);
+                    navigate("/");
+                });
+        } else {
+            setLoading(false);
+        }
+
     }, []);
 
     function getPagesDashboard() {

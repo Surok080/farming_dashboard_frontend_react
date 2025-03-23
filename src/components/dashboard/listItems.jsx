@@ -54,7 +54,7 @@ export default function ListItems() {
       </ListItemButton>
         {
             menu.map((item, index) => {
-                if (item === 'api_smsr') return (null);
+                if (item === 'api_smsr' || item === 'proxy_1c') return (null);
                 return (
                     <ListItemButton key={item} onClick={() => setTabs(item)}>
                         <ListItemIcon sx={{minWidth: '36px'}}>

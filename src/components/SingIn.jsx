@@ -10,7 +10,7 @@ import {SignInApi} from "../api/singIn";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {useSnackbar} from "notistack";
 import {useDispatch, useSelector} from "react-redux";
-import {setUserFio} from "../store/userDto";
+import {setUserFio, setUserInfo} from "../store/userDto";
 import logo from "../images/agro_logo.svg"
 
 export const StoreContext = createContext("light");
@@ -39,6 +39,7 @@ export default function SignIn() {
             setLoad(false);
             setUserDto(user.data);
             dispatch(setUserFio(`${user.data.first_name + user.data.last_name}`))
+            dispatch(setUserInfo(user?.data));
             enqueueSnackbar("Добро пожаловать", {
               autoHideDuration: 1000,
               variant: "success",
