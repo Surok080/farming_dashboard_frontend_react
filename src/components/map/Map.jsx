@@ -273,7 +273,7 @@ const Map = memo(({ year, setAllArea }) => {
           </Box>
         </Box>
         <MapContainer
-          center={[56.66163543086128, 54.6566711425781]}  // TODO Координаты захардокрежы
+          center={[56.66163543086128, 54.6566711425781]}
           zoom={12}
           zoomControl={false}
           scrollWheelZoom={true}

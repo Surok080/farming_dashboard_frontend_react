@@ -1,9 +1,11 @@
 import React from 'react';
 import {Box, Typography} from "@mui/material";
 import UploadFiles from "./UploadFiles";
+import {useSelector} from "react-redux";
 
 
 const MapSettings = () => {
+    const user = useSelector((state) => state.user)
 
 
     return (
@@ -17,26 +19,41 @@ const MapSettings = () => {
                 </Typography>
             </Box>
             <Box display={'flex'} alignItems={'flex-start'} gap={5}>
-                <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
-                    <Typography variant="h6" color="textSecondary">
-                        Слой “Поля”
-                    </Typography>
-                    <UploadFiles url={"/fields"}/>
-                </Box>
 
-                <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
-                    <Typography variant="h6" color="textSecondary">
-                        Слой “Картограммы”
-                    </Typography>
-                    <UploadFiles url={"/cartogram"}/>
-                </Box>
+                {
+                    user?.userInfo?.module && user.userInfo.module.includes('fields') ?
+                        <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
+                            <Typography variant="h6" color="textSecondary">
+                                Слой “Поля”
+                            </Typography>
+                            <UploadFiles url={"/fields"}/>
+                        </Box>
+                        :
+                        null
+                }
 
-                <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
-                    <Typography variant="h6" color="textSecondary">
-                        Слой “Госмониторинг”
-                    </Typography>
-                    <UploadFiles url={"/state_monitoring"}/>
-                </Box>
+                {
+                    user?.userInfo?.module && user.userInfo.module.includes('cartogram') ?
+                        <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
+                            <Typography variant="h6" color="textSecondary">
+                                Слой “Картограммы”
+                            </Typography>
+                            <UploadFiles url={"/cartogram"}/>
+                        </Box>
+                        :
+                        null
+                }
+                {
+                    user?.userInfo?.module && user.userInfo.module.includes('state_monitoring') ?
+                        <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
+                            <Typography variant="h6" color="textSecondary">
+                                Слой “Госмониторинг”
+                            </Typography>
+                            <UploadFiles url={"/state_monitoring"}/>
+                        </Box>
+                        :
+                        null
+                }
             </Box>
 
         </Box>

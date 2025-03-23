@@ -46,15 +46,15 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
 
   function getNameTabs() {
     switch (valueTabs) {
-      case "menu_dashboard":
+      case "dashboard":
         return "Обзор";
-      case "menu_tehcart":
+      case "tech_map":
         return "ТехКарта";
-      case "menu_fields":
+      case "fields":
         return "Поля";
-      case "menu_gos":
+      case "state_monitoring":
         return "Госмониторинг";
-      case "menu_сartograms":
+      case "cartogram":
         return "Картограммы";
       case "menu_settings":
         return "Настройки";
@@ -93,7 +93,7 @@ const AppBarHeader = memo(({ valueTabs, year, user, setYear, allArea }) => {
             alignItems={"center"}
           >
             {getNameTabs()}
-            {valueTabs === "menu_fields" && allArea ? (
+            {valueTabs === "fields" && allArea ? (
               <Typography color={"grey"}>{allArea} га</Typography>
             ) : null}
           </Typography>

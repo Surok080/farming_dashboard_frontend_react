@@ -1,20 +1,10 @@
 import {Box, Typography} from "@mui/material";
-import React, {useEffect} from "react";
-import Grid from "@mui/material/Grid";
-import {styled} from "@mui/material/styles";
+import React from "react";
 import Paper from "@mui/material/Paper";
 import logo from "../../images/agro_logo.svg";
 import hello_bg from "../../images/hello_bg.jpg";
 
 const FieldsPages = () => {
-    const Item = styled(Paper)(({theme}) => ({
-        backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        textAlign: "center",
-        color: theme.palette.text.secondary,
-        width: '100%'
-    }));
 
     return (
         <Box sx={{height: '100%'}}>

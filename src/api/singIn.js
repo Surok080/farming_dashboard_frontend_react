@@ -35,20 +35,6 @@ class SignInService {
         throw new Error(`Ошибка: ${error}`);
       });
   }
-
-    async getSessionToken() {
-        try {
-            const response = await httpService.get('https://smsr.online/api/integration/v1/connect?login=bir&password=542297&lang=ru-ru',);  // TODO возможно тоже не нужна тут
-            if (!response.status.toString().startsWith('2')) {
-                throw new Error(`Ошибка получения токена: ${response.status} ${response.statusText}`);
-            }
-            console.log('Токен получен:', response.data); // Проверьте, что токен действительно пришел
-            return response; // Возвращаем весь ответ, а не только данные
-        } catch (error) {
-            console.error('Ошибка при получении токена:', error);
-            throw error; // Перебрасываем ошибку для обработки выше по цепочке
-        }
-    }
 }
 
 const SignInApi = new SignInService();

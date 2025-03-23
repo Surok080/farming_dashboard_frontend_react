@@ -18,6 +18,7 @@ import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
 import CartogramsPage from "../dashboardPages/CartogramsPage";
 import TechcartPage from "../dashboardPages/TechcartPage";
 import SettingsPage from "../dashboardPages/SettingsPage";
+import {useEffect} from "react";
 
 export const drawerWidth = 180;
 
@@ -30,13 +31,22 @@ const defaultTheme = createTheme({
 });
 
 export default function Dashboard() {
-    const user = useSelector((state) => state.user.fio);
+    const user = useSelector((state) => state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [valueTabs, setValueTabs] = React.useState(localStorage.getItem('tabs') ?? "menu_tehcart");
+    const [valueTabs, setValueTabs] = React.useState("dashboard");
     const [loading, setLoading] = React.useState(true);
     const [year, setYear] = React.useState(localStorage.getItem('year') ?? 2024);
     const [allArea, setAllArea] = React.useState(null);
+
+    useEffect(() => {
+        if (localStorage.getItem('tabs') !== 'dashboard'
+            && localStorage.getItem('tabs')
+            && user?.userInfo?.module?.length > 0
+            && user.userInfo.module.includes(localStorage.getItem('tabs'))) {
+            setValueTabs(localStorage.getItem('tabs'))
+        }
+    }, [user]);
 
     React.useEffect(() => {
         SignInApi.getMe()
@@ -58,15 +68,15 @@ export default function Dashboard() {
 
     function getPagesDashboard() {
         switch (valueTabs) {
-            case "menu_dashboard":
+            case "dashboard":
                 return <FieldsPages/>;
-            case "menu_tehcart":
+            case "tech_map":
                 return <TechcartPage year={year}/>;
-            case "menu_fields":
+            case "fields":
                 return <DashboardPages setAllArea={setAllArea} year={year}/>;
-            case "menu_gos":
+            case "state_monitoring":
                 return <StateMonitoringPages setAllArea={setAllArea} year={year}/>;
-            case "menu_сartograms":
+            case "cartogram":
                 return <CartogramsPage setAllArea={setAllArea} year={year}/>;
             case "menu_settings":
                 return <SettingsPage setAllArea={setAllArea} year={year}/>;
@@ -89,7 +99,7 @@ export default function Dashboard() {
                         allArea={allArea}
                         valueTabs={valueTabs}
                         year={year}
-                        user={user}
+                        user={user.fio}
                         setYear={setYear}
                     />
                     <LeftMenu/>

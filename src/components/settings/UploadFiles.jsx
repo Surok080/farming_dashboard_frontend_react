@@ -21,7 +21,7 @@ const UploadFiles= ({url}) => {
     const fileInputRef = useRef(null);
 
     const handleFileSelection = (event) => {
-        const file = event.target.files[0]; // get file
+        const file = event.target.files[0];
 
         let formData = new FormData();
         formData.append("file", file);
@@ -29,8 +29,8 @@ const UploadFiles= ({url}) => {
         httpService
             .post(url, formData)
             .then((res) => {
-                if (res.status === 200) {
-                    enqueueSnackbar("Данные добавлены", {
+                if (res.status === 202) {
+                    enqueueSnackbar("Данные загружаются, скоро можно будет увидеть их на сайте", {
                         autoHideDuration: 1000,
                         variant: "success",
                     });
