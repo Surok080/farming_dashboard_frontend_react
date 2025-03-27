@@ -50,7 +50,7 @@ const CenterBlockPlan = ({ data }) => {
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
             >
-              Итого затрат
+              Итого затрат, руб
             </Typography>
           </Box>
           <Box p={2} display={"flex"} flexDirection={"column"} gap={2}>
@@ -66,7 +66,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.total_costs.costs_on_1_ga}
+                  {new Intl.NumberFormat("ru-RU").format(data.total_costs.costs_on_1_ga.toFixed(2))}
                 </Typography>
               </Box>
               <Box
@@ -80,7 +80,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.total_costs.total_costs}
+                  {new Intl.NumberFormat("ru-RU").format(data.total_costs.total_costs.toFixed(2))}
                 </Typography>
               </Box>
             </Box>
@@ -102,7 +102,7 @@ const CenterBlockPlan = ({ data }) => {
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
             >
-              Планируемый бюджет
+              Планируемый бюджет, руб
             </Typography>
           </Box>
           <Box p={2} display={"flex"} flexDirection={"column"} gap={1}>
@@ -118,7 +118,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.budget.seeds}
+                  {new Intl.NumberFormat("ru-RU").format(data.budget.seeds.toFixed(2))}
                 </Typography>
               </Box>
               <Box
@@ -216,7 +216,7 @@ const CenterBlockPlan = ({ data }) => {
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
             >
-              Распределение потребности
+              Распределение потребностей
             </Typography>
           </Box>
 

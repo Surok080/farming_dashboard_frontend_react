@@ -155,7 +155,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 p={2}
             >
                 <Box width={"50%"} gap={1} display={"flex"} flexDirection={"column"}>
-                    <Typography variant="body1">Площадь</Typography>
+                    <Typography variant="body1">Площадь, га</Typography>
                     <Typography
                         sx={{fontWeight: "bold", color: "#62A65D"}}
                         variant="h5"
@@ -164,7 +164,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                     </Typography>
                 </Box>
                 <Box width={"50%"} gap={1} display={"flex"} flexDirection={"column"}>
-                    <Typography variant="body1">Кол-во полей</Typography>
+                    <Typography variant="body1">Кол-во полей, шт</Typography>
                     <Typography
                         sx={{fontWeight: "bold", color: "#62A65D"}}
                         variant="h5"
