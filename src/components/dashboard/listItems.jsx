@@ -11,7 +11,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import {useSelector} from "react-redux";
-import {appBarName} from "../../utils/appBar";
+import {appBarName, moveStringToSecondPositionImmutable} from "../../utils/appBar";
 
 export default function ListItems() {
   const { valueTabs, setValueTabs } = useContext(Context);
@@ -20,7 +20,7 @@ export default function ListItems() {
 
     useEffect(() => {
         if (user.userInfo.module && user.userInfo.module.length > 0) {
-            setMenu(user.userInfo.module)
+            setMenu(moveStringToSecondPositionImmutable(user.userInfo.module, 'tech_map'))
         }
     }, [user]);
 

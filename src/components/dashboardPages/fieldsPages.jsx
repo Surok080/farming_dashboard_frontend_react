@@ -9,7 +9,7 @@ const FieldsPages = () => {
     return (
         <Box sx={{height: '100%'}}>
 
-            <Paper sx={{padding: '26px', height: '100%'}}>
+            <Paper sx={{padding: '26px', height: '100%', overflowY: 'auto'}}>
                 <Box display="flex" justifyContent="center" alignItems="center" margin={'0 auto'}>
                     <img src={logo} width={34} height={27} alt="logo"/>
                     <Typography variant={'h6'}>Агро-Коннект</Typography>
@@ -40,7 +40,7 @@ const FieldsPages = () => {
 
                     <Typography mt={4}>Если у вас возникнут трудности с использованием Агро-Коннект,
                         Вы всегда можете обратиться в нашу тех.поддержку или пройти обучение.</Typography>
-                    <Typography>По всем вопросам можете обращаться по адресу: <a href="mailto:sof-it.tech@yandex.ru">sof-it.tech@yandex.ru</a> sof-it.tech@yandex.ru</Typography>
+                    <Typography>По всем вопросам можете обращаться по адресу: <a href="mailto:sof-it.tech@yandex.ru">sof-it.tech@yandex.ru</a></Typography>
                 </Box>
 
 

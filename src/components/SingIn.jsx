@@ -38,7 +38,7 @@ export default function SignIn() {
           SignInApi.getMe().then((user) => {
             setLoad(false);
             setUserDto(user.data);
-            dispatch(setUserFio(`${user.data.first_name + user.data.last_name}`))
+            dispatch(setUserFio(`${user.data.first_name + ' ' + user.data.last_name}`))
             dispatch(setUserInfo(user?.data));
             enqueueSnackbar("Добро пожаловать", {
               autoHideDuration: 1000,
