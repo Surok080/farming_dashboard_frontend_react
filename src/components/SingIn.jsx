@@ -41,7 +41,7 @@ export default function SignIn() {
             dispatch(setUserFio(`${user.data.first_name + ' ' + user.data.last_name}`))
             dispatch(setUserInfo(user?.data));
             enqueueSnackbar("Добро пожаловать", {
-              autoHideDuration: 1000,
+              autoHideDuration: 4000,
               variant: "success",
             });
 
@@ -49,12 +49,12 @@ export default function SignIn() {
           });
         } else if (res?.status === 403) {
           enqueueSnackbar("Доступ запрещен", {
-            autoHideDuration: 3000,
+            autoHideDuration: 4000,
             variant: "warning",
           });
         } else {
           enqueueSnackbar("Что-то пошло не так", {
-            autoHideDuration: 3000,
+            autoHideDuration: 4000,
             variant: "error",
           });
         }

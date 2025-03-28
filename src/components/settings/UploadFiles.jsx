@@ -31,17 +31,17 @@ const UploadFiles= ({url}) => {
             .then((res) => {
                 if (res.status === 202) {
                     enqueueSnackbar("Данные загружаются, скоро можно будет увидеть их на сайте", {
-                        autoHideDuration: 1000,
+                        autoHideDuration: 4000,
                         variant: "success",
                     });
                 } else if (res.status === 422) {
                     enqueueSnackbar("Некорректный файл", {
-                        autoHideDuration: 1000,
+                        autoHideDuration: 4000,
                         variant: "error",
                     });
                 } else {
                     enqueueSnackbar("Ошибка загрузки файлов", {
-                        autoHideDuration: 1000,
+                        autoHideDuration: 4000,
                         variant: "error",
                     });
                 }

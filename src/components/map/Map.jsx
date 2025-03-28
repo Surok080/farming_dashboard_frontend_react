@@ -124,19 +124,19 @@ const Map = memo(({ year, setAllArea }) => {
           if (res.status === 200) {
             getData();
             enqueueSnackbar("Поле успешно удалено", {
-              autoHideDuration: 1000,
+              autoHideDuration: 4000,
               variant: "success",
             });
           } else {
             enqueueSnackbar("Ошибка удаления поля", {
-              autoHideDuration: 1000,
+              autoHideDuration: 4000,
               variant: "error",
             });
           }
         })
         .catch(() => {
           enqueueSnackbar("Ошибка удаления поля", {
-            autoHideDuration: 1000,
+            autoHideDuration: 4000,
             variant: "error",
           });
         })
