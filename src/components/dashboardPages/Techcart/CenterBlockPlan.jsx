@@ -132,7 +132,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.budget.fuel.toFixed(2)}
+                  {data.budget.fuel.toFixed(0)}
                 </Typography>
               </Box>
             </Box>
@@ -148,7 +148,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.budget.shzr.toFixed(2)}
+                  {data.budget.shzr.toFixed(0)}
                 </Typography>
               </Box>
               <Box
@@ -162,7 +162,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.budget.other_expenses.toFixed(2)}
+                  {data.budget.other_expenses.toFixed(0)}
                 </Typography>
               </Box>
             </Box>
@@ -178,7 +178,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.budget.fertilizers.toFixed(2)}
+                  {data.budget.fertilizers.toFixed(0)}
                 </Typography>
               </Box>
               <Box
@@ -192,7 +192,7 @@ const CenterBlockPlan = ({ data }) => {
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
                   variant="h5"
                 >
-                  {data.budget.products.toFixed(2)}
+                  {data.budget.products.toFixed(0)}
                 </Typography>
               </Box>
             </Box>
