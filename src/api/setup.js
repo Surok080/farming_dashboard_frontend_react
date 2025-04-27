@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const httpService = axios.create({
+	// baseURL: process.env.NODE_ENV === "development" ? 'https://agro-connect.ru/' : `https://agro-connect.ru/`,
 	baseURL: process.env.NODE_ENV === "development" ? 'http://127.0.0.1:8000/' : `https://agro-connect.ru/`,
 	withCredentials: true,
 	headers: {
