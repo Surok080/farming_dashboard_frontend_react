@@ -73,7 +73,7 @@ const CenterBlockPlan = ({ data }) => {
                 <Typography variant="body1">Затраты на 1 га</Typography>
                 <Typography
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                  variant="h6"
                 >
                   {data?.total?.costs_on_1_ga
                     ? new Intl.NumberFormat("ru-RU").format(
@@ -91,7 +91,7 @@ const CenterBlockPlan = ({ data }) => {
                 <Typography variant="body1">Итого затрат</Typography>
                 <Typography
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                  variant="h6"
                 >
                   {data?.total?.total_costs
                     ? new Intl.NumberFormat("ru-RU").format(
@@ -136,16 +136,30 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">в семенах</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {data?.plan_budget?.seeds?.plan_rub
-                    ? new Intl.NumberFormat("ru-RU").format(
-                        data.plan_budget.seeds.plan_rub.toFixed(0)
-                      )
-                    : 0}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.seeds?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.seeds.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.seeds?.fact_per
+                      ? data.plan_budget.seeds.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
               <Box
                 width={"50%"}
@@ -154,16 +168,30 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">ГСМ</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {data?.plan_budget?.fuel?.plan_rub
-                    ? new Intl.NumberFormat("ru-RU").format(
-                        data.plan_budget.fuel.plan_rub.toFixed(0)
-                      )
-                    : 0}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.fuel?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.fuel.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.fuel?.fact_per
+                      ? data.plan_budget.fuel.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
             </Box>
             <Box display={"flex"}>
@@ -174,16 +202,30 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">в СХЗР</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {data?.plan_budget?.shzr?.plan_rub
-                    ? new Intl.NumberFormat("ru-RU").format(
-                        data.plan_budget.shzr.plan_rub.toFixed(0)
-                      )
-                    : 0}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.shzr?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.shzr.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.shzr?.fact_per
+                      ? data.plan_budget.shzr.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
               <Box
                 width={"50%"}
@@ -192,16 +234,31 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">прочие затраты </Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {data?.plan_budget?.other_expenses?.plan_rub
-                    ? new Intl.NumberFormat("ru-RU").format(
-                        data.plan_budget.other_expenses.plan_rub.toFixed(0)
-                      )
-                    : 0}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.other_expenses?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.other_expenses.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.other_expenses?.fact_per
+                      ? data.plan_budget.other_expenses.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
             </Box>
             <Box display={"flex"}>
@@ -212,16 +269,31 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">в мин. удобрениях</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {data?.plan_budget?.fertilizers?.plan_rub
-                    ? new Intl.NumberFormat("ru-RU").format(
-                        data.plan_budget.fertilizers.plan_rub.toFixed(0)
-                      )
-                    : 0}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.fertilizers?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.fertilizers.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.fertilizers?.fact_per
+                      ? data.plan_budget.fertilizers.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
               <Box
                 width={"50%"}
@@ -230,19 +302,37 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">продукция </Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {data?.plan_budget?.fertilizers?.products
-                    ? new Intl.NumberFormat("ru-RU").format(
-                        data.plan_budget.fertilizers.products.toFixed(0)
-                      )
-                    : 0}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.products?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.products.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.products?.fact_per
+                      ? data.plan_budget.products.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Box>
+          <Typography color={"#00BCE5"} variant={"caption"}>
+            % выполнения плана
+          </Typography>
         </Box>
       </Box>
       <Box display={"flex"} maxHeight={"50%"}>
@@ -267,7 +357,7 @@ const CenterBlockPlan = ({ data }) => {
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
             >
-              Распределение потребностей
+              План-фактный анализ по затратам, в руб
             </Typography>
           </Box>
 
