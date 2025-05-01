@@ -36,6 +36,17 @@ class TehMapService {
 	getPlanFact(year){
 		return httpService.get(`/plan_fact/list?year=${year}`)
 	}
+
+
+  	/**
+	 * Получение полей
+	 */
+	getPlanFactCultureInfo(year, culture = []){
+		return httpService.post(`/plan_fact`, {
+      "ids_culture": culture,
+      year
+    })
+	}
 }
 
 

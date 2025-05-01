@@ -10,7 +10,6 @@ import {
   IconButton,
   Collapse,
   Box,
-  Typography,
   Paper,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
