@@ -1,28 +1,32 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 
 const CenterBlockPlan = ({ data }) => {
-  const uData = [
-    data?.consumption?.seeds?.kg,
-    data?.consumption?.fertilizers?.kg,
-    data?.consumption?.shzr?.kg,
-    data?.consumption?.fuel?.kg,
-    data?.consumption?.products?.kg,
-    data?.consumption?.other_expenses?.kg,
-  ];
+  const [safeUData, setSafeUData] = useState([0, 0, 0, 0, 0, 0]);
+  const [safeXData, setSafeXData] = useState([0, 0, 0, 0, 0, 0]);
 
-  const xData = [
-    data?.consumption?.seeds?.liter,
-    data?.consumption?.fertilizers?.liter,
-    data?.consumption?.shzr?.liter,
-    data?.consumption?.fuel?.liter,
-    data?.consumption?.products?.liter,
-    data?.consumption?.other_expenses?.liter,
-  ];
+  useEffect(() => {
+    setSafeUData([
+      data?.plan_fact_analyze?.seeds?.plan ?? 0,
+      data?.plan_fact_analyze?.fertilizers?.plan ?? 0,
+      data?.plan_fact_analyze?.shzr?.plan ?? 0,
+      data?.plan_fact_analyze?.fuel?.plan ?? 0,
+      data?.plan_fact_analyze?.products?.plan ?? 0,
+      data?.plan_fact_analyze?.other_expenses?.plan ?? 0,
+    ]);
+    setSafeXData([
+      data?.plan_fact_analyze?.seeds?.fact ?? 0,
+      data?.plan_fact_analyze?.fertilizers?.fact ?? 0,
+      data?.plan_fact_analyze?.shzr?.fact ?? 0,
+      data?.plan_fact_analyze?.fuel?.fact ?? 0,
+      data?.plan_fact_analyze?.products?.fact ?? 0,
+      data?.plan_fact_analyze?.other_expenses?.fact ?? 0,
+    ]);
+  }, [data]);
 
-
-  const xLabels = [
+  const xLabels = [0, 1, 2, 3, 4, 5];
+  const xAxisLabels = [
     "Семена",
     "Удобрения",
     "СХЗР",
@@ -45,7 +49,12 @@ const CenterBlockPlan = ({ data }) => {
           display={"flex"}
           width={"50%"}
         >
-          <Box p={2} sx={{ background: "#62A65D" }} textAlign={'start'} width={"100%"}>
+          <Box
+            p={2}
+            sx={{ background: "#62A65D" }}
+            textAlign={"start"}
+            width={"100%"}
+          >
             <Typography
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
@@ -64,9 +73,13 @@ const CenterBlockPlan = ({ data }) => {
                 <Typography variant="body1">Затраты на 1 га</Typography>
                 <Typography
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                  variant="h6"
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.total_costs.costs_on_1_ga.toFixed(0))}
+                  {data?.total?.costs_on_1_ga
+                    ? new Intl.NumberFormat("ru-RU").format(
+                        data.total.costs_on_1_ga.toFixed(0)
+                      )
+                    : 0}
                 </Typography>
               </Box>
               <Box
@@ -78,9 +91,13 @@ const CenterBlockPlan = ({ data }) => {
                 <Typography variant="body1">Итого затрат</Typography>
                 <Typography
                   sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                  variant="h6"
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.total_costs.total_costs.toFixed(0))}
+                  {data?.total?.total_costs
+                    ? new Intl.NumberFormat("ru-RU").format(
+                        data.total.total_costs.toFixed(0)
+                      )
+                    : 0}
                 </Typography>
               </Box>
             </Box>
@@ -97,7 +114,12 @@ const CenterBlockPlan = ({ data }) => {
           display={"flex"}
           width={"50%"}
         >
-          <Box p={2} sx={{ background: "#62A65D" }} textAlign={'start'} width={"100%"}>
+          <Box
+            p={2}
+            sx={{ background: "#62A65D" }}
+            textAlign={"start"}
+            width={"100%"}
+          >
             <Typography
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
@@ -114,12 +136,30 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">в семенах</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.budget.seeds.toFixed(0))}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.seeds?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.seeds.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.seeds?.fact_per
+                      ? data.plan_budget.seeds.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
               <Box
                 width={"50%"}
@@ -128,12 +168,30 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">ГСМ</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.budget.fuel.toFixed(0))}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.fuel?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.fuel.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.fuel?.fact_per
+                      ? data.plan_budget.fuel.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
             </Box>
             <Box display={"flex"}>
@@ -144,12 +202,30 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">в СХЗР</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.budget.shzr.toFixed(0))}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.shzr?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.shzr.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.shzr?.fact_per
+                      ? data.plan_budget.shzr.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
               <Box
                 width={"50%"}
@@ -158,12 +234,31 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">прочие затраты </Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.budget.other_expenses.toFixed(0))}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.other_expenses?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.other_expenses.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.other_expenses?.fact_per
+                      ? data.plan_budget.other_expenses.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
             </Box>
             <Box display={"flex"}>
@@ -174,12 +269,31 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">в мин. удобрениях</Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.budget.fertilizers.toFixed(0))}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.fertilizers?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.fertilizers.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.fertilizers?.fact_per
+                      ? data.plan_budget.fertilizers.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
               <Box
                 width={"50%"}
@@ -188,15 +302,37 @@ const CenterBlockPlan = ({ data }) => {
                 flexDirection={"column"}
               >
                 <Typography variant="body1">продукция </Typography>
-                <Typography
-                  sx={{ fontWeight: "bold", color: "#62A65D" }}
-                  variant="h5"
+
+                <Box
+                  position={"relative"}
+                  display={"flex"}
+                  alignItems={"flex-end"}
+                  gap={1}
+                  justifyContent={"center"}
                 >
-                  {new Intl.NumberFormat("ru-RU").format(data.budget.products.toFixed(0))}
-                </Typography>
+                  <Typography
+                    sx={{ fontWeight: "bold", color: "#62A65D" }}
+                    variant="h6"
+                  >
+                    {data?.plan_budget?.products?.plan_rub
+                      ? new Intl.NumberFormat("ru-RU").format(
+                          data.plan_budget.products.plan_rub.toFixed(0)
+                        )
+                      : 0}
+                  </Typography>
+                  <Typography color={"#00BCE5"} variant={"caption"}>
+                    {data?.plan_budget?.products?.fact_per
+                      ? data.plan_budget.products.fact_per
+                      : 0}{" "}
+                    %
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Box>
+          <Typography color={"#00BCE5"} variant={"caption"}>
+            % выполнения плана
+          </Typography>
         </Box>
       </Box>
       <Box display={"flex"} maxHeight={"50%"}>
@@ -211,40 +347,104 @@ const CenterBlockPlan = ({ data }) => {
           display={"flex"}
           width={"100%"}
         >
-          <Box p={2} textAlign={'start'} sx={{ background: "#62A65D" }} width={"100%"}>
+          <Box
+            p={2}
+            textAlign={"start"}
+            sx={{ background: "#62A65D" }}
+            width={"100%"}
+          >
             <Typography
               sx={{ fontWeight: "bold", color: "white" }}
               variant="body"
             >
-              Распределение потребностей
+              План-фактный анализ по затратам, в руб
             </Typography>
           </Box>
 
-          <Box sx={{
-            padding: "0 16px"
-          }} display={"flex"} flexDirection={"column"} gap={1}>
+          <Box
+            sx={{
+              padding: "0 16px",
+            }}
+            display={"flex"}
+            flexDirection={"column"}
+            gap={1}
+          >
             <BarChart
               height={300}
               sx={{
-                padding: "5px 0"
+                padding: "5px 0",
               }}
               series={[
                 {
-                  data: uData,
-                  label: "кг",
-                  id: "pvId",
-                  stack: "total",
-                  color: "#82F865", // измените цвет этой серии на зеленый
+                  data: safeUData,
+                  label: "План",
+                  color: "#82F865",
+                  type: "bar", // Явно указываем тип серии
                 },
                 {
-                  data: xData,
-                  label: "литры",
-                  id: "uvId",
-                  stack: "total",
-                  color: "#D9D9D9", // измените цвет этой серии на фиолетовый
+                  data: safeXData,
+                  label: "Факт",
+                  color: "#D9D9D9",
+                  type: "bar", // Явно указываем тип серии
                 },
               ]}
-              xAxis={[{ data: xLabels, scaleType: "band" }]}
+              xAxis={[
+                {
+                  data: xLabels,
+                  scaleType: "band",
+                  label: "Категории",
+                  valueFormatter: (index) => xAxisLabels[index],
+                },
+              ]}
+              slots={{
+                // Переопределяем компонент тултипа для поддержки bar-графика
+                tooltip: (props) => {
+                  const { series, itemData, axisData } = props;
+                  const category = xAxisLabels[axisData?.x?.value] || "";
+
+                  return (
+                    <div
+                      style={{
+                        padding: 10,
+                        background: "white",
+                        border: "1px solid #ddd",
+                        borderRadius: 4,
+                        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                      }}
+                    >
+                      <div style={{ fontWeight: "bold", marginBottom: 5 }}>
+                        {category}
+                      </div>
+                      {series.map((s, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            color: s.color,
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 10,
+                              height: 10,
+                              backgroundColor: s.color,
+                              marginRight: 5,
+                              borderRadius: 2,
+                            }}
+                          />
+                          {s.label}: {s.data[itemData.dataIndex]}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                },
+              }}
+              slotProps={{
+                bar: {
+                  rx: 4,
+                },
+              }}
             />
           </Box>
         </Box>

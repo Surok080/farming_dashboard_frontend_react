@@ -6,7 +6,7 @@ class TehMapService {
 	 * Получение полей
 	 */
 	getCrops(year,fact){
-		return httpService.get(`/tech_map/list?year=${year}&fact=${fact}`)
+		return httpService.get(`/tech_map/list?year=${year}`)
 	}
 
 	/**
@@ -28,6 +28,24 @@ class TehMapService {
 	 */
 	getDataCrop(year,fact, crop, tech = 0){
 		return httpService.get(`/tech_map?culture=${crop}&year=${year}&fact=${fact}&tech_cultivation=${tech}`)
+	}
+
+  	/**
+	 * Получение полей
+	 */
+	getPlanFact(year){
+		return httpService.get(`/plan_fact/list?year=${year}`)
+	}
+
+
+  	/**
+	 * Получение полей
+	 */
+	getPlanFactCultureInfo(year, culture = []){
+		return httpService.post(`/plan_fact`, {
+      "ids_culture": culture,
+      year
+    })
 	}
 }
 
