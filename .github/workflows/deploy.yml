@@ -21,7 +21,6 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          # Убедитесь, что правильная версия Node.js активирована
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           nvm use 22 || nvm install 22
@@ -31,6 +30,7 @@ jobs:
           cd farming_dashboard_frontend_react
           git pull origin develop
           yarn
+          export NODE_OPTIONS=--max-old-space-size=2048
           yarn build
           sudo scp -r build/* /var/www/html/dashboard/
           sudo rm -R node_modules
