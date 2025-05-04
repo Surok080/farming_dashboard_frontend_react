@@ -362,89 +362,114 @@ const CenterBlockPlan = ({ data }) => {
           </Box>
 
           <Box
-            sx={{
-              padding: "0 16px",
-            }}
-            display={"flex"}
-            flexDirection={"column"}
-            gap={1}
+              sx={{
+                padding: "0 16px",
+                width: "100%", // Добавляем полную ширину
+                overflow: "visible" // Разрешаем overflow для видимости подписей
+              }}
+              display={"flex"}
+              flexDirection={"column"}
+              gap={1}
           >
             <BarChart
-              height={300}
-              sx={{
-                padding: "5px 0",
-              }}
-              series={[
-                {
-                  data: safeUData,
-                  label: "План",
-                  color: "#82F865",
-                  type: "bar", // Явно указываем тип серии
-                },
-                {
-                  data: safeXData,
-                  label: "Факт",
-                  color: "#D9D9D9",
-                  type: "bar", // Явно указываем тип серии
-                },
-              ]}
-              xAxis={[
-                {
-                  data: xLabels,
-                  scaleType: "band",
-                  label: "Категории",
-                  valueFormatter: (index) => xAxisLabels[index],
-                },
-              ]}
-              slots={{
-                // Переопределяем компонент тултипа для поддержки bar-графика
-                tooltip: (props) => {
-                  const { series, itemData, axisData } = props;
-                  const category = xAxisLabels[axisData?.x?.value] || "";
+                height={300}
+                margin={{ // Добавляем отступы для осей
+                  left: 80, // Увеличиваем место для подписей Y
+                  right: 30,
+                  top: 30,
+                  bottom: 70 // Увеличиваем место для подписей X
+                }}
+                sx={{
+                  padding: "5px 0",
+                  width: "100%",
+                  "& .MuiChartsAxis-label": { // Стили для подписей осей
+                    fontSize: "0.75rem",
+                    transform: "translate(-10px, 0)" // Сдвигаем подпись оси Y влево
+                  }
+                }}
+                series={[
+                  {
+                    data: safeUData,
+                    label: "План",
+                    color: "#82F865",
+                    type: "bar",
+                  },
+                  {
+                    data: safeXData,
+                    label: "Факт",
+                    color: "#D9D9D9",
+                    type: "bar",
+                  },
+                ]}
+                xAxis={[
+                  {
+                    data: xLabels,
+                    scaleType: "band",
+                    label: "Категории",
+                    valueFormatter: (index) => xAxisLabels[index],
+                    labelStyle: { // Стили для подписи оси X
+                      fontSize: "0.75rem",
+                      transform: "translateY(40px)" // Сдвигаем подпись вниз
+                    }
+                  },
+                ]}
+                yAxis={[
+                  {
+                    label: "Значения", // Добавляем подпись оси Y
+                    labelStyle: {
+                      fontSize: "0.75rem",
+                      transform: "translateX(-40px)" // Сдвигаем подпись влево
+                    }
+                  }
+                ]}
+                slots={{
+                  tooltip: (props) => {
+                    const { series, itemData, axisData } = props;
+                    const category = xAxisLabels[axisData?.x?.value] || "";
 
-                  return (
-                    <div
-                      style={{
-                        padding: 10,
-                        background: "white",
-                        border: "1px solid #ddd",
-                        borderRadius: 4,
-                        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      <div style={{ fontWeight: "bold", marginBottom: 5 }}>
-                        {category}
-                      </div>
-                      {series.map((s, i) => (
+                    return (
                         <div
-                          key={i}
-                          style={{
-                            color: s.color,
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <div
                             style={{
-                              width: 10,
-                              height: 10,
-                              backgroundColor: s.color,
-                              marginRight: 5,
-                              borderRadius: 2,
+                              padding: 10,
+                              background: "white",
+                              border: "1px solid #ddd",
+                              borderRadius: 4,
+                              boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
                             }}
-                          />
-                          {s.label}: {s.data[itemData.dataIndex]}
+                        >
+                          <div style={{ fontWeight: "bold", marginBottom: 5 }}>
+                            {category}
+                          </div>
+                          {series.map((s, i) => (
+                              <div
+                                  key={i}
+                                  style={{
+                                    color: s.color,
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                              >
+                                <div
+                                    style={{
+                                      width: 10,
+                                      height: 10,
+                                      backgroundColor: s.color,
+                                      marginRight: 5,
+                                      borderRadius: 2,
+                                    }}
+                                />
+                                {s.label}: {s.data[itemData.dataIndex]}
+                              </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  );
-                },
-              }}
-              slotProps={{
-                bar: {
-                  rx: 4,
-                },
-              }}
+                    );
+                  },
+                }}
+                slotProps={{
+                  bar: {
+                    rx: 4,
+                  },
+                }}
             />
           </Box>
         </Box>
