@@ -28,6 +28,8 @@ jobs:
           
           # Деплой приложения
           cd farming_dashboard_frontend_react
+          sudo rm -R node_modules
+          sudo rm -R yarn.lock
           git pull origin develop
           yarn
           export NODE_OPTIONS=--max-old-space-size=2048
