@@ -413,15 +413,6 @@ const CenterBlockPlan = ({ data }) => {
                     }
                   },
                 ]}
-                yAxis={[
-                  {
-                    label: "Значения", // Добавляем подпись оси Y
-                    labelStyle: {
-                      fontSize: "0.75rem",
-                      transform: "translateX(-40px)" // Сдвигаем подпись влево
-                    }
-                  }
-                ]}
                 slots={{
                   tooltip: (props) => {
                     const { series, itemData, axisData } = props;
