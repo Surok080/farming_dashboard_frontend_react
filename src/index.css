@@ -11,3 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.leaflet-control-zoom {
+  margin-right: 210px !important;
+}
+
+.leaflet-control-layers.leaflet-control {
+  margin-right: 210px !important;
+}

@@ -59,7 +59,7 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
 
   return (
     <>
-      <LayersControl position="topleft">
+      <LayersControl position="topright">
         <LayersControl.BaseLayer name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

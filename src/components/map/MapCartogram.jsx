@@ -229,7 +229,10 @@ const MapCartogram = memo(() => {
                     scrollWheelZoom={true}
                     style={{height: "100%", width: "100%", position: "relative"}}
                 >
-                    <ZoomControl position="topleft"/>
+                    <ZoomControl
+                        position={"topright"}
+                        className="custom-zoom-control"
+                    />
                     {layer ? (
                         <LayersCartogram
                             layer={layer}

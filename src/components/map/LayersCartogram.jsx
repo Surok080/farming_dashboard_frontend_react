@@ -1,12 +1,5 @@
 import React, {memo, useEffect} from "react";
-import {
-    TileLayer,
-    LayersControl,
-    useMapEvents,
-    GeoJSON,
-    LayerGroup,
-    Tooltip,
-} from "react-leaflet";
+import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMapEvents,} from "react-leaflet";
 import {Typography} from "@mui/material";
 
 const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
@@ -59,7 +52,7 @@ const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
 
     return (
         <>
-            <LayersControl position="topleft">
+            <LayersControl position="topright">
                 <LayersControl.BaseLayer name="Basic Map">
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

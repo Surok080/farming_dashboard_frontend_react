@@ -5,7 +5,7 @@ import {
   useMapEvents,
   GeoJSON,
   LayerGroup,
-  Tooltip,
+  Tooltip, ZoomControl,
 } from "react-leaflet";
 import {
   Box,
@@ -90,7 +90,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
 
   return (
     <>
-      <LayersControl position="topleft">
+      <LayersControl position="topright">
         <LayersControl.BaseLayer name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

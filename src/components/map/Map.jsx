@@ -279,7 +279,10 @@ const Map = memo(({ year, setAllArea }) => {
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
-          <ZoomControl position="topleft" />
+          <ZoomControl
+              position={"topright"}
+              className="custom-zoom-control"
+          />
           {layer ? (
             <Layers
               year={year}
