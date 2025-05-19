@@ -84,7 +84,7 @@ const CulturalTable = ({ data, checked, setChecked }) => {
             p: 2,
           }}
         >
-          {node.total_area ?? "-"}
+          {node.total_area.toFixed(1) ?? "-"}
         </TableCell>
       </TableRow>
 
