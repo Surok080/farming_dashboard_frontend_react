@@ -19,8 +19,9 @@ export default function ListItems() {
     const [menu, setMenu] = useState([]);
 
     useEffect(() => {
-        if (user.userInfo.module && user.userInfo.module.length > 0) {
-            setMenu(moveStringToSecondPositionImmutable(user.userInfo.module, 'tech_map'))
+        if (user.userInfo.tabs && user.userInfo.tabs.length > 0) {
+            const tabNames = user.userInfo.tabs.map(tab => tab.name);
+            setMenu(moveStringToSecondPositionImmutable(tabNames, 'tech_map'))
         }
     }, [user]);
 
@@ -54,7 +55,6 @@ export default function ListItems() {
       </ListItemButton>
         {
             menu.map((item, index) => {
-                if (item === 'api_smsr' || item === 'proxy_1c') return (null);
                 return (
                     <ListItemButton key={item} onClick={() => setTabs(item)}>
                         <ListItemIcon sx={{minWidth: '36px'}}>
