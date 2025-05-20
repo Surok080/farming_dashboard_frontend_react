@@ -153,7 +153,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
                         aria-expanded={openUserInfo ? 'true' : undefined}
                     >
                         <Avatar
-                            sx={{width: 32, height: 32}}>{userFio.split(' ').map(word => word.charAt(0)).join('')}</Avatar>
+                            sx={{width: 32, height: 32}}>{userFio.split(' ').slice(0,2).map(word => word.charAt(0)).join('')}</Avatar>
                     </IconButton>
                     <Menu
                         anchorEl={anchorElUserInfo}
@@ -199,7 +199,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
                         <Divider/>
                         <Typography fontWeight={"bold"} ml={2} variant={'subtitle1'}>Аккаунт</Typography>
                         <Box m={2} mt={1} alignItems={"center"} display={"flex"}> <Avatar
-                            sx={{width: 32, height: 32}}>{userFio.split(' ').map(word => word.charAt(0)).join('')}</Avatar>
+                            sx={{width: 32, height: 32}}>{userFio.split(' ').slice(0,2).map(word => word.charAt(0)).join('')}</Avatar>
                             <Box>
                                 <Typography >
                                     {userFio}
@@ -252,7 +252,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
                     >
                         <Typography fontWeight={"bold"} ml={2} variant={'subtitle1'}>Поддержка</Typography>
                         <MenuItem onClick={handleCloseHelp}>
-                            <InfoOutlineIcon/> <Link ml={1} color={"black"} target={"_blank"} href="https://agro-connect.ru/dashboard" underline="none">
+                            <InfoOutlineIcon/> <Link ml={1} color={"black"} target={"_blank"} href="https://docs.google.com/document/d/194Yvd-p-elYzfjQyxyI9gugwAeEA2L3tKs76cgQc63g/edit?usp=sharing" underline="none">
                             {'База знаний'}
                         </Link>
                         </MenuItem>
