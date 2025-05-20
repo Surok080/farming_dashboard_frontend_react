@@ -105,7 +105,6 @@ export default function Dashboard() {
                         allArea={allArea}
                         valueTabs={valueTabs}
                         year={year}
-                        user={user.fio}
                         setYear={setYear}
                     />
                     <LeftMenu/>

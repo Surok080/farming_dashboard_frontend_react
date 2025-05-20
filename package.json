@@ -7,7 +7,7 @@
     "@emotion/styled": "^11.11.0",
     "@mapbox/geojson-rewind": "^0.5.2",
     "@mapbox/togeojson": "^0.16.2",
-    "@mui/icons-material": "^5.14.14",
+    "@mui/icons-material": "^7.1.0",
     "@mui/lab": "^5.0.0-alpha.150",
     "@mui/material": "^5.14.14",
     "@mui/x-charts": "^6.18.7",
