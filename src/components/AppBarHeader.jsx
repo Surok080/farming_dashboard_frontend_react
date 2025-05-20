@@ -252,7 +252,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
                     >
                         <Typography fontWeight={"bold"} ml={2} variant={'subtitle1'}>Поддержка</Typography>
                         <MenuItem onClick={handleCloseHelp}>
-                            <InfoOutlineIcon/> <Link ml={1} color={"black"} target={"_blank"} href="https://mui.com/material-ui/material-icons/?query=ques" underline="none">
+                            <InfoOutlineIcon/> <Link ml={1} color={"black"} target={"_blank"} href="https://agro-connect.ru/dashboard" underline="none">
                             {'База знаний'}
                         </Link>
                         </MenuItem>
