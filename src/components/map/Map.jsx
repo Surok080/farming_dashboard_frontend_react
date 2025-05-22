@@ -21,38 +21,41 @@ import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import {getAreaLayers, getColorLayers, getOptionChart,} from "../../utils/mapUtils";
 import ReportArea from "./ReportArea";
+import IconButton from "@mui/material/IconButton";
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 
 
-const Map = memo(({ year, setAllArea }) => {
-  const [layer, setLayer] = useState(null);
-  const [layerSearch, setLayerSearch] = useState(null);
-  const [statistics, setStatistics] = useState([]);
-  const [activeArea, setActiveArea] = useState(null);
-  const [deleteIdArea, setDeleteIdArea] = useState(null);
-  const [colorLayers, setColorLayers] = useState([]);
-  const [load, setLoad] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
-  const [value, setValue] = React.useState("1");
-  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-  const [searchValue, setSearchValue] = useState(false);
-  const [grouping, setGrouping] = useState("crop");
-  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+const Map = memo(({year, setAllArea}) => {
+    const [layer, setLayer] = useState(null);
+    const [layerSearch, setLayerSearch] = useState(null);
+    const [statistics, setStatistics] = useState([]);
+    const [activeArea, setActiveArea] = useState(null);
+    const [deleteIdArea, setDeleteIdArea] = useState(null);
+    const [colorLayers, setColorLayers] = useState([]);
+    const [load, setLoad] = useState(false);
+    const {enqueueSnackbar} = useSnackbar();
+    const [value, setValue] = React.useState("1");
+    const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+    const [searchValue, setSearchValue] = useState(false);
+    const [grouping, setGrouping] = useState("crop");
+    const [openBackdrop, setOpenBackdrop] = React.useState(false);
+    const [hideMenu, setHideMenu] = React.useState(false);
 
-  const handleCloseBackdrop = () => {
-    setTimeout(() => {
-      setOpenBackdrop(false);
-    }, 1000);
-  };
+    const handleCloseBackdrop = () => {
+        setTimeout(() => {
+            setOpenBackdrop(false);
+        }, 1000);
+    };
 
-  const handleOpenBackdrop = () => {
-    setOpenBackdrop(true);
-  };
+    const handleOpenBackdrop = () => {
+        setOpenBackdrop(true);
+    };
 
-  useEffect(() => {
-    if (!load) {
-      getData();
-    }
-  }, [year, grouping]);
+    useEffect(() => {
+        if (!load) {
+            getData();
+        }
+    }, [year, grouping]);
 
     useEffect(() => {
         if (searchValue && layer) {
@@ -66,311 +69,328 @@ const Map = memo(({ year, setAllArea }) => {
         }
     }, [searchValue, layer]);
 
-  const handleChangeGrouping = (event) => {
-    setGrouping(event.target.value);
-  };
+    const handleChangeGrouping = (event) => {
+        setGrouping(event.target.value);
+    };
 
-  const handleOpenConfirmDelete = () => {
-    setOpenConfirmDelete(true);
-  };
+    const handleOpenConfirmDelete = () => {
+        setOpenConfirmDelete(true);
+    };
 
-  const handleCloseConfirmDelete = () => {
-    setOpenConfirmDelete(false);
-  };
+    const handleCloseConfirmDelete = () => {
+        setOpenConfirmDelete(false);
+    };
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
-  const getData = () => {
-    handleOpenBackdrop();
-    setLoad(true);
-    httpService
-      .get(`/fields?year=${year}&group=${grouping}`)
-      .then((res) => {
-        if (res?.status === 200 && res.data?.features) {
-          setLayer(res.data);
-          setAllArea(res.data.total_area.toFixed(2));
-          getAreaLayers(res.data, setStatistics, grouping);
-          getColorLayers(res.data, setColorLayers, grouping);
-        } else {
-          resetState();
+    const getData = () => {
+        handleOpenBackdrop();
+        setLoad(true);
+        httpService
+            .get(`/fields?year=${year}&group=${grouping}`)
+            .then((res) => {
+                if (res?.status === 200 && res.data?.features) {
+                    setLayer(res.data);
+                    setAllArea(res.data.total_area.toFixed(2));
+                    getAreaLayers(res.data, setStatistics, grouping);
+                    getColorLayers(res.data, setColorLayers, grouping);
+                } else {
+                    resetState();
+                }
+            })
+            .finally(() => {
+                setLoad(false);
+                handleCloseBackdrop();
+            });
+    };
+
+    const resetState = () => {
+        setLayer([]);
+        setStatistics([]);
+        setActiveArea(null);
+        setColorLayers([]);
+    };
+
+    const deletArea = () => {
+        if (deleteIdArea) {
+            httpService
+                .delete(`/fields`, {
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    data: Array.isArray(deleteIdArea) ? deleteIdArea : [deleteIdArea]
+                })
+                .then((res) => {
+                    if (res.status === 200) {
+                        getData();
+                        enqueueSnackbar("Поле успешно удалено", {
+                            autoHideDuration: 4000,
+                            variant: "success",
+                        });
+                    } else {
+                        enqueueSnackbar("Ошибка удаления поля", {
+                            autoHideDuration: 4000,
+                            variant: "error",
+                        });
+                    }
+                })
+                .catch(() => {
+                    enqueueSnackbar("Ошибка удаления поля", {
+                        autoHideDuration: 4000,
+                        variant: "error",
+                    });
+                })
+                .finally(() => {
+                    handleCloseConfirmDelete();
+                });
         }
-      })
-      .finally(() => {
-        setLoad(false);
-        handleCloseBackdrop();
-      });
-  };
+    };
 
-  const resetState = () => {
-    setLayer([]);
-    setStatistics([]);
-    setActiveArea(null);
-    setColorLayers([]);
-  };
-
-  const deletArea = () => {
-    if (deleteIdArea) {
-      httpService
-        .delete(`/fields`, {
-          headers: {
-            'accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          data: Array.isArray(deleteIdArea) ? deleteIdArea : [deleteIdArea]
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            getData();
-            enqueueSnackbar("Поле успешно удалено", {
-              autoHideDuration: 4000,
-              variant: "success",
-            });
-          } else {
-            enqueueSnackbar("Ошибка удаления поля", {
-              autoHideDuration: 4000,
-              variant: "error",
-            });
-          }
-        })
-        .catch(() => {
-          enqueueSnackbar("Ошибка удаления поля", {
-            autoHideDuration: 4000,
-            variant: "error",
-          });
-        })
-        .finally(() => {
-          handleCloseConfirmDelete();
-        });
-    }
-  };
-
-  return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          width: "100%",
-          position: "relative",
-          height: "100%",
-        }}
-      >
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: "400px",
-            padding: "10px",
-            height: "auto",
-            bgcolor: "background.paper",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Box
-            sx={{
-              width: "100%",
-              typography: "body1",
-              height: "100%",
-              overflow: "hidden",
-            }}
-          >
-            <TabContext value={value}>
-              {/* <Box sx={{ borderBottom: 1, borderColor: 'red' }}> */}
-              <TabList
-                centered
-                textColor="primary"
-                onChange={handleChange}
-                aria-label="lab API tabs example"
-              >
-                <Tab label="Поля" value="1" />
-                <Tab label="Структура" value="2" />
-                <Tab label="Отчет" value="3" />
-              </TabList>
-              {/* </Box> */}
-              <TabPanel
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  maxHeight: "96%",
+    return (
+        <>
+            <div
+                style={{
+                    display: "flex",
+                    width: "100%",
+                    position: "relative",
+                    height: "100%",
                 }}
-                value="1"
-              >
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">
-                    Группировка
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={grouping}
-                    label="Группировка"
-                    onChange={handleChangeGrouping}
-                    size="small"
-                  >
-                    <MenuItem value={"crop"}>По культуре</MenuItem>
-                    <MenuItem value={"crop_group"}>По группе</MenuItem>
-                    <MenuItem value={"productivity"}>По урожайности</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <TextField
-                  size="small"
-                  sx={{ marginTop: "20px" }}
-                  onChange={(e) => {
-                    setSearchValue(e.target.value);
-                  }}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Поиск"
-                  variant="outlined"
-                />
-                <Box
-                  display={"flex"}
-                  flexDirection={"column"}
-                  overflow={"hidden"}
-                  sx={{ overflowY: "scroll" }}
-                >
-                  {layerSearch?.length && layerSearch ? (
-                    <ListArea
-                      layer={layerSearch}
-                      setActiveArea={setActiveArea}
-                      setDeleteIdArea={setDeleteIdArea}
-                      handleOpenConfirmDelete={handleOpenConfirmDelete}
-                    />
-                  ) : (
-                    <p>Нет данных</p>
-                  )}
-                </Box>
-              </TabPanel>
-              <TabPanel sx={{ marginTop: "-40px" }} value="2">
-                <Box>
-                  {statistics.length ? (
-                    <Chart
-                      chartType="PieChart"
-                      width="100%"
-                      height="350px"
-                      data={statistics}
-                      options={getOptionChart(colorLayers)}
-                      // style={{ display: "flex", justifyContent: "space-between" }}
-                    />
-                  ) : null}
-                </Box>
-              </TabPanel>
-              <TabPanel
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "90%",
-                  paddingBottom: "0px",
-                  marginTop: "-40px",
-                }}
-                value="3"
-              >
-                <ReportArea grouping={grouping} year={year} />
-              </TabPanel>
-            </TabContext>
-          </Box>
-        </Box>
-        <MapContainer
-          center={[56.66163543086128, 54.6566711425781]}
-          zoom={12}
-          zoomControl={false}
-          scrollWheelZoom={true}
-          style={{ height: "100%", width: "100%", position: "relative" }}
-        >
-          <ZoomControl
-              position={"topright"}
-              className="custom-zoom-control"
-          />
-          {layer ? (
-            <Layers
-              year={year}
-              layer={layer}
-              activeArea={activeArea}
-              setActiveArea={setActiveArea}
-            />
-          ) : null}
-        </MapContainer>
-        {layer ? (
-          <Box
-            sx={{
-              position: "absolute",
-              right: "0px",
-              bottom: "0px",
-              width: "200px",
-              height: "100%",
-              zIndex: "1000",
-              background: "#ffffffed",
-              borderRadius: "0px",
-              overflowX: "hidden",
-              overflowY: "scroll",
-              padding: "10px",
-            }}
-          >
-            <Typography>Легенда</Typography>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-              }}
             >
-              {statistics &&
-                statistics.map((item, key) => {
+                <Box
+                    sx={{
+                        width: "100%",
+                        maxWidth: hideMenu ? "0px" : "400px",
+                        padding: hideMenu ? 0 : "10px",
+                        height: "auto",
+                        bgcolor: "background.paper",
+                        display: "flex",
+                        flexDirection: "column",
+                        position: "relative",
+                        transition: "all 0.3s ease",
+                    }}
+                >
+                    <IconButton
+                        sx={{
+                            position: "absolute",
+                            right: "-45px",
+                            top: '50%',
+                            transform: `translate(0, -50%) rotate(${hideMenu ? "180deg" : 0})`,
+                            transition: "all 0.3s ease",
+                            zIndex: 1000,
+                        }}
+                        onClick={() => {
+                            setHideMenu(!hideMenu);
+                        }}
+                    >
+                        <ArrowCircleLeftIcon sx={{ fontSize: 40 }}/>
+                    </IconButton>
+                    <Box
+                        sx={{
+                            width: "100%",
+                            typography: "body1",
+                            height: "100%",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <TabContext value={value}>
+                            {/* <Box sx={{ borderBottom: 1, borderColor: 'red' }}> */}
+                            <TabList
+                                centered
+                                textColor="primary"
+                                onChange={handleChange}
+                                aria-label="lab API tabs example"
+                            >
+                                <Tab label="Поля" value="1"/>
+                                <Tab label="Структура" value="2"/>
+                                <Tab label="Отчет" value="3"/>
+                            </TabList>
+                            {/* </Box> */}
+                            <TabPanel
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    maxHeight: "96%",
+                                }}
+                                value="1"
+                            >
+                                <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label">
+                                        Группировка
+                                    </InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={grouping}
+                                        label="Группировка"
+                                        onChange={handleChangeGrouping}
+                                        size="small"
+                                    >
+                                        <MenuItem value={"crop"}>По культуре</MenuItem>
+                                        <MenuItem value={"crop_group"}>По группе</MenuItem>
+                                        <MenuItem value={"productivity"}>По урожайности</MenuItem>
+                                    </Select>
+                                </FormControl>
 
-                  
-                  if (key > 0) {
-                    const color =
-                      colorLayers.find((layer) => layer.name === item[0])
-                        ?.color ?? "red";
-
-                    return (
-                      <Box
-                        key={key}
-                        alignItems={"center"}
-                        alignContent={"center"}
-                        display={"flex"}
-                        gap={"4px"}
-                      >
+                                <TextField
+                                    size="small"
+                                    sx={{marginTop: "20px"}}
+                                    onChange={(e) => {
+                                        setSearchValue(e.target.value);
+                                    }}
+                                    fullWidth
+                                    id="outlined-basic"
+                                    label="Поиск"
+                                    variant="outlined"
+                                />
+                                <Box
+                                    display={"flex"}
+                                    flexDirection={"column"}
+                                    overflow={"hidden"}
+                                    sx={{overflowY: "scroll"}}
+                                >
+                                    {layerSearch?.length && layerSearch ? (
+                                        <ListArea
+                                            layer={layerSearch}
+                                            setActiveArea={setActiveArea}
+                                            setDeleteIdArea={setDeleteIdArea}
+                                            handleOpenConfirmDelete={handleOpenConfirmDelete}
+                                        />
+                                    ) : (
+                                        <p>Нет данных</p>
+                                    )}
+                                </Box>
+                            </TabPanel>
+                            <TabPanel sx={{marginTop: "-40px"}} value="2">
+                                <Box>
+                                    {statistics.length ? (
+                                        <Chart
+                                            chartType="PieChart"
+                                            width="100%"
+                                            height="350px"
+                                            data={statistics}
+                                            options={getOptionChart(colorLayers)}
+                                            // style={{ display: "flex", justifyContent: "space-between" }}
+                                        />
+                                    ) : null}
+                                </Box>
+                            </TabPanel>
+                            <TabPanel
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    height: "90%",
+                                    paddingBottom: "0px",
+                                    marginTop: "-40px",
+                                }}
+                                value="3"
+                            >
+                                <ReportArea grouping={grouping} year={year}/>
+                            </TabPanel>
+                        </TabContext>
+                    </Box>
+                </Box>
+                <MapContainer
+                    center={[56.66163543086128, 54.6566711425781]}
+                    zoom={12}
+                    zoomControl={false}
+                    scrollWheelZoom={true}
+                    style={{height: "100%", width: "100%", position: "relative"}}
+                >
+                    <ZoomControl
+                        position={"topright"}
+                        className="custom-zoom-control"
+                    />
+                    {layer ? (
+                        <Layers
+                            year={year}
+                            layer={layer}
+                            activeArea={activeArea}
+                            setActiveArea={setActiveArea}
+                        />
+                    ) : null}
+                </MapContainer>
+                {layer ? (
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            right: "0px",
+                            bottom: "0px",
+                            width: "200px",
+                            height: "100%",
+                            zIndex: "1000",
+                            background: "#ffffffed",
+                            borderRadius: "0px",
+                            overflowX: "hidden",
+                            overflowY: "scroll",
+                            padding: "10px",
+                        }}
+                    >
+                        <Typography>Легенда</Typography>
                         <Box
-                          sx={{
-                            width: "5px",
-                            height: "30px",
-                            background: color,
-                            minWidth: "5px",
-                            minHeight: '100%'
-                          }}
-                        ></Box>
-                        <Typography align="left" variant="caption">
-                          {item[0]}
-                        </Typography>
-                        <Typography sx={{marginLeft: 'auto'}} variant="caption">
-                          {item[1]}га
-                        </Typography>
-                      </Box>
-                    );
-                  }
-                })}
-            </Box>
-          </Box>
-        ) : null}
-      </div>
-      <ConfirmDeleteModal
-        deletArea={deletArea}
-        handleCloseConfirmDelete={handleCloseConfirmDelete}
-        openConfirmDelete={openConfirmDelete}
-        deleteIdArea={deleteIdArea}
-      />
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackdrop}
-        onClick={handleCloseBackdrop}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    </>
-  );
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "10px",
+                            }}
+                        >
+                            {statistics &&
+                                statistics.map((item, key) => {
+
+
+                                    if (key > 0) {
+                                        const color =
+                                            colorLayers.find((layer) => layer.name === item[0])
+                                                ?.color ?? "red";
+
+                                        return (
+                                            <Box
+                                                key={key}
+                                                alignItems={"center"}
+                                                alignContent={"center"}
+                                                display={"flex"}
+                                                gap={"4px"}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        width: "5px",
+                                                        height: "30px",
+                                                        background: color,
+                                                        minWidth: "5px",
+                                                        minHeight: '100%'
+                                                    }}
+                                                ></Box>
+                                                <Typography align="left" variant="caption">
+                                                    {item[0]}
+                                                </Typography>
+                                                <Typography sx={{marginLeft: 'auto'}} variant="caption">
+                                                    {item[1]}га
+                                                </Typography>
+                                            </Box>
+                                        );
+                                    }
+                                })}
+                        </Box>
+                    </Box>
+                ) : null}
+            </div>
+            <ConfirmDeleteModal
+                deletArea={deletArea}
+                handleCloseConfirmDelete={handleCloseConfirmDelete}
+                openConfirmDelete={openConfirmDelete}
+                deleteIdArea={deleteIdArea}
+            />
+            <Backdrop
+                sx={{color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1}}
+                open={openBackdrop}
+                onClick={handleCloseBackdrop}
+            >
+                <CircularProgress color="inherit"/>
+            </Backdrop>
+        </>
+    );
 });
 
 export default Map;

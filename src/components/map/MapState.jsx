@@ -21,7 +21,8 @@ import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import {getAreaLayers, getColorLayers, getOptionChart,} from "../../utils/mapUtils";
 import LayersState from "./LayersState";
 import ReportAreaState from "./ReportAreaState";
-
+import IconButton from "@mui/material/IconButton";
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 
 const MapState = memo(() => {
     const [layer, setLayer] = useState(null);
@@ -37,6 +38,8 @@ const MapState = memo(() => {
     const [serachValue, setSerachValue] = useState(false);
     const [grouping, setGrouping] = useState("plot_form_owner");
     const [openBackdrop, setOpenBackdrop] = useState(false);
+    const [hideMenu, setHideMenu] = React.useState(false);
+
 
     const handleCloseBackdrop = () => {
         setTimeout(() => {
@@ -160,14 +163,31 @@ const MapState = memo(() => {
                 <Box
                     sx={{
                         width: "100%",
-                        maxWidth: "400px",
-                        padding: "10px",
+                        maxWidth: hideMenu ? "0px" : "400px",
+                        padding: hideMenu ? 0 : "10px",
                         height: "auto",
                         bgcolor: "background.paper",
                         display: "flex",
                         flexDirection: "column",
+                        position: "relative",
+                        transition: "all 0.3s ease",
                     }}
                 >
+                    <IconButton
+                        sx={{
+                            position: "absolute",
+                            right: "-45px",
+                            top: '50%',
+                            transform: `translate(0, -50%) rotate(${hideMenu ? "180deg" : 0})`,
+                            transition: "all 0.3s ease",
+                            zIndex: 1000,
+                        }}
+                        onClick={() => {
+                            setHideMenu(!hideMenu);
+                        }}
+                    >
+                        <ArrowCircleLeftIcon sx={{ fontSize: 40 }}/>
+                    </IconButton>
                     <Box
                         sx={{
                             width: "100%",
