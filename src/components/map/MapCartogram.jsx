@@ -255,6 +255,7 @@ const MapCartogram = memo(() => {
                     />
                     {layer ? (
                         <LayersCartogram
+                            grouping={grouping}
                             layer={layer}
                             activeArea={activeArea}
                             setActiveArea={setActiveArea}

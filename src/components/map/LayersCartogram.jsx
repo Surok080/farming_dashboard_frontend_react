@@ -2,7 +2,7 @@ import React, {memo, useEffect} from "react";
 import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMapEvents,} from "react-leaflet";
 import {Typography} from "@mui/material";
 
-const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
+const LayersCartogram = memo(({layer, activeArea, setActiveArea, grouping}) => {
     const map = useMapEvents({
         // Use leaflet map event as the key and a call back with the
         // map method as the value:
@@ -49,6 +49,16 @@ const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
         return hash;
     };
 
+    const getSizes = () => {
+        switch (grouping) {
+            case "acidity":
+                return "";
+            case "hummus":
+                return "%";
+            default:
+                return "мг/кг";
+        }
+    }
 
     return (
         <>
@@ -80,10 +90,10 @@ const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
                                     onEachFeature={(feature, layer) => {
                                         layer.on({
                                             mouseover: (e) => {
-                                                e.target.setStyle({ fillColor: 'yellow'});
+                                                e.target.setStyle({fillColor: 'yellow'});
                                             },
                                             mouseout: (e) => {
-                                                e.target.setStyle({ fillColor: item.properties.color });
+                                                e.target.setStyle({fillColor: item.properties.color});
                                             },
                                         });
                                     }}
@@ -104,7 +114,7 @@ const LayersCartogram = memo(({layer, activeArea, setActiveArea}) => {
                                     }}
                                 >
                                     <Tooltip sticky>
-                                        <Typography>{item.properties.value} мг/кг</Typography>
+                                        <Typography>{item.properties.value} {getSizes()}</Typography>
                                         <Typography>{item.properties.area} га</Typography>
                                     </Tooltip>
                                 </GeoJSON>

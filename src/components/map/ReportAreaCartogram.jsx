@@ -20,6 +20,18 @@ const ReportAreaCartogram = ({ grouping }) => {
         setYearReports([]);
       });
   }, []);
+
+    const getNameColumns = () => {
+        switch (grouping) {
+            case "acidity":
+                return "Уровень";
+            case "hummus":
+                return "Уровень";
+            default:
+                return "мг/кг";
+        }
+    }
+
   return yearReports?.groups?.length ? (
     <>
       <Typography mb={2}>Диапазоны значений</Typography>
@@ -36,7 +48,7 @@ const ReportAreaCartogram = ({ grouping }) => {
         >
           <Box display={"flex"} alignItems={"center"} gap={1}>
             <Typography sx={{ fontWeight: 'bold' }} ml={4} textAlign={"left"} alignItems={"left"}>
-              мк/г
+                {getNameColumns()}
             </Typography>
           </Box>
           <Box
