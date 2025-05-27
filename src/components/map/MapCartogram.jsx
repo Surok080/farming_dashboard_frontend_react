@@ -149,14 +149,17 @@ const MapCartogram = memo(() => {
             >
                 <Box
                     sx={{
+                        top: 0,
+                        left: 0,
+                        zIndex: 1000,
                         width: "100%",
                         maxWidth: hideMenu ? "0px" : "400px",
                         padding: hideMenu ? 0 : "10px",
-                        height: "auto",
+                        height: "100%",
                         bgcolor: "background.paper",
                         display: "flex",
                         flexDirection: "column",
-                        position: "relative",
+                        position: "absolute",
                         transition: "all 0.3s ease",
                     }}
                 >
