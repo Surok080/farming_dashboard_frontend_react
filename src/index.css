@@ -19,3 +19,12 @@ code {
 .leaflet-control-layers.leaflet-control {
   margin-right: 210px !important;
 }
+
+@media (max-width: 1200px) {
+  .leaflet-control-zoom {
+    margin-right: 10px !important;
+  }
+  .leaflet-control-layers.leaflet-control {
+    margin-right: 10px !important;
+  }
+}

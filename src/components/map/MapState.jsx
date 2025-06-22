@@ -11,7 +11,7 @@ import {
     Select,
     Tab,
     TextField,
-    Typography,
+    Typography, useMediaQuery, useTheme,
 } from "@mui/material";
 import {Chart} from "react-google-charts";
 import {useSnackbar} from "notistack";
@@ -40,6 +40,8 @@ const MapState = memo(() => {
     const [openBackdrop, setOpenBackdrop] = useState(false);
     const [hideMenu, setHideMenu] = React.useState(false);
 
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
     const handleCloseBackdrop = () => {
         setTimeout(() => {
@@ -166,7 +168,7 @@ const MapState = memo(() => {
                         left: 0,
                         zIndex: 1000,
                         width: "100%",
-                        maxWidth: hideMenu ? "0px" : "400px",
+                        maxWidth: hideMenu ? "0px" : isSmallScreen ? "300px" : "400px",
                         padding: hideMenu ? 0 : "10px",
                         height: "100%",
                         bgcolor: "background.paper",
@@ -327,7 +329,9 @@ const MapState = memo(() => {
                             right: "0px",
                             bottom: "0px",
                             width: "200px",
-                            height: "100%",
+                            height: isSmallScreen ? "auto" : "100%",
+                            maxHeight: isSmallScreen ? "500px" : "100%",
+                            minHeight: "100px",
                             zIndex: "1000",
                             background: "#ffffffed",
                             borderRadius: "0px",

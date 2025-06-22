@@ -12,9 +12,11 @@ import GridOnIcon from '@mui/icons-material/GridOn';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import {useSelector} from "react-redux";
 import {appBarName, moveStringToSecondPositionImmutable} from "../../utils/appBar";
+import {defaultTheme} from "./Dashboard";
+import Typography from "@mui/material/Typography";
 
 export default function ListItems() {
-  const { valueTabs, setValueTabs } = useContext(Context);
+    const {valueTabs, setValueTabs} = useContext(Context);
     const user = useSelector((state) => state.user)
     const [menu, setMenu] = useState([]);
 
@@ -26,51 +28,117 @@ export default function ListItems() {
     }, [user]);
 
     const setTabs = (value) => {
-      localStorage.setItem('tabs', value);
-      setValueTabs(value)
-  }
+        localStorage.setItem('tabs', value);
+        setValueTabs(value)
+    }
 
     const getIconAppBar = (menu) => {
         switch (menu) {
             case 'cartogram':
-                return <GridOnIcon sx={{color: valueTabs ===  "cartogram" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+                return <GridOnIcon
+                    sx={{color: valueTabs === "cartogram" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             case 'fields':
-                return <LayersOutlinedIcon sx={{color: valueTabs ===  "fields" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+                return <LayersOutlinedIcon
+                    sx={{color: valueTabs === "fields" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             case 'state_monitoring':
-                return <DashboardOutlinedIcon sx={{color: valueTabs ===  "state_monitoring" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+                return <DashboardOutlinedIcon
+                    sx={{color: valueTabs === "state_monitoring" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             case 'tech_map':
-                return <DescriptionOutlinedIcon sx={{color: valueTabs ===  "tech_map" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+                return <DescriptionOutlinedIcon
+                    sx={{color: valueTabs === "tech_map" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             default:
                 return null;
         }
     }
 
-  return (
-    <>
-      <ListItemButton onClick={() => setTabs("dashboard")}>
-        <ListItemIcon sx={{minWidth: '36px'}}>
-          <GridViewOutlinedIcon sx={{color: valueTabs ===  "dashboard" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
-        </ListItemIcon>
-        <ListItemText primary="Обзор" />
-      </ListItemButton>
-        {
-            menu.map((item, index) => {
-                return (
-                    <ListItemButton key={item} onClick={() => setTabs(item)}>
-                        <ListItemIcon sx={{minWidth: '36px'}}>
-                            {getIconAppBar(item)}
-                        </ListItemIcon>
-                        <ListItemText primary={appBarName(item)} />
-                    </ListItemButton>
-                )
-            })
-        }
-      <ListItemButton onClick={() => setTabs("menu_settings")}>
-        <ListItemIcon sx={{minWidth: '36px'}}>
-          <SettingsOutlinedIcon sx={{color: valueTabs ===  "menu_settings" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
-        </ListItemIcon>
-        <ListItemText primary="Настройки" />
-      </ListItemButton>
-    </>
-  );
+    return (
+        <>
+            <ListItemButton sx={{
+                [defaultTheme.breakpoints.down("lg")]: {
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                },
+            }} onClick={() => setTabs("dashboard")}>
+                <ListItemIcon sx={{
+                    minWidth: '36px',
+                    [defaultTheme.breakpoints.down("lg")]: {
+                        justifyContent: 'center',
+                    },
+                }}>
+                    <GridViewOutlinedIcon
+                        sx={{color: valueTabs === "dashboard" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+                </ListItemIcon>
+                <ListItemText
+                    primary={
+                        <Typography sx={{
+                            [defaultTheme.breakpoints.down("lg")]: {
+                                fontSize: '14px'
+                            }
+                        }}>
+                            Обзор
+                        </Typography>
+                    }
+                />
+            </ListItemButton>
+            {
+                menu.map((item, index) => {
+                    return (
+                        <ListItemButton sx={{
+                            [defaultTheme.breakpoints.down("lg")]: {
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                            },
+                        }} key={item} onClick={() => setTabs(item)}>
+                            <ListItemIcon sx={{
+                                minWidth: '36px',
+                                [defaultTheme.breakpoints.down("lg")]: {
+                                    justifyContent: 'center',
+                                },
+                            }}>
+                                {getIconAppBar(item)}
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={
+                                    <Typography sx={{
+                                        [defaultTheme.breakpoints.down("lg")]: {
+                                            fontSize: '14px'
+                                        }
+                                    }}>
+                                        {appBarName(item)}
+                                    </Typography>
+                                }
+                            />
+                        </ListItemButton>
+                    )
+                })
+            }
+            <ListItemButton sx={{
+                [defaultTheme.breakpoints.down("lg")]: {
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                },
+            }} onClick={() => setTabs("menu_settings")}>
+                <ListItemIcon sx={{
+                    minWidth: '36px',
+                    [defaultTheme.breakpoints.down("lg")]: {
+                        justifyContent: 'center',
+                    },
+                }}>
+                    <SettingsOutlinedIcon sx={{
+                        color: valueTabs === "menu_settings" ? "#82F865" : "",
+                        transition: 'all .2s ease-in-out'
+                    }}/>
+                </ListItemIcon>
+                <ListItemText   primary={
+                    <Typography sx={{
+                        [defaultTheme.breakpoints.down("lg")]: {
+                            fontSize: '14px'
+                        }
+                    }}>
+                        Настройки
+                    </Typography>
+                }/>
+            </ListItemButton>
+        </>
+    );
 }

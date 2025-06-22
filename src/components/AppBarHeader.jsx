@@ -2,7 +2,6 @@ import {Box, Divider, FormControl, InputLabel, Link, MenuItem, Select, Toolbar, 
 import React, {memo} from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import styled from "@emotion/styled";
-import {drawerWidth} from "./dashboard/Dashboard";
 import {useNavigate} from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import Avatar from '@mui/material/Avatar';
@@ -10,27 +9,12 @@ import Menu from '@mui/material/Menu';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
 import {useSelector} from "react-redux";
+import {defaultTheme} from "./dashboard/Dashboard";
 
 
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== "open",
-})(({theme, open}) => ({
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(({
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(["width", "margin"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    })),
-}));
 
-const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
+
+const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => {
     const navigate = useNavigate();
     const [anchorElUserInfo, setAnchorElUserInfo] = React.useState(null);
     const openUserInfo = Boolean(anchorElUserInfo);
@@ -38,6 +22,24 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
     const openHelp = Boolean(anchorElHelp);
     const user = useSelector((state) => state.user);
     const userFio = user.fio;
+
+    const AppBar = styled(MuiAppBar, {
+        shouldForwardProp: (prop) => prop !== "open",
+    })(({theme, open}) => ({
+        zIndex: theme.zIndex.drawer + 1,
+        transition: theme.transitions.create(["width", "margin"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        ...(({
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            transition: theme.transitions.create(["width", "margin"], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        })),
+    }));
 
     const handleClickUserInfo = (event) => {
         setAnchorElUserInfo(event.currentTarget);
@@ -107,6 +109,9 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
                             boxShadow: "none",
                             display: "flex",
                             gap: "20px",
+                            [defaultTheme.breakpoints.down("lg")]: {
+                            fontSize: '16px',
+                        },
                         }}
                         textAlign={"left"}
                         alignItems={"center"}
@@ -120,7 +125,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea}) => {
                         <FormControl fullWidth>
                             <InputLabel id="select-label">Год</InputLabel>
                             <Select
-                                size="small"
+                                size={"small"}
                                 labelId="select-label"
                                 id="simple-select"
                                 value={year}

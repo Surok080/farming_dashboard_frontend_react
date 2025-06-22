@@ -19,13 +19,21 @@ import CartogramsPage from "../dashboardPages/CartogramsPage";
 import TechcartPage from "../dashboardPages/TechcartPage";
 import SettingsPage from "../dashboardPages/SettingsPage";
 import {useEffect} from "react";
+import {useMediaQuery, useTheme} from "@mui/material";
 
-export const drawerWidth = 180;
-
-const defaultTheme = createTheme({
+export const defaultTheme = createTheme({
     palette: {
         primary: {
             main: "#82F865",
+        },
+    },
+    breakpoints: {
+        values: {
+            xs: 0,
+            sm: 600,
+            md: 900,
+            lg: 1200, // теперь `lg` начинается с 1200px
+            xl: 1536,
         },
     },
 });
@@ -38,6 +46,10 @@ export default function Dashboard() {
     const [loading, setLoading] = React.useState(true);
     const [year, setYear] = React.useState(localStorage.getItem('year') ?? 2025);
     const [allArea, setAllArea] = React.useState(null);
+
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg")); // md = 900px (по вашей теме)
+    const drawerWidth = isSmallScreen ? 120 : 180; // Меняем ширину в зависимости от экрана
 
     useEffect(() => {
         if (localStorage.getItem('tabs') !== 'dashboard'
@@ -102,12 +114,13 @@ export default function Dashboard() {
                 <Box sx={{display: "flex"}}>
                     <CssBaseline/>
                     <AppBarHeader
+                        drawerWidth={drawerWidth}
                         allArea={allArea}
                         valueTabs={valueTabs}
                         year={year}
                         setYear={setYear}
                     />
-                    <LeftMenu/>
+                    <LeftMenu drawerWidth={drawerWidth}/>
                     <Box
                         component="main"
                         sx={{
@@ -131,7 +144,11 @@ export default function Dashboard() {
                                 height: "calc(100% - 96px)",
                                 width: "calc(100% - 220px)",
                                 padding: "0",
-                                overflow: 'hidden'
+                                overflow: 'hidden',
+                                [theme.breakpoints.down("lg")]: {
+                                    width: "calc(100% - 170px)",
+                                    marginLeft: "145px",
+                                },
                             }}
                         >
                             {getPagesDashboard()}

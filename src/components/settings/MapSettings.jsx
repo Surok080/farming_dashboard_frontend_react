@@ -1,11 +1,13 @@
 import React from 'react';
-import {Box, Typography} from "@mui/material";
+import {Box, Typography, useMediaQuery, useTheme} from "@mui/material";
 import UploadFiles from "./UploadFiles";
 import {useSelector} from "react-redux";
 
 
 const MapSettings = () => {
     const user = useSelector((state) => state.user)
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
 
     return (
@@ -18,7 +20,7 @@ const MapSettings = () => {
                     Поддерживаемый формат —Google KML (.kml файл)
                 </Typography>
             </Box>
-            <Box display={'flex'} alignItems={'flex-start'} gap={5}>
+            <Box display={'flex'} flexDirection={isSmallScreen ? "column" : "row"} alignItems={'flex-start'} gap={5}>
 
                 {
                     user?.userInfo?.module && user.userInfo.module.includes('fields') ?
