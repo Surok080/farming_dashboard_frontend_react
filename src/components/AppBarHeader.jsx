@@ -1,5 +1,5 @@
 import {Box, Divider, FormControl, InputLabel, Link, MenuItem, Select, Toolbar, Typography,} from "@mui/material";
-import React, {memo} from "react";
+import React, {memo, useEffect} from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import styled from "@emotion/styled";
 import {useNavigate} from "react-router-dom";
@@ -12,7 +12,23 @@ import {useSelector} from "react-redux";
 import {defaultTheme} from "./dashboard/Dashboard";
 
 
-
+const StyledAppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== "open" && prop !== "drawerwidth",
+})(({ theme, open, drawerwidth }) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(["width", "margin"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        marginLeft: drawerwidth,
+        width: `calc(100% - ${drawerwidth}px)`,
+        transition: theme.transitions.create(["width", "margin"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
 
 const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => {
     const navigate = useNavigate();
@@ -21,25 +37,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
     const [anchorElHelp, setAnchorElHelp] = React.useState(null);
     const openHelp = Boolean(anchorElHelp);
     const user = useSelector((state) => state.user);
-    const userFio = user.fio;
-
-    const AppBar = styled(MuiAppBar, {
-        shouldForwardProp: (prop) => prop !== "open",
-    })(({theme, open}) => ({
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(["width", "margin"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        ...(({
-            marginLeft: drawerWidth,
-            width: `calc(100% - ${drawerWidth}px)`,
-            transition: theme.transitions.create(["width", "margin"], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-        })),
-    }));
+    const userFio = user?.fio;
 
     const handleClickUserInfo = (event) => {
         setAnchorElUserInfo(event.currentTarget);
@@ -86,8 +84,9 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
 
     return (
         <>
-            <AppBar
+            <StyledAppBar
                 position="absolute"
+                drawerwidth={drawerWidth}
                 sx={{
                     boxShadow: "none",
                     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
@@ -270,7 +269,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                         </MenuItem>
                     </Menu>
                 </Toolbar>
-            </AppBar>
+            </StyledAppBar>
         </>
     );
 });
