@@ -10,6 +10,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
 import {useSelector} from "react-redux";
 import {defaultTheme} from "./dashboard/Dashboard";
+import logo from "../images/agro_logo.svg"
 
 
 const StyledAppBar = styled(MuiAppBar, {
@@ -93,17 +94,20 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                     background: "#f0f0f0",
                 }}
             >
+
                 <Toolbar
                     sx={{
-                        pr: "24px", // keep right padding when drawer closed
+                        pr: "24px",
                     }}
                 >
+                    <img src={logo} width={'30px'} height={'30px'} alt={"logo"} />
                     <Typography
                         component="h1"
                         variant="h5"
                         color="inherit"
                         noWrap
                         sx={{
+                            ml: `calc(${drawerWidth}px - 30px)`,
                             flexGrow: 1,
                             boxShadow: "none",
                             display: "flex",
