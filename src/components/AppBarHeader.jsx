@@ -100,14 +100,16 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                         pr: "24px",
                     }}
                 >
-                    <img src={logo} width={'30px'} height={'30px'} alt={"logo"} />
+                    <Box width={`calc(${drawerWidth}px - 30px)`}>
+                        <img src={logo} width={'30px'} height={'30px'} alt={"logo"} />
+                    </Box>
                     <Typography
                         component="h1"
                         variant="h5"
                         color="inherit"
                         noWrap
                         sx={{
-                            ml: `calc(${drawerWidth}px - 30px)`,
+                            ml: `30px`,
                             flexGrow: 1,
                             boxShadow: "none",
                             display: "flex",
