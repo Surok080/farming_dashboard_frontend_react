@@ -16,27 +16,26 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { httpService } from "../../../api/setup";
 
 const RightBlockPlanFactV2 = ({ dashboardData, selectedCultures, selectedFields, year, planType }) => {
-  const [clickedBar, setClickedBar] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [detailsData, setDetailsData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Данные из API или тестовые данные по умолчанию
+  // Данные из API
   const totalCostsData = dashboardData?.summary ? {
     planned: { total: dashboardData.summary.plan, perHa: dashboardData.summary.plan_per_ha },
     actual: { total: dashboardData.summary.fact, perHa: dashboardData.summary.fact_per_ha }
   } : {
-    planned: { total: 100977935, perHa: 7100 },
-    actual: { total: 98977865, perHa: 6100 }
+    planned: { total: 0, perHa: 0 },
+    actual: { total: 0, perHa: 0 }
   };
 
   const grossOutputData = dashboardData?.production ? {
     planned: { total: dashboardData.production.plan, perHa: dashboardData.production.plan_c_per_ha },
     actual: { total: dashboardData.production.fact, perHa: dashboardData.production.fact_c_per_ha }
   } : {
-    planned: { total: 12550.0, perHa: 40.5 },
-    actual: { total: 13550.0, perHa: 41.5 }
+    planned: { total: 0, perHa: 0 },
+    actual: { total: 0, perHa: 0 }
   };
 
   const materialCostsData = dashboardData?.materials ? [
@@ -47,12 +46,12 @@ const RightBlockPlanFactV2 = ({ dashboardData, selectedCultures, selectedFields,
     { category: "Оплата труда", plan: dashboardData.materials.payment_work.plan, fact: dashboardData.materials.payment_work.fact, percentage: dashboardData.materials.payment_work.percent },
     { category: "Прочие затраты", plan: dashboardData.materials.other.plan, fact: dashboardData.materials.other.fact, percentage: dashboardData.materials.other.percent }
   ] : [
-    { category: "Семена", plan: 6475770, fact: 8475700, percentage: 72 },
-    { category: "Удобрения", plan: 3475770, fact: 2475770, percentage: 45 },
-    { category: "СХЗР", plan: 4025220, fact: 4025220, percentage: 100 },
-    { category: "ГСМ", plan: 5000450, fact: 4000450, percentage: 45 },
-    { category: "Оплата труда", plan: 2000220, fact: 1000220, percentage: 45 },
-    { category: "Прочие затраты", plan: 80000505, fact: 79000505, percentage: 89 }
+    { category: "Семена", plan: 0, fact: 0, percentage: 0 },
+    { category: "Удобрения", plan: 0, fact: 0, percentage: 0 },
+    { category: "СХЗР", plan: 0, fact: 0, percentage: 0 },
+    { category: "ГСМ", plan: 0, fact: 0, percentage: 0 },
+    { category: "Оплата труда", plan: 0, fact: 0, percentage: 0 },
+    { category: "Прочие затраты", plan: 0, fact: 0, percentage: 0 }
   ];
 
   // Данные для графика
@@ -68,7 +67,7 @@ const RightBlockPlanFactV2 = ({ dashboardData, selectedCultures, selectedFields,
   };
 
   // Функция для получения деталей по категории
-  const fetchDetailsData = async (categoryName, dataIndex) => {
+  const fetchDetailsData = async (categoryName) => {
     setLoading(true);
     try {
       // Маппинг названий категорий на группы
@@ -117,10 +116,9 @@ const RightBlockPlanFactV2 = ({ dashboardData, selectedCultures, selectedFields,
         ...categoryData
       });
       setModalOpen(true);
-      setClickedBar(category);
-      
+
       // Получаем детали по выбранной категории
-      await fetchDetailsData(category, dataIndex);
+      await fetchDetailsData(category);
     }
   };
 
@@ -397,7 +395,7 @@ const RightBlockPlanFactV2 = ({ dashboardData, selectedCultures, selectedFields,
       label: "Факт",
       color: "#00BCE5",
       type: "bar",
-      valueFormatter: (value, context) => {
+      valueFormatter: (value) => {
         const dataIndex = chartData.fact.indexOf(value) || 0;
         const percentage = chartData.percentages[dataIndex] || 0;
         return `${formatNumber(value)} (${percentage}%)`;

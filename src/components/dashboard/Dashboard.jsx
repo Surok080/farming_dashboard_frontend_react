@@ -44,7 +44,7 @@ export default function Dashboard() {
     const dispatch = useDispatch();
     const [valueTabs, setValueTabs] = React.useState("dashboard");
     const [loading, setLoading] = React.useState(true);
-    const [year, setYear] = React.useState(localStorage.getItem('year') ?? 2025);
+    const [year, setYear] = React.useState(localStorage.getItem('year') ?? new Date().getFullYear());
     const [allArea, setAllArea] = React.useState(null);
 
     const theme = useTheme();
@@ -74,7 +74,7 @@ export default function Dashboard() {
                     }, 100);
 
                 })
-                .catch((error) => {
+                .catch(() => {
                     navigate("/");
                 });
         } else {
