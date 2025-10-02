@@ -25,10 +25,10 @@ const LeftBlockFact = ({crops, year, fact, data, setData}) => {
                     setData(res.data);
                 })
                     .catch((err) => {
-                        console.log(err)
+                        // Обработка ошибки
                     })
             } catch (e) {
-                console.log(e);
+                // Обработка ошибки
             }
         } else {
             setData([]);

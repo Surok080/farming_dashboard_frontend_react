@@ -22,9 +22,9 @@ const FactComponent = ({ year, fact }) => {
           setCrops(res.data)
         }
       })
-    } catch (e) {
-      console.log(e);
-    }
+        } catch (e) {
+            // Обработка ошибки
+        }
 
   }, [year, fact]);
 

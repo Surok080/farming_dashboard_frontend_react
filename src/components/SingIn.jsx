@@ -59,9 +59,9 @@ export default function SignIn() {
           });
         }
       });
-    } catch (e) {
-      console.log(e);
-    } finally {
+        } catch (e) {
+            // Обработка ошибки
+        } finally {
       setLoad(false);
     }
   };

@@ -26,7 +26,7 @@ httpService.interceptors.request.use(authInterceptor,
 	},
 	async (error) => {
 		if (error?.response?.status === 401) {
-      console.log('401', error);
+      // Обработка ошибки 401
       window.location.href = '/'
 		}
     return error.response

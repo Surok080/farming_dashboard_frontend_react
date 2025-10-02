@@ -15,11 +15,9 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
     // map method as the value:
     zoomend: () => {
       // Get the zoom level once zoom ended:
-      // console.log(map.getZoom());
     },
     moveend: () => {
       // Get bounds once move has ended:
-      // console.log(map.getBounds());
     },
     // click: (e) => {
     //   map.setView(e.latlng, map.getZoom(), {

@@ -16,7 +16,6 @@ const ReportArea = ({year, grouping}) => {
                 }
             })
             .catch((e) => {
-                console.log(e);
                 setYearReports([])
             })
 

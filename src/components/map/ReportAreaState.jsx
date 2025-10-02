@@ -16,7 +16,6 @@ const ReportAreaState = () => {
       }
     })
     .catch((e) => {
-      console.log(e);
       setYearReports([])
     })
   }, [])

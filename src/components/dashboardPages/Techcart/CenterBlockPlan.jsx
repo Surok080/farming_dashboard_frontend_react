@@ -7,22 +7,29 @@ const CenterBlockPlan = ({data}) => {
     const [safeXData, setSafeXData] = useState([0, 0, 0, 0, 0, 0]);
 
     useEffect(() => {
-        setSafeUData([
-            data?.plan_fact_analyze?.seeds?.plan ?? 0,
-            data?.plan_fact_analyze?.fertilizers?.plan ?? 0,
-            data?.plan_fact_analyze?.shzr?.plan ?? 0,
-            data?.plan_fact_analyze?.fuel?.plan ?? 0,
-            data?.plan_fact_analyze?.payment_work?.plan ?? 0,
-            data?.plan_fact_analyze?.other_expenses?.plan ?? 0,
-        ]);
-        setSafeXData([
-            data?.plan_fact_analyze?.seeds?.fact ?? 0,
-            data?.plan_fact_analyze?.fertilizers?.fact ?? 0,
-            data?.plan_fact_analyze?.shzr?.fact ?? 0,
-            data?.plan_fact_analyze?.fuel?.fact ?? 0,
-            data?.plan_fact_analyze?.payment_work?.fact ?? 0,
-            data?.plan_fact_analyze?.other_expenses?.fact ?? 0,
-        ]);
+        // Проверяем, что data существует и имеет нужную структуру
+        if (data && data.plan_fact_analyze) {
+            setSafeUData([
+                data.plan_fact_analyze.seeds?.plan ?? 0,
+                data.plan_fact_analyze.fertilizers?.plan ?? 0,
+                data.plan_fact_analyze.shzr?.plan ?? 0,
+                data.plan_fact_analyze.fuel?.plan ?? 0,
+                data.plan_fact_analyze.payment_work?.plan ?? 0,
+                data.plan_fact_analyze.other_expenses?.plan ?? 0,
+            ]);
+            setSafeXData([
+                data.plan_fact_analyze.seeds?.fact ?? 0,
+                data.plan_fact_analyze.fertilizers?.fact ?? 0,
+                data.plan_fact_analyze.shzr?.fact ?? 0,
+                data.plan_fact_analyze.fuel?.fact ?? 0,
+                data.plan_fact_analyze.payment_work?.fact ?? 0,
+                data.plan_fact_analyze.other_expenses?.fact ?? 0,
+            ]);
+        } else {
+            // Если данных нет, устанавливаем значения по умолчанию
+            setSafeUData([0, 0, 0, 0, 0, 0]);
+            setSafeXData([0, 0, 0, 0, 0, 0]);
+        }
     }, [data]);
 
     const xLabels = [0, 1, 2, 3, 4, 5];
@@ -37,7 +44,7 @@ const CenterBlockPlan = ({data}) => {
 
     return (
         <Box display={"flex"} flexDirection={"column"} gap={1} minHeight={"100%"}>
-            <Box display={"flex"} maxHeight={"50%"} gap={1}>
+            <Box display={"flex"} maxHeight={"35"} gap={1}>
                 <Box
                     sx={{
                         background: "#F9F9F9",
@@ -112,7 +119,7 @@ const CenterBlockPlan = ({data}) => {
                         flexDirection: "column",
                     }}
                     display={"flex"}
-                    width={"50%"}
+                    width={"65%"}
                 >
                     <Box
                         p={2}
@@ -382,10 +389,10 @@ const CenterBlockPlan = ({data}) => {
                         <BarChart
                             height={300}
                             margin={{ // Добавляем отступы для осей
-                                left: 80, // Увеличиваем место для подписей Y
-                                right: 30,
+                                left: 20, // Увеличиваем место для подписей Y
+                                right: 20,
                                 top: 30,
-                                bottom: 70 // Увеличиваем место для подписей X
+                                bottom: 30 // Увеличиваем место для подписей X
                             }}
                             sx={{
                                 padding: "5px 0",
@@ -413,7 +420,7 @@ const CenterBlockPlan = ({data}) => {
                                 {
                                     data: xLabels,
                                     scaleType: "band",
-                                    label: "Категории",
+
                                     valueFormatter: (index) => xAxisLabels[index],
                                     labelStyle: { // Стили для подписи оси X
                                         fontSize: "0.75rem",
@@ -421,49 +428,7 @@ const CenterBlockPlan = ({data}) => {
                                     }
                                 },
                             ]}
-                            slots={{
-                                tooltip: (props) => {
-                                    const {series, itemData, axisData} = props;
-                                    const category = xAxisLabels[axisData?.x?.value] || "";
-
-                                    return (
-                                        <div
-                                            style={{
-                                                padding: 10,
-                                                background: "white",
-                                                border: "1px solid #ddd",
-                                                borderRadius: 4,
-                                                boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-                                            }}
-                                        >
-                                            <div style={{fontWeight: "bold", marginBottom: 5}}>
-                                                {category}
-                                            </div>
-                                            {series.map((s, i) => (
-                                                <div
-                                                    key={i}
-                                                    style={{
-                                                        color: s.color,
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                    }}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            width: 10,
-                                                            height: 10,
-                                                            backgroundColor: s.color,
-                                                            marginRight: 5,
-                                                            borderRadius: 2,
-                                                        }}
-                                                    />
-                                                    {s.label}: {s.data[itemData.dataIndex]}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    );
-                                },
-                            }}
+                    
                             slotProps={{
                                 bar: {
                                     rx: 4,

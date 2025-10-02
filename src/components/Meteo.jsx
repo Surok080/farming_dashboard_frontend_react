@@ -32,7 +32,7 @@ const Meteo = () => {
                     setWeatherData(result);
                 },
                 (error) => {
-                    console.log(error);
+                    // Обработка ошибки
                 }
             );
     }

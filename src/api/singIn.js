@@ -25,13 +25,11 @@ class SignInService {
     return httpService.get("/auth/get_me")
       .then(response => {
         if (response?.status !== 200) {
-          console.log(response, '---!response.status && response.status !== 200');
           throw new Error(`Ошибка: ${response.statusText}`);
         }
         return response;
       })
       .catch((error) => {
-        console.log(response, '---catch((error) => {');
         throw new Error(`Ошибка: ${error}`);
       });
   }

@@ -140,7 +140,7 @@ const CulturalTable = ({ data, checked, setChecked }) => {
             <TableCell sx={{ color: "white", fontWeight: 700 }} align="center">Общая площадь (га)</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>{data.map((node) => renderRow(node))}</TableBody>
+        <TableBody>{data && Array.isArray(data) ? data.map((node) => renderRow(node)) : null}</TableBody>
       </Table>
     </TableContainer>
   );

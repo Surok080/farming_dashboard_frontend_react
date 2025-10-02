@@ -16,7 +16,6 @@ const ReportAreaCartogram = ({ grouping }) => {
         }
       })
       .catch((e) => {
-        console.log(e);
         setYearReports([]);
       });
   }, []);

@@ -24,7 +24,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
             setArrTech([])
             setUpdateId(0)
         } catch (e) {
-            console.log(e);
+            // Обработка ошибки
         }
 
     }, [crops]);
@@ -74,7 +74,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                 }
             })
                 .catch((err) => {
-                    console.log(err)
+                    // Обработка ошибки
                 })
         }
     }, [tech, updateId])
@@ -195,7 +195,7 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                     </Typography>
                 </Box>
                 <Box p={2} display={"flex"} flexDirection={"column"} gap={1}>
-                    {data.works.map((item, index) => (
+                    {data?.works && Array.isArray(data.works) ? data.works.map((item, index) => (
                         <Box
                             key={index + item.work_type}
                             display={"flex"}
@@ -223,7 +223,11 @@ const LeftBlockPlan = ({crops, year, fact, data, setData}) => {
                                 })}
                             </Typography>
                         </Box>
-                    ))}
+                    )) : (
+                        <Typography variant="body2" color="text.secondary" textAlign="center">
+                            Нет данных о технологических операциях
+                        </Typography>
+                    )}
                 </Box>
             </Box>
         </Box>

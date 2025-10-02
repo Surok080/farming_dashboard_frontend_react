@@ -24,7 +24,7 @@ import {useMediaQuery, useTheme} from "@mui/material";
 export const defaultTheme = createTheme({
     palette: {
         primary: {
-            main: "#82F865",
+            main: "#62A65D",
         },
     },
     breakpoints: {
@@ -75,7 +75,6 @@ export default function Dashboard() {
 
                 })
                 .catch((error) => {
-                    console.error('Ошибка запроса:', error);
                     navigate("/");
                 });
         } else {
