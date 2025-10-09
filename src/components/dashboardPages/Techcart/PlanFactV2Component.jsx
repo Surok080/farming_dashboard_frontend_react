@@ -27,7 +27,7 @@ const PlanFactV2Component = ({ year }) => {
             sx={{
                 display: "flex",
                 flexDirection: "column",
-                gap: 2,
+                gap: 0,
                 width: "100%",
                 height: "100%",
                 background: "#f0f0f0",

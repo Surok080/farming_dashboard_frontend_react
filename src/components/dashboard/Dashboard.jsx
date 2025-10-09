@@ -138,7 +138,7 @@ export default function Dashboard() {
                             style={{padding: "0"}}
                             sx={{
                                 maxWidth: "100%",
-                                marginTop: "20px",
+                                marginTop: "5px",
                                 marginLeft: "200px",
                                 height: "calc(100% - 96px)",
                                 width: "calc(100% - 220px)",

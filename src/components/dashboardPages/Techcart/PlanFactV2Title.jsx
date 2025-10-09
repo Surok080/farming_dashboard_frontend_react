@@ -3,7 +3,7 @@ import React from "react";
 
 const PlanFactV2Title = ({ year }) => {
   return (
-    <Box display={"flex"} gap={2} mb={2}>
+    <Box display={"flex"} gap={2} mb={0}>
       <Typography
         sx={{ 
           background: "#62A65D", 
