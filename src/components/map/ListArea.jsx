@@ -134,6 +134,7 @@ const ListArea = ({
                     height: "100%",
                     borderRadius: "3px",
                     backgroundColor: item.properties.color,
+                    opacity: 0.8,
                   }}
                 />
 

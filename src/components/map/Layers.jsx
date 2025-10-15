@@ -33,14 +33,8 @@ const style = {
 const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
   const [open, setOpen] = useState(false);
   const [activeAreaToModal, setActiveAreaToModal] = useState(null);
-  const handleOpen = (item) => {
-    setOpen(true);
-    setActiveAreaToModal(item);
-  };
-  const handleClose = () => {
-    setOpen(false);
-    setActiveAreaToModal(null);
-  };
+  const [previousMapState, setPreviousMapState] = useState(null);
+  const [showTooltips, setShowTooltips] = useState(true);
 
   const map = useMapEvents({
     // Use leaflet map event as the key and a call back with the
@@ -58,6 +52,43 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
     // },
   });
 
+  const handleOpen = (item) => {
+    // Сохраняем текущее состояние карты перед зумом
+    setPreviousMapState({
+      center: map.getCenter(),
+      zoom: map.getZoom()
+    });
+    // Скрываем тултипы при открытии модального окна
+    setShowTooltips(false);
+    setOpen(true);
+    setActiveAreaToModal(item);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setActiveAreaToModal(null);
+    
+    // Принудительно удаляем все тултипы из DOM
+    setTimeout(() => {
+      const tooltips = document.querySelectorAll('.leaflet-tooltip');
+      tooltips.forEach(tooltip => {
+        tooltip.remove();
+      });
+    }, 50);
+    
+    // Показываем тултипы обратно
+    setShowTooltips(true);
+    
+    // Возвращаемся к предыдущему состоянию карты
+    if (previousMapState) {
+      map.setView(previousMapState.center, previousMapState.zoom, {
+        animate: true,
+        duration: 1
+      });
+      setPreviousMapState(null);
+    }
+  };
+
   useEffect(() => {
     if (layer && layer?.features?.length) {
       map.setView([layer.center[1], layer.center[0]], map.getZoom());
@@ -71,7 +102,6 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
       const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
       const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
       
-      // Перемещаем камеру к центру поля с фиксированным зумом (например, 15)
       map.setView([centerLat, centerLng], 13, {
         animate: true,
         duration: 1
@@ -122,7 +152,10 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                 <GeoJSON
                   key={item.properties.id}
                   data={item}
-                  pathOptions={{ color: item.properties.color }}
+                  pathOptions={{ 
+                    color: item.properties.color,
+                    opacity: 0.8
+                  }}
                   eventHandlers={{
                     click: (event, type) => {
                       // Вычисляем центр поля
@@ -130,8 +163,8 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                       const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
                       const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
                       
-                      // Перемещаем камеру к центру поля с фиксированным зумом (например, 15)
-                      map.setView([centerLat, centerLng], 15, {
+                      // Перемещаем камеру к центру поля с фиксированным зумом (например, 10)
+                      map.setView([centerLat, centerLng], 14, {
                         animate: true,
                         duration: 1
                       });
@@ -140,7 +173,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                     },
                   }}
                 >
-                  <Tooltip sticky>
+                  <Tooltip sticky={showTooltips}>
                     <Typography>
                       {item.properties.crop.charAt(0).toUpperCase() +
                         item.properties.crop.slice(1)}

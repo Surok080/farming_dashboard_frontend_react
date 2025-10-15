@@ -367,7 +367,9 @@ const Map = memo(({year, setAllArea}) => {
                                                         height: "30px",
                                                         background: color,
                                                         minWidth: "5px",
-                                                        minHeight: '100%'
+                                                        minHeight: '100%',
+                                                        borderRadius: "2px",
+                                                        opacity: 0.8,
                                                     }}
                                                 ></Box>
                                                 <Typography align="left" variant="caption">
