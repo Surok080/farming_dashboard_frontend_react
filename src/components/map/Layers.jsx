@@ -66,10 +66,17 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
 
   useEffect(() => {
     if (activeArea) {
-      map.fitBounds(
-        activeArea.geometry.coordinates[0].map((item) => item.reverse())
-      );
-      activeArea.geometry.coordinates[0].map((item) => item.reverse());
+      // Вычисляем центр поля
+      const coordinates = activeArea.geometry.coordinates[0];
+      const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+      const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+      
+      // Перемещаем камеру к центру поля с фиксированным зумом (например, 15)
+      map.setView([centerLat, centerLng], 13, {
+        animate: true,
+        duration: 1
+      });
+      
       setActiveArea(null);
     }
   }, [activeArea]);
@@ -118,14 +125,17 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                   pathOptions={{ color: item.properties.color }}
                   eventHandlers={{
                     click: (event, type) => {
-                      map.fitBounds(
-                        item.geometry.coordinates[0].map((item) =>
-                          item.reverse()
-                        )
-                      );
-                      item.geometry.coordinates[0].map((item) =>
-                        item.reverse()
-                      );
+                      // Вычисляем центр поля
+                      const coordinates = item.geometry.coordinates[0];
+                      const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+                      const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+                      
+                      // Перемещаем камеру к центру поля с фиксированным зумом (например, 15)
+                      map.setView([centerLat, centerLng], 15, {
+                        animate: true,
+                        duration: 1
+                      });
+                      
                       handleOpen(item);
                     },
                   }}

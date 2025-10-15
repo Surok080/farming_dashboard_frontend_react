@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   IconButton,
   List,
   ListItemButton,
@@ -78,6 +79,7 @@ const ListArea = ({
           <DeleteForeverIcon />
         </IconButton>
       </Box>
+      <Divider />
       <List
         sx={{
           width: "100%",
@@ -126,14 +128,15 @@ const ListArea = ({
                   setActiveArea(item);
                 }}
               >
-                <svg
-                  style={{
-                    width: "100%",
-                    maxWidth: "70px",
-                    height: "70px",
+                <Box
+                  sx={{
+                    width: "8px",
+                    height: "100%",
+                    borderRadius: "3px",
+                    backgroundColor: item.properties.color,
                   }}
-                  dangerouslySetInnerHTML={{ __html: svgString }}
                 />
+
                 <Box display={"flex"} flexDirection={"column"} flexGrow={1}>
                   <Typography
                     variant="body2"
@@ -147,11 +150,11 @@ const ListArea = ({
                     {state
                       ? item.properties.plot_form_owner
                       : item.properties.crop_kind}
-                  </Typography>
-                  <Typography noWrap maxWidth={140} variant="caption">
-                    {state
+                      (
+                        {state
                       ? item.properties.plot_land_category
                       : item.properties.name}
+                      )
                   </Typography>
                 </Box>
                 <Typography variant="caption">
