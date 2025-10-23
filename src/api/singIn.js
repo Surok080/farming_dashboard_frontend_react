@@ -12,13 +12,54 @@ class SignInService {
         },
       })
       .then((res) => {
-        // try {
-          localStorage.setItem("access_token", res?.data?.access_token);
-        // } catch (error) {
-        //   window.location.href = '/'
-        // }
+        // Сохраняем оба токена
+        if (res?.data?.access_token) {
+          localStorage.setItem("access_token", res.data.access_token);
+        }
+        if (res?.data?.refresh_token) {
+          localStorage.setItem("refresh_token", res.data.refresh_token);
+        }
         return res;
       })
+  }
+
+  /**
+   * Обновление токена
+   */
+  refreshToken() {
+    const refreshTokenValue = localStorage.getItem('refresh_token');
+    if (!refreshTokenValue) {
+      throw new Error('No refresh token available');
+    }
+
+    return httpService.post("/auth/refresh", { refresh_token: refreshTokenValue })
+      .then(response => {
+        if (response?.data?.access_token) {
+          localStorage.setItem("access_token", response.data.access_token);
+        }
+        
+        // Если сервер вернул новый refresh токен, обновляем его
+        if (response?.data?.refresh_token) {
+          localStorage.setItem("refresh_token", response.data.refresh_token);
+        }
+        
+        return response;
+      })
+      .catch((error) => {
+        // Если не удалось обновить токен, очищаем localStorage
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        throw error;
+      });
+  }
+
+  /**
+   * Выход из системы
+   */
+  logout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = '/';
   }
 
   getMe() {

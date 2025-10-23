@@ -10,6 +10,9 @@ import {
     InputLabel,
     MenuItem,
     Select,
+    SpeedDial,
+    SpeedDialAction,
+    SpeedDialIcon,
     Tab,
     TextField,
     Typography, useMediaQuery, useTheme,
@@ -19,10 +22,13 @@ import {useSnackbar} from "notistack";
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { TelemetryModal, SatelliteModal } from "./IntegrationModals";
 import {getAreaLayers, getColorLayers, getOptionChart,} from "../../utils/mapUtils";
 import ReportArea from "./ReportArea";
 import IconButton from "@mui/material/IconButton";
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import WallpaperIcon from '@mui/icons-material/Wallpaper';
+import ModeOfTravelIcon from '@mui/icons-material/ModeOfTravel';
 
 
 const Map = memo(({year, setAllArea}) => {
@@ -40,9 +46,17 @@ const Map = memo(({year, setAllArea}) => {
     const [grouping, setGrouping] = useState("crop");
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
     const [hideMenu, setHideMenu] = React.useState(false);
+    const [openSpeedDial, setOpenSpeedDial] = React.useState(false);
+    const [openTelemetryModal, setOpenTelemetryModal] = React.useState(false);
+    const [openSatelliteModal, setOpenSatelliteModal] = React.useState(false);
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+
+    const actions = [
+        { icon: <WallpaperIcon />, name: 'Космоснимки' },
+        { icon: <ModeOfTravelIcon />, name: 'Телеметрия' },
+    ];
 
     const handleCloseBackdrop = () => {
         setTimeout(() => {
@@ -86,6 +100,25 @@ const Map = memo(({year, setAllArea}) => {
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
+    };
+
+    const handleSpeedDialAction = (action) => {
+
+        if (action.name === 'Космоснимки') {
+            // Открываем модальное окно космоснимков
+            setOpenSatelliteModal(true);
+        } else if (action.name === 'Телеметрия') {
+            // Открываем модальное окно телеметрии
+            setOpenTelemetryModal(true);
+        }
+    };
+
+    const handleCloseTelemetryModal = () => {
+        setOpenTelemetryModal(false);
+    };
+
+    const handleCloseSatelliteModal = () => {
+        setOpenSatelliteModal(false);
     };
 
     const getData = () => {
@@ -385,6 +418,53 @@ const Map = memo(({year, setAllArea}) => {
                         </Box>
                     </Box>
                 ) : null}
+                
+                {/* SpeedDial в нижнем правом углу */}
+                <SpeedDial
+                    ariaLabel="Дополнительные функции"
+                    sx={{ 
+                        position: 'absolute', 
+                        bottom: 16, 
+                        right: 220,
+                        zIndex: 1000
+                    }}
+                    icon={<SpeedDialIcon />}
+                    onClose={() => setOpenSpeedDial(false)}
+                    onOpen={() => setOpenSpeedDial(true)}
+                    open={openSpeedDial}
+                >
+                    {actions.map((action) => (
+                        <SpeedDialAction
+                            key={action.name}
+                            icon={action.icon}
+                            tooltipTitle={action.name}
+                            tooltipOpen={true}
+                            onClick={() => handleSpeedDialAction(action)}
+                            // sx={{
+                            //     '& .MuiSpeedDialAction-staticTooltipLabel': {
+                            //         backgroundColor: '#616161 !important',
+                            //         color: 'white !important',
+                            //         fontSize: '14px !important',
+                            //         fontWeight: '500 !important',
+                            //         borderRadius: '6px !important',
+                            //         padding: '8px 12px !important',
+                            //         boxShadow: '0 2px 8px rgba(0,0,0,0.3) !important',
+                            //         minWidth: '120px !important',
+                            //         width: '120px !important',
+                            //         textAlign: 'center !important',
+                            //         transition: 'background-color 0.3s ease !important',
+                            //     },
+                            //     '&:hover .MuiSpeedDialAction-staticTooltipLabel': {
+                            //         backgroundColor: '#4caf50 !important',
+                            //     }
+                            // }}
+                            // TooltipProps={{
+                            //     placement: 'left',
+                            //     arrow: true,
+                            // }}
+                        />
+                    ))}
+                </SpeedDial>
             </div>
             <ConfirmDeleteModal
                 deletArea={deletArea}
@@ -399,6 +479,16 @@ const Map = memo(({year, setAllArea}) => {
             >
                 <CircularProgress color="inherit"/>
             </Backdrop>
+
+            {/* Модальные окна */}
+            <TelemetryModal 
+                open={openTelemetryModal} 
+                onClose={handleCloseTelemetryModal} 
+            />
+            <SatelliteModal 
+                open={openSatelliteModal} 
+                onClose={handleCloseSatelliteModal} 
+            />
         </>
     );
 });
