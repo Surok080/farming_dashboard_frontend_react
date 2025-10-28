@@ -1,15 +1,8 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  IconButton,
-  List,
-  ListItemButton,
-  Typography,
-} from "@mui/material";
-import React, { useState } from "react";
+import {Box, Checkbox, Collapse, Divider, IconButton, List, ListItemButton, Typography,} from "@mui/material";
+import React, {useMemo, useState} from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import ExpandLess from "@mui/icons-material/ExpandLess";
 
 const ListArea = ({
   layer,
@@ -17,9 +10,67 @@ const ListArea = ({
   setDeleteIdArea,
   handleOpenConfirmDelete,
   state = false,
+  grouping = "crop",
 }) => {
   // State to track selected items
   const [selectedItems, setSelectedItems] = useState([]);
+  const [expandedGroups, setExpandedGroups] = useState({});
+
+  // Группировка данных
+  const groupedData = useMemo(() => {
+    const groups = {};
+    
+    layer.forEach((item) => {
+      let groupKey = '';
+      let groupName = '';
+      
+      if (grouping === 'crop' || grouping === 'productivity') {
+        // Группируем по группе культур
+        const cropGroup = item.properties.crop_group || 'Другие';
+        groupKey = cropGroup;
+        groupName = cropGroup;
+      } else if (grouping === 'crop_group') {
+        // Группируем по группе
+        const cropGroup = item.properties.crop_group || 'Другие';
+        groupKey = cropGroup;
+        groupName = cropGroup;
+      }
+      
+      if (!groups[groupKey]) {
+        groups[groupKey] = {
+          groupName: groupName,
+          items: []
+        };
+      }
+      
+      groups[groupKey].items.push(item);
+    });
+    
+    return groups;
+  }, [layer, grouping]);
+
+  // Инициализируем все группы как развернутые при изменении данных
+  React.useEffect(() => {
+    if (Object.keys(groupedData).length > 0) {
+      setExpandedGroups(prev => {
+        const updated = { ...prev };
+        Object.keys(groupedData).forEach(key => {
+          if (!(key in updated)) {
+            updated[key] = true;
+          }
+        });
+        return updated;
+      });
+    }
+  }, [groupedData]);
+
+  // Toggle expanded state
+  const handleExpandToggle = (groupKey) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupKey]: prev[groupKey] === undefined ? false : !prev[groupKey]
+    }));
+  };
 
   // Handle individual checkbox toggle
   const handleToggle = (value) => {
@@ -90,89 +141,125 @@ const ListArea = ({
           bgcolor: "background.paper",
         }}
       >
-        {layer.map((item, index) => {
-          const svgString = item.properties.svg.replace(
-            'stroke-width="40"',
-            'stroke-width="30"'
-          );
-          const labelId = `checkbox-list-label-${item.properties.id}`;
-
+        {Object.keys(groupedData).map((groupKey) => {
+          const group = groupedData[groupKey];
+          const isExpanded = expandedGroups[groupKey] !== false;
+          
           return (
-            <Box display={"flex"} key={index}>
-              <Checkbox
-                edge="start"
-                checked={selectedItems.indexOf(item.properties.id) !== -1}
-                tabIndex={-1}
-                disableRipple
-                inputProps={{ "aria-labelledby": labelId }}
-                onChange={() => handleToggle(item.properties.id)}
-              />
-              <ListItemButton
-                key={index}
-                style={{
-                  width: "100%",
+            <Box key={groupKey}>
+              {/* Заголовок группы */}
+              <Box
+                sx={{
                   display: "flex",
-                  gap: "5px",
-                  // height: "100px",
-                  padding: "0",
+                  alignItems: "center",
                   justifyContent: "space-between",
-                  "&:hover": {
-                    backgroundColor: "blue",
-                    color: "white",
-                    "& .MuiListItemIcon-root": {
-                      color: "white",
-                    },
-                  },
+                  padding: "8px 16px",
+                  backgroundColor: "#f5f5f5",
+                  borderBottom: "1px solid #e0e0e0",
                 }}
-                onClick={() => {
-                  setActiveArea(item);
-                }}
+                onClick={() => handleExpandToggle(groupKey)}
               >
-                <Box
-                  sx={{
-                    width: "8px",
-                    height: "100%",
-                    borderRadius: "3px",
-                    backgroundColor: item.properties.color,
-                    opacity: 0.8,
-                  }}
-                />
-
-                <Box display={"flex"} flexDirection={"column"} flexGrow={1}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: "bold", fontSize: "12px" }}
-                  >
-                    {state
-                      ? item.properties.plot_сadastral_number
-                      : item.properties.crop}
+                <Box display="flex" alignItems="center" gap={1}>
+                  <IconButton size="small">
+                    {isExpanded ? <ExpandLess /> : <ExpandMore />}
+                  </IconButton>
+                  <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: "13px" }}>
+                    {group.groupName}
                   </Typography>
-                  <Typography noWrap maxWidth={140} variant="caption">
-                    {state
-                      ? item.properties.plot_form_owner
-                      : item.properties.crop_kind}
-                      (
-                        {state
-                      ? item.properties.plot_land_category
-                      : item.properties.name}
-                      )
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                    ({group.items.length})
                   </Typography>
                 </Box>
-                <Typography variant="caption">
-                  {item.properties.area} га
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                  {group.items.reduce((sum, item) => sum + parseFloat(item.properties.area || 0), 0).toFixed(2)} га
                 </Typography>
-                <IconButton
-                  disabled={selectedItems.indexOf(item.properties.id) !== -1}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // e.preventDefault()
-                    setDeleteIdArea(item.properties.id);
-                    handleOpenConfirmDelete();
-                  }}
-                >
-                  <DeleteForeverIcon />
-                </IconButton>
-              </ListItemButton>
+              </Box>
+              
+              {/* Поля в группе */}
+              <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                <Box display="flex" flexDirection="column" gap={0.5} sx={{ paddingBottom: "8px", paddingTop: "8px" }}>
+                  {group.items.map((item, index) => {
+                  const labelId = `checkbox-list-label-${item.properties.id}`;
+
+                  return (
+                    <Box display={"flex"} key={index}>
+                      <Checkbox
+                        edge="start"
+                        checked={selectedItems.indexOf(item.properties.id) !== -1}
+                        tabIndex={-1}
+                        disableRipple
+                        inputProps={{ "aria-labelledby": labelId }}
+                        onChange={() => handleToggle(item.properties.id)}
+                      />
+                      <ListItemButton
+                        key={index}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          gap: "5px",
+                          padding: "0",
+                          justifyContent: "space-between",
+                          "&:hover": {
+                            backgroundColor: "blue",
+                            color: "white",
+                            "& .MuiListItemIcon-root": {
+                              color: "white",
+                            },
+                          },
+                        }}
+                        onClick={() => {
+                          setActiveArea(item);
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: "8px",
+                            height: "100%",
+                            borderRadius: "3px",
+                            backgroundColor: item.properties.color,
+                            opacity: 0.8,
+                          }}
+                        />
+
+                        <Box display={"flex"} flexDirection={"column"} flexGrow={1}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: "bold", fontSize: "12px" }}
+                          >
+                            {state
+                              ? item.properties.plot_cadastral_number
+                              : item.properties.crop}
+                          </Typography>
+                          <Typography noWrap maxWidth={140} variant="caption">
+                            {state
+                              ? item.properties.plot_form_owner
+                              : item.properties.crop_kind}
+                            (
+                            {state
+                              ? item.properties.plot_land_category
+                              : item.properties.name}
+                            )
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption">
+                          {item.properties.area} га
+                        </Typography>
+                        <IconButton
+                          disabled={selectedItems.indexOf(item.properties.id) !== -1}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteIdArea(item.properties.id);
+                            handleOpenConfirmDelete();
+                          }}
+                        >
+                          <DeleteForeverIcon />
+                        </IconButton>
+                      </ListItemButton>
+                    </Box>
+                  );
+                })}
+                </Box>
+              </Collapse>
             </Box>
           );
         })}

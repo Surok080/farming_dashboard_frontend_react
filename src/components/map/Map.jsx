@@ -121,17 +121,87 @@ const Map = memo(({year, setAllArea}) => {
         setOpenSatelliteModal(false);
     };
 
+    // Функция для преобразования новой структуры данных в формат GeoJSON
+    const transformNewDataToGeoJSON = (data, grouping) => {
+        const features = [];
+        
+        // Проходим по всем группам
+        data.groups?.forEach(group => {
+            // Проходим по всем культурам в группе
+            group.crops?.forEach(crop => {
+                // Проходим по всем полям в культуре
+                crop.fields?.forEach(field => {
+                    if (field.geojson) {
+                        // Добавляем свойства в зависимости от группировки
+                        const properties = {
+                            id: field.field_id,
+                            name: field.field_name,
+                            area: field.area,
+                            color: crop.color,
+                            center: field.center
+                        };
+                        
+                        // Добавляем свойства для группировки
+                        if (grouping === 'crop') {
+                            properties[grouping] = field.crop_name;
+                            properties.crop = field.crop_name;
+                            properties.crop_name = field.crop_name;
+                            properties.cultivar = field.cultivar;
+                            properties.crop_kind = field.cultivar;
+                            properties.crop_group = group.group_name;
+                        } else if (grouping === 'crop_group') {
+                            properties[grouping] = group.group_name;
+                            properties.crop_group = group.group_name;
+                            properties.crop = field.crop_name;
+                            properties.crop_name = field.crop_name;
+                            properties.cultivar = field.cultivar;
+                            properties.crop_kind = field.cultivar;
+                        } else if (grouping === 'productivity') {
+                            properties[grouping] = group.group_name;
+                            properties.crop = field.crop_name;
+                            properties.crop_name = field.crop_name;
+                            properties.cultivar = field.cultivar;
+                            properties.crop_kind = field.cultivar;
+                            properties.crop_group = group.group_name;
+                            // Добавляем урожайность, если она есть
+                            if (field.productivity_value !== undefined) {
+                                properties.productivity_value = field.productivity_value;
+                            }
+                        }
+                        
+                        // Создаем GeoJSON feature
+                        features.push({
+                            type: 'Feature',
+                            geometry: field.geojson.geometry,
+                            properties: properties
+                        });
+                    }
+                });
+            });
+        });
+        
+        return {
+            type: 'FeatureCollection',
+            center: data.center,
+            total_area: data.total_area,
+            features: features
+        };
+    };
+
     const getData = () => {
         handleOpenBackdrop();
         setLoad(true);
         httpService
-            .get(`/fields?year=${year}&group=${grouping}`)
+            .get(`/fields_v2?year=${year}&group=${grouping}`)
             .then((res) => {
-                if (res?.status === 200 && res.data?.features) {
-                    setLayer(res.data);
-                    setAllArea(res.data.total_area.toFixed(2));
-                    getAreaLayers(res.data, setStatistics, grouping);
-                    getColorLayers(res.data, setColorLayers, grouping);
+                if (res?.status === 200 && res.data) {
+                    // Преобразуем новую структуру данных в формат GeoJSON
+                    const transformedData = transformNewDataToGeoJSON(res.data, grouping);
+                    
+                    setLayer(transformedData);
+                    setAllArea(transformedData.total_area.toFixed(2));
+                    getAreaLayers(transformedData, setStatistics, grouping);
+                    getColorLayers(transformedData, setColorLayers, grouping);
                 } else {
                     resetState();
                 }
@@ -151,13 +221,17 @@ const Map = memo(({year, setAllArea}) => {
 
     const deletArea = () => {
         if (deleteIdArea) {
+            const seasonIds = Array.isArray(deleteIdArea) ? deleteIdArea : [deleteIdArea];
             httpService
-                .delete(`/fields`, {
+                .delete(`/fields_v2`, {
                     headers: {
                         'accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    data: Array.isArray(deleteIdArea) ? deleteIdArea : [deleteIdArea]
+                    data: {
+                        year: year,
+                        season_ids: seasonIds
+                    }
                 })
                 .then((res) => {
                     if (res.status === 200) {
@@ -296,6 +370,7 @@ const Map = memo(({year, setAllArea}) => {
                                             setActiveArea={setActiveArea}
                                             setDeleteIdArea={setDeleteIdArea}
                                             handleOpenConfirmDelete={handleOpenConfirmDelete}
+                                            grouping={grouping}
                                         />
                                     ) : (
                                         <p>Нет данных</p>

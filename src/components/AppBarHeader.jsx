@@ -1,5 +1,5 @@
 import {Box, Divider, FormControl, InputLabel, Link, MenuItem, Select, Toolbar, Typography,} from "@mui/material";
-import React, {memo, useEffect} from "react";
+import React, {memo} from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import styled from "@emotion/styled";
 import {useNavigate} from "react-router-dom";
@@ -53,10 +53,6 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
     const handleCloseHelp = () => {
         setAnchorElHelp(null);
     };
-
-    const refreshPage = () => {
-        navigate(0);
-    }
 
     const handleChangeYear = (e) => {
         setYear(e.target.value);
@@ -136,7 +132,8 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                                 value={year}
                                 label="year"
                                 onChange={handleChangeYear}
-                            >
+                                variant={"outlined"}>
+                                <MenuItem value={2026}>2026</MenuItem>
                                 <MenuItem value={2025}>2025</MenuItem>
                                 <MenuItem value={2024}>2024</MenuItem>
                                 <MenuItem value={2023}>2023</MenuItem>

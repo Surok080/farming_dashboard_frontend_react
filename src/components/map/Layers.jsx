@@ -1,19 +1,6 @@
-import React, { memo, useEffect, useState } from "react";
-import {
-  TileLayer,
-  LayersControl,
-  useMapEvents,
-  GeoJSON,
-  LayerGroup,
-  Tooltip, ZoomControl,
-} from "react-leaflet";
-import {
-  Box,
-  CircularProgress,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
+import React, {memo, useEffect, useState} from "react";
+import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMapEvents,} from "react-leaflet";
+import {Box, CircularProgress, Modal, TextField, Typography,} from "@mui/material";
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -98,30 +85,39 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
   useEffect(() => {
     if (activeArea) {
       // Вычисляем центр поля
-      const coordinates = activeArea.geometry.coordinates[0];
-      const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
-      const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+      let centerLat, centerLng;
       
-      map.setView([centerLat, centerLng], 13, {
-        animate: true,
-        duration: 1
-      });
+      if (activeArea.properties.center && Array.isArray(activeArea.properties.center)) {
+        // Используем готовые координаты центра
+        centerLng = activeArea.properties.center[0];
+        centerLat = activeArea.properties.center[1];
+      } else {
+        // Вычисляем центр из геометрии
+        const coordinates = activeArea.geometry.coordinates[0];
+        
+        // Обрабатываем MultiPolygon: coordinates[0][0] - первый полигон, первый ring
+        if (activeArea.geometry.type === 'MultiPolygon' && coordinates[0] && Array.isArray(coordinates[0][0])) {
+          const firstRing = coordinates[0][0];
+          centerLat = firstRing.reduce((sum, coord) => sum + coord[1], 0) / firstRing.length;
+          centerLng = firstRing.reduce((sum, coord) => sum + coord[0], 0) / firstRing.length;
+        } else {
+          // Обычный Polygon
+          centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+          centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+        }
+      }
+      
+      // Проверяем, что координаты валидные
+      if (!isNaN(centerLat) && !isNaN(centerLng)) {
+        map.setView([centerLat, centerLng], 13, {
+          animate: true,
+          duration: 1
+        });
+      }
       
       setActiveArea(null);
     }
   }, [activeArea]);
-
-  const hashString = (str) => {
-    var hash = 0,
-      i,
-      chr;
-    for (i = 0; i < Math.min(str.length, 255); i++) {
-      chr = str.charCodeAt(i);
-      hash = (hash << 5) - hash + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-  };
 
   return (
     <>
@@ -157,13 +153,38 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                     opacity: 0.8
                   }}
                   eventHandlers={{
-                    click: (event, type) => {
-                      // Вычисляем центр поля
-                      const coordinates = item.geometry.coordinates[0];
-                      const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
-                      const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+                    click: () => {
+                      // Используем координаты центра из properties, если они есть
+                      let centerLat, centerLng;
                       
-                      // Перемещаем камеру к центру поля с фиксированным зумом (например, 10)
+                      if (item.properties.center && Array.isArray(item.properties.center)) {
+                        // Используем готовые координаты центра
+                        centerLng = item.properties.center[0];
+                        centerLat = item.properties.center[1];
+                      } else {
+                        // Вычисляем центр поля из геометрии
+                        const coordinates = item.geometry.coordinates[0];
+                        
+                        // Обрабатываем MultiPolygon: coordinates[0][0] - первый полигон, первый ring
+                        if (item.geometry.type === 'MultiPolygon' && coordinates[0] && Array.isArray(coordinates[0][0])) {
+                          const firstRing = coordinates[0][0];
+                          centerLat = firstRing.reduce((sum, coord) => sum + coord[1], 0) / firstRing.length;
+                          centerLng = firstRing.reduce((sum, coord) => sum + coord[0], 0) / firstRing.length;
+                        } else {
+                          // Обычный Polygon
+                          centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+                          centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+                        }
+                      }
+                      
+                      // Проверяем, что координаты валидные
+                      if (isNaN(centerLat) || isNaN(centerLng)) {
+                        console.error('Invalid coordinates for field:', item.properties.id);
+                        handleOpen(item);
+                        return;
+                      }
+                      
+                      // Перемещаем камеру к центру поля с фиксированным зумом
                       map.setView([centerLat, centerLng], 14, {
                         animate: true,
                         duration: 1

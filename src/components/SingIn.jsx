@@ -17,7 +17,6 @@ import { CircularProgress } from "@mui/material";
 export const StoreContext = createContext("light");
 
 export default function SignIn() {
-  const user = useSelector((state) => state.user.fio)
   const dispatch = useDispatch()
   const navigate = useNavigate();
   const [load, setLoad] = useState(false);
@@ -76,8 +75,8 @@ export default function SignIn() {
     };
 
     setLoad(true);
-    try {
-      SignInApi.auth(userDto).then((res) => {
+    SignInApi.auth(userDto)
+      .then((res) => {
         if (res?.status === 200) {
           SignInApi.getMe().then((user) => {
             setLoad(false);
@@ -90,24 +89,60 @@ export default function SignIn() {
             });
 
             navigate("/dashboard");
+          }).catch((error) => {
+            setLoad(false);
+            console.error('Ошибка получения данных пользователя:', error);
+            enqueueSnackbar("Ошибка получения данных пользователя", {
+              autoHideDuration: 4000,
+              variant: "error",
+            });
           });
         } else if (res?.status === 403) {
+          setLoad(false);
           enqueueSnackbar("Доступ запрещен", {
             autoHideDuration: 4000,
             variant: "warning",
           });
         } else {
+          setLoad(false);
           enqueueSnackbar("Что-то пошло не так", {
             autoHideDuration: 4000,
             variant: "error",
           });
         }
+      })
+      .catch((error) => {
+        setLoad(false);
+        console.error('Ошибка авторизации:', error);
+        
+        // Обработка различных типов ошибок
+        if (error?.response?.status === 401) {
+          enqueueSnackbar("Неверный логин или пароль", {
+            autoHideDuration: 4000,
+            variant: "error",
+          });
+        } else if (error?.response?.status === 403) {
+          enqueueSnackbar("Доступ запрещен", {
+            autoHideDuration: 4000,
+            variant: "warning",
+          });
+        } else if (error?.response?.status >= 500) {
+          enqueueSnackbar("Ошибка сервера. Попробуйте позже", {
+            autoHideDuration: 4000,
+            variant: "error",
+          });
+        } else if (error?.message === 'Network Error' || !error?.response) {
+          enqueueSnackbar("Ошибка подключения к серверу", {
+            autoHideDuration: 4000,
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar("Не удалось авторизоваться", {
+            autoHideDuration: 4000,
+            variant: "error",
+          });
+        }
       });
-        } catch (e) {
-            // Обработка ошибки
-        } finally {
-      setLoad(false);
-    }
   };
 
   // Показываем индикатор загрузки во время проверки токена
