@@ -140,13 +140,13 @@ export default function Dashboard() {
                                 maxWidth: "100%",
                                 marginTop: "5px",
                                 marginLeft: "200px",
-                                height: "calc(100% - 96px)",
+                                height: "calc(100% - 50px)",
                                 width: "calc(100% - 220px)",
                                 padding: "0",
                                 overflow: 'hidden',
                                 [theme.breakpoints.down("lg")]: {
-                                    width: "calc(100% - 170px)",
-                                    marginLeft: "145px",
+                                    width: "calc(100% - 130px)",
+                                    marginLeft: "125px",
                                 },
                             }}
                         >

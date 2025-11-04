@@ -1,86 +1,39 @@
 import React, {memo, useEffect, useState} from "react";
-import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMapEvents,} from "react-leaflet";
-import {Box, CircularProgress, Modal, TextField, Typography,} from "@mui/material";
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
+import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMap} from "react-leaflet";
+import {Typography} from "@mui/material";
 
+const Layers = memo(({ layer, activeArea, setActiveArea, year, onFieldClick, isModalOpen, hoveredFieldId }) => {
+  const [tooltipKey, setTooltipKey] = useState(0);
+  const map = useMap();
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
-const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
-  const [open, setOpen] = useState(false);
-  const [activeAreaToModal, setActiveAreaToModal] = useState(null);
-  const [previousMapState, setPreviousMapState] = useState(null);
-  const [showTooltips, setShowTooltips] = useState(true);
-
-  const map = useMapEvents({
-    // Use leaflet map event as the key and a call back with the
-    // map method as the value:
-    zoomend: () => {
-      // Get the zoom level once zoom ended:
-    },
-    moveend: () => {
-      // Get bounds once move has ended:
-    },
-    // click: (e) => {
-    //   map.setView(e.latlng, map.getZoom(), {
-    //     animate: true,
-    //   })
-    // },
-  });
-
-  const handleOpen = (item) => {
-    // Сохраняем текущее состояние карты перед зумом
-    setPreviousMapState({
-      center: map.getCenter(),
-      zoom: map.getZoom()
-    });
-    // Скрываем тултипы при открытии модального окна
-    setShowTooltips(false);
-    setOpen(true);
-    setActiveAreaToModal(item);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setActiveAreaToModal(null);
-    
-    // Принудительно удаляем все тултипы из DOM
-    setTimeout(() => {
+  // Управление тултипами при открытии/закрытии модального окна
+  useEffect(() => {
+    if (isModalOpen) {
+      // При открытии модального окна - закрываем все тултипы
+      map.closePopup();
+      // Закрываем все тултипы через DOM
       const tooltips = document.querySelectorAll('.leaflet-tooltip');
       tooltips.forEach(tooltip => {
-        tooltip.remove();
+        tooltip.style.display = 'none';
       });
-    }, 50);
-    
-    // Показываем тултипы обратно
-    setShowTooltips(true);
-    
-    // Возвращаемся к предыдущему состоянию карты
-    if (previousMapState) {
-      map.setView(previousMapState.center, previousMapState.zoom, {
-        animate: true,
-        duration: 1
+    } else {
+      // При закрытии модального окна - закрываем все тултипы и обновляем ключ
+      map.closePopup();
+      const tooltips = document.querySelectorAll('.leaflet-tooltip');
+      tooltips.forEach(tooltip => {
+        tooltip.style.display = 'none';
       });
-      setPreviousMapState(null);
+      // Обновляем ключ для принудительного пересоздания тултипов
+      setTooltipKey(prev => prev + 1);
     }
-  };
+  }, [isModalOpen, map]);
+
 
   useEffect(() => {
     if (layer && layer?.features?.length) {
       map.setView([layer.center[1], layer.center[0]], map.getZoom());
     }
-  }, [layer]);
+  }, [layer, map]);
 
   useEffect(() => {
     if (activeArea) {
@@ -117,7 +70,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
       
       setActiveArea(null);
     }
-  }, [activeArea]);
+  }, [activeArea, map]);
 
   return (
     <>
@@ -143,6 +96,7 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
         </LayersControl.BaseLayer>
         {layer.features &&
           layer.features.map((item, key) => {
+            const isHovered = hoveredFieldId === item.properties.id;
             return (
               <LayerGroup key={key}>
                 <GeoJSON
@@ -150,51 +104,20 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
                   data={item}
                   pathOptions={{ 
                     color: item.properties.color,
-                    opacity: 0.8
+                    opacity: isHovered ? 1 : 0.8,
+                    weight: isHovered ? 4 : 2,
+                    fillOpacity: isHovered ? 0.6 : 0.3
                   }}
                   eventHandlers={{
-                    click: () => {
-                      // Используем координаты центра из properties, если они есть
-                      let centerLat, centerLng;
-                      
-                      if (item.properties.center && Array.isArray(item.properties.center)) {
-                        // Используем готовые координаты центра
-                        centerLng = item.properties.center[0];
-                        centerLat = item.properties.center[1];
-                      } else {
-                        // Вычисляем центр поля из геометрии
-                        const coordinates = item.geometry.coordinates[0];
-                        
-                        // Обрабатываем MultiPolygon: coordinates[0][0] - первый полигон, первый ring
-                        if (item.geometry.type === 'MultiPolygon' && coordinates[0] && Array.isArray(coordinates[0][0])) {
-                          const firstRing = coordinates[0][0];
-                          centerLat = firstRing.reduce((sum, coord) => sum + coord[1], 0) / firstRing.length;
-                          centerLng = firstRing.reduce((sum, coord) => sum + coord[0], 0) / firstRing.length;
-                        } else {
-                          // Обычный Polygon
-                          centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
-                          centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
-                        }
+                    click: (e) => {
+                      // При клике на поле на карте - открываем модальное окно
+                      if (onFieldClick) {
+                        onFieldClick(item);
                       }
-                      
-                      // Проверяем, что координаты валидные
-                      if (isNaN(centerLat) || isNaN(centerLng)) {
-                        console.error('Invalid coordinates for field:', item.properties.id);
-                        handleOpen(item);
-                        return;
-                      }
-                      
-                      // Перемещаем камеру к центру поля с фиксированным зумом
-                      map.setView([centerLat, centerLng], 14, {
-                        animate: true,
-                        duration: 1
-                      });
-                      
-                      handleOpen(item);
                     },
                   }}
                 >
-                  <Tooltip sticky={showTooltips}>
+                  <Tooltip key={`${item.properties.id}-${tooltipKey}`} permanent={false} sticky={false}>
                     <Typography>
                       {item.properties.crop.charAt(0).toUpperCase() +
                         item.properties.crop.slice(1)}
@@ -208,78 +131,6 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year }) => {
               </LayerGroup>
             );
           })}
-        <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style} display={"flex"} justifyContent={"center"}>
-            {activeAreaToModal ? (
-              <Box display={"flex"} flexDirection={"column"} gap={2}>
-                <Typography variant="h5" mb={2}>Паспорт поля</Typography>
-                <IconButton
-                  aria-label="close"
-                  onClick={handleClose}
-                  sx={{
-                    position: "absolute",
-                    right: 8,
-                    top: 8,
-                    color: (theme) => theme.palette.grey[500],
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-                <Box display={"flex"} gap={2}>
-                  <TextField
-                    disabled
-                    id="name-area"
-                    label={"Название поля"}
-                    defaultValue={activeAreaToModal.properties.name}
-                    variant="outlined"
-                  />
-                  <TextField
-                    disabled
-                    id="year-area"
-                    defaultValue={year}
-                    label={"Год"}
-                    variant="outlined"
-                  />
-                </Box>
-                <TextField
-                  disabled
-                  id="crop-area"
-                  label={"Культура"}
-                  defaultValue={activeAreaToModal.properties.crop}
-                  variant="outlined"
-                />
-                <TextField
-                  disabled
-                  id="crop-kind-area"
-                  label={"Сорт"}
-                  defaultValue={activeAreaToModal.properties.crop_kind}
-                  variant="outlined"
-                />
-                <TextField
-                  disabled
-                  id="crop-group-area"
-                  label={"Группа с/х культур"}
-                  defaultValue={activeAreaToModal.properties.crop_group}
-                  variant="outlined"
-                />
-                <TextField
-                  disabled
-                  id="area-area"
-                  label={"Площадь, га"}
-                  defaultValue={activeAreaToModal.properties.area}
-                  variant="outlined"
-                />
-              </Box>
-            ) : (
-              <CircularProgress color="success" />
-            )}
-          </Box>
-        </Modal>
       </LayersControl>
     </>
   );
