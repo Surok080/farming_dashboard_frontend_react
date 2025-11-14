@@ -20,6 +20,7 @@ import TechcartPage from "../dashboardPages/TechcartPage";
 import SettingsPage from "../dashboardPages/SettingsPage";
 import {useEffect} from "react";
 import {useMediaQuery, useTheme} from "@mui/material";
+import {httpService} from "../../api/setup";
 
 export const defaultTheme = createTheme({
     palette: {
@@ -46,6 +47,22 @@ export default function Dashboard() {
     const [loading, setLoading] = React.useState(true);
     const [year, setYear] = React.useState(localStorage.getItem('year') ?? new Date().getFullYear());
     const [allArea, setAllArea] = React.useState(null);
+
+    // Загрузка текущего года с сервера
+    useEffect(() => {
+        httpService.get('/year')
+            .then((res) => {
+                if (res?.status === 200 && res.data?.year) {
+                    const serverYear = res.data.year;
+                    setYear(serverYear);
+                    localStorage.setItem('year', serverYear.toString());
+                }
+            })
+            .catch((error) => {
+                console.error('Ошибка при загрузке года:', error);
+                // В случае ошибки используем значение по умолчанию
+            });
+    }, []);
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg")); // md = 900px (по вашей теме)
@@ -90,6 +107,7 @@ export default function Dashboard() {
             case "tech_map":
                 return <TechcartPage year={year}/>;
             case "fields":
+            case "fields_v2":
                 return <DashboardPages setAllArea={setAllArea} year={year}/>;
             case "state_monitoring":
                 return <StateMonitoringPages setAllArea={setAllArea} year={year}/>;

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {httpService} from '../../api/setup';
 import {
     Box,
     FormControl,
@@ -13,12 +14,11 @@ import {
     TabList,
     TabPanel,
 } from '@mui/lab';
-import {Chart} from 'react-google-charts';
 import IconButton from '@mui/material/IconButton';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ListArea from './ListArea';
-import ReportArea from './ReportArea';
-import {getOptionChart} from '../../utils/mapUtils';
+import StructureContent from './StructureContent';
+import StructureTable from './StructureTable';
 import {defaultTheme} from "../dashboard/Dashboard";
 
 const MapSidebar = ({
@@ -41,6 +41,34 @@ const MapSidebar = ({
                         tabValue,
                         onTabChange,
                     }) => {
+    const isStructureTab = tabValue === "2";
+    const sidebarWidth = hideMenu 
+        ? "0px" 
+        : isStructureTab 
+            ? "100%" 
+            : isSmallScreen 
+                ? "300px" 
+            : "400px";
+    
+    // Загрузка данных для вкладки "Структура"
+    const [structureReportData, setStructureReportData] = useState(null);
+    
+    useEffect(() => {
+        if (tabValue === "2" && year) {
+            httpService.get(`/fields_v2/report?year=${year}`)
+                .then((res) => {
+                    if (res.status && res.status === 200) {
+                        setStructureReportData(res.data);
+                    } else {
+                        setStructureReportData(null);
+                    }
+                })
+                .catch((e) => {
+                    setStructureReportData(null);
+                });
+        }
+    }, [tabValue, year]);
+
     return (
         <Box
             sx={{
@@ -48,7 +76,7 @@ const MapSidebar = ({
                 left: 0,
                 zIndex: 1000,
                 width: "100%",
-                maxWidth: hideMenu ? "0px" : isSmallScreen ? "300px" : "400px",
+                maxWidth: sidebarWidth,
                 padding: hideMenu ? 0 : "10px",
                 height: "100%",
                 bgcolor: "background.paper",
@@ -77,19 +105,31 @@ const MapSidebar = ({
                     width: "100%",
                     typography: "body1",
                     height: "100%",
-                    overflow: "hidden",
+                    overflow: tabValue === "2" ? "visible" : "hidden",
                 }}
             >
                 <TabContext value={tabValue}>
                     <TabList
-                        centered
                         textColor="primary"
                         onChange={onTabChange}
                         aria-label="lab API tabs example"
+                        sx={{
+                            '& .MuiTabs-indicator': {
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                height: '2px',
+                            },
+                            '& .MuiTab-root': {
+                                minWidth: 'auto',
+                                padding: '12px 24px',
+                                flex: '0 1 auto',
+                            },
+                            '& .MuiTabs-flexContainer': {
+                                justifyContent: 'flex-start',
+                            },
+                        }}
                     >
                         <Tab label="Поля" value="1"/>
                         <Tab label="Структура" value="2"/>
-                        <Tab label="Отчет" value="3"/>
                     </TabList>
 
                     <TabPanel
@@ -116,7 +156,6 @@ const MapSidebar = ({
                             >
                                 <MenuItem value="crop">По культуре</MenuItem>
                                 <MenuItem value="crop_group">По группе</MenuItem>
-                                <MenuItem value="productivity">По урожайности</MenuItem>
                             </Select>
                         </FormControl>
 
@@ -152,31 +191,44 @@ const MapSidebar = ({
                         </Box>
                     </TabPanel>
 
-                    <TabPanel sx={{marginTop: "-40px"}} value="2">
-                        <Box>
-                            {statistics.length ? (
-                                <Chart
-                                    chartType="PieChart"
-                                    width="100%"
-                                    height="350px"
-                                    data={statistics}
-                                    options={getOptionChart(colorLayers)}
-                                />
-                            ) : null}
-                        </Box>
-                    </TabPanel>
-
-                    <TabPanel
+                    <TabPanel 
                         sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            height: "90%",
-                            paddingBottom: "0px",
                             marginTop: "-40px",
-                        }}
-                        value="3"
+                            padding: "0",
+                            height: "100%",
+                            display: "flex",
+                            gap: "10px",
+                            overflow: "visible",
+                            position: "relative",
+                        }} 
+                        value="2"
                     >
-                        <ReportArea grouping={grouping} year={year}/>
+                        {/* Левый блок - 60% */}
+                        <Box
+                            sx={{
+                                width: "60%",
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                overflow: "auto",
+                                paddingBottom: "150px",
+                            }}
+                        >
+                            <StructureContent key={`structure-${tabValue}-${year}`} year={year} reportData={structureReportData} />
+                        </Box>
+
+                        {/* Правый блок - 40% */}
+                        <Box
+                            sx={{
+                                width: "40%",
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                overflow: "auto",
+                            }}
+                        >
+                            <StructureTable reportData={structureReportData} />
+                        </Box>
                     </TabPanel>
                 </TabContext>
             </Box>

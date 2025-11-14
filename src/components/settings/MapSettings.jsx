@@ -23,12 +23,12 @@ const MapSettings = () => {
             <Box display={'flex'} flexDirection={isSmallScreen ? "column" : "row"} alignItems={'flex-start'} gap={5}>
 
                 {
-                    user?.userInfo?.module && user.userInfo.module.includes('fields') ?
+                    user?.userInfo?.module && (user.userInfo.module.includes('fields') || user.userInfo.module.includes('fields_v2')) ?
                         <Box display={'flex'} flexDirection={'column'} textAlign={'left'} gap={2}>
                             <Typography variant="h6" color="textSecondary">
-                                Слой “Поля”
+                                Слой "Поля"
                             </Typography>
-                            <UploadFiles url={"/fields"}/>
+                            <UploadFiles url={"/fields_v2/upload_kml"}/>
                         </Box>
                         :
                         null

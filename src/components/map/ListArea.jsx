@@ -21,51 +21,59 @@ const ListArea = ({
 
     // Группировка данных
     const groupedData = useMemo(() => {
-        const groups = {};
-
-        layer.forEach((item) => {
-            let groupKey = '';
-            let groupName = '';
-
-            if (grouping === 'crop' || grouping === 'productivity') {
-                // Группируем по группе культур
+        // Если группировка по культуре или урожайности - не группируем, показываем все поля в одном списке
+        if (grouping === 'crop' || grouping === 'productivity') {
+            return {
+                'all': {
+                    groupName: 'Все поля',
+                    items: layer
+                }
+            };
+        }
+        
+        // Если группировка по группе - группируем по группам культур
+        if (grouping === 'crop_group') {
+            const groups = {};
+            
+            layer.forEach((item) => {
                 const cropGroup = item.properties.crop_group || 'Другие';
-                groupKey = cropGroup;
-                groupName = cropGroup;
-            } else if (grouping === 'crop_group') {
-                // Группируем по группе
-                const cropGroup = item.properties.crop_group || 'Другие';
-                groupKey = cropGroup;
-                groupName = cropGroup;
+                const groupKey = cropGroup;
+                const groupName = cropGroup;
+
+                if (!groups[groupKey]) {
+                    groups[groupKey] = {
+                        groupName: groupName,
+                        items: []
+                    };
+                }
+
+                groups[groupKey].items.push(item);
+            });
+
+            return groups;
+        }
+
+        // По умолчанию - без группировки
+        return {
+            'all': {
+                groupName: 'Все поля',
+                items: layer
             }
-
-            if (!groups[groupKey]) {
-                groups[groupKey] = {
-                    groupName: groupName,
-                    items: []
-                };
-            }
-
-            groups[groupKey].items.push(item);
-        });
-
-        return groups;
+        };
     }, [layer, grouping]);
 
-    // Инициализируем все группы как развернутые при изменении данных
+    // Инициализируем состояние групп при изменении данных или группировки
     React.useEffect(() => {
         if (Object.keys(groupedData).length > 0) {
-            setExpandedGroups(prev => {
-                const updated = {...prev};
-                Object.keys(groupedData).forEach(key => {
-                    if (!(key in updated)) {
-                        updated[key] = true;
-                    }
-                });
-                return updated;
+            // При группировке по группе - все группы свернуты, иначе - развернуты
+            const defaultExpanded = grouping !== 'crop_group';
+            const updated = {};
+            Object.keys(groupedData).forEach(key => {
+                updated[key] = defaultExpanded;
             });
+            setExpandedGroups(updated);
         }
-    }, [groupedData]);
+    }, [groupedData, grouping]);
 
     // Toggle expanded state
     const handleExpandToggle = (groupKey) => {
@@ -147,45 +155,49 @@ const ListArea = ({
                 {Object.keys(groupedData).map((groupKey) => {
                     const group = groupedData[groupKey];
                     const isExpanded = expandedGroups[groupKey] !== false;
+                    // Скрываем заголовок группы, если группировка по культуре или урожайности
+                    const showGroupHeader = grouping === 'crop_group';
 
                     return (
                         <Box key={groupKey}>
-                            {/* Заголовок группы */}
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    padding: "3px 16px",
-                                    backgroundColor: "#f5f5f5d4",
-                                    border: "1px solid #e0e0e0cf",
-                                    borderRadius: "4px",
-                                    [defaultTheme.breakpoints.down("lg")]: {
-                                        padding: "5px 10px 5px 1px"
-                                    },
+                            {/* Заголовок группы - показываем только при группировке по группе */}
+                            {showGroupHeader && (
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        padding: "3px 16px",
+                                        backgroundColor: "#f5f5f5d4",
+                                        border: "1px solid #e0e0e0cf",
+                                        borderRadius: "4px",
+                                        [defaultTheme.breakpoints.down("lg")]: {
+                                            padding: "5px 10px 5px 1px"
+                                        },
 
-                                }}
-                                onClick={() => handleExpandToggle(groupKey)}
-                            >
-                                <Box display="flex" alignItems="center" gap={1} maxWidth={"70%"} width={"100%"}>
-                                    <IconButton size="small">
-                                        {isExpanded ? <ExpandLess/> : <ExpandMore/>}
-                                    </IconButton>
-                                    <Typography variant="body2" textAlign={"left"}
-                                                sx={{fontWeight: "bold", fontSize: "13px"}}>
-                                        {group.groupName}
-                                    </Typography>
-                                    <Typography marginLeft={"auto"} variant="caption" sx={{color: "text.secondary"}}>
-                                        ({group.items.length})
+                                    }}
+                                    onClick={() => handleExpandToggle(groupKey)}
+                                >
+                                    <Box display="flex" alignItems="center" gap={1} maxWidth={"70%"} width={"100%"}>
+                                        <IconButton size="small">
+                                            {isExpanded ? <ExpandLess/> : <ExpandMore/>}
+                                        </IconButton>
+                                        <Typography variant="body2" textAlign={"left"}
+                                                    sx={{fontWeight: "bold", fontSize: "13px"}}>
+                                            {group.groupName}
+                                        </Typography>
+                                        <Typography marginLeft={"auto"} variant="caption" sx={{color: "text.secondary"}}>
+                                            ({group.items.length})
+                                        </Typography>
+                                    </Box>
+                                    <Typography variant="caption" sx={{color: "text.secondary"}}>
+                                        {group.items.reduce((sum, item) => sum + parseFloat(item.properties.area || 0), 0).toFixed(2)} га
                                     </Typography>
                                 </Box>
-                                <Typography variant="caption" sx={{color: "text.secondary"}}>
-                                    {group.items.reduce((sum, item) => sum + parseFloat(item.properties.area || 0), 0).toFixed(2)} га
-                                </Typography>
-                            </Box>
+                            )}
 
                             {/* Поля в группе */}
-                            <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                            <Collapse in={showGroupHeader ? isExpanded : true} timeout="auto" unmountOnExit>
                                 <Box display="flex" flexDirection="column" gap={1}
                                      sx={{paddingBottom: "8px", paddingTop: "15px"}}>
                                     {group.items.map((item, index) => {

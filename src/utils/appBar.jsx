@@ -3,6 +3,7 @@ export const appBarName = (menu) => {
       case 'cartogram':
             return "Картограммы"
       case 'fields':
+      case 'fields_v2':
           return "Поля"
       case 'state_monitoring':
           return "Госмониторинг"

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState, memo, useMemo, useCallback} from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -15,31 +15,38 @@ import {appBarName, moveStringToSecondPositionImmutable} from "../../utils/appBa
 import {defaultTheme} from "./Dashboard";
 import Typography from "@mui/material/Typography";
 
-export default function ListItems() {
+const ListItems = memo(() => {
     const {valueTabs, setValueTabs} = useContext(Context);
     const user = useSelector((state) => state.user)
     const [menu, setMenu] = useState([]);
 
     useEffect(() => {
         if (user.userInfo.tabs && user.userInfo.tabs.length > 0) {
-            const tabNames = user.userInfo.tabs.map(tab => tab.name);
+            let tabNames = user.userInfo.tabs.map(tab => tab.name);
+            
+            // Если есть fields_v2, убираем fields чтобы не было дубликатов
+            if (tabNames.includes('fields_v2')) {
+                tabNames = tabNames.filter(name => name !== 'fields');
+            }
+            
             setMenu(moveStringToSecondPositionImmutable(tabNames, 'tech_map'))
         }
     }, [user]);
 
-    const setTabs = (value) => {
+    const setTabs = useCallback((value) => {
         localStorage.setItem('tabs', value);
         setValueTabs(value)
-    }
+    }, [setValueTabs]);
 
-    const getIconAppBar = (menu) => {
+    const getIconAppBar = useCallback((menu) => {
         switch (menu) {
             case 'cartogram':
                 return <GridOnIcon
                     sx={{color: valueTabs === "cartogram" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             case 'fields':
+            case 'fields_v2':
                 return <LayersOutlinedIcon
-                    sx={{color: valueTabs === "fields" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+                    sx={{color: (valueTabs === "fields" || valueTabs === "fields_v2") ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             case 'state_monitoring':
                 return <DashboardOutlinedIcon
                     sx={{color: valueTabs === "state_monitoring" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
@@ -49,7 +56,7 @@ export default function ListItems() {
             default:
                 return null;
         }
-    }
+    }, [valueTabs]);
 
     return (
         <>
@@ -141,4 +148,8 @@ export default function ListItems() {
             </ListItemButton>
         </>
     );
-}
+});
+
+ListItems.displayName = 'ListItems';
+
+export default ListItems;

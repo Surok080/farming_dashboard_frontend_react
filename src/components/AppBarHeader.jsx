@@ -67,6 +67,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
             case "tech_map":
                 return "ТехКарта";
             case "fields":
+            case "fields_v2":
                 return "Поля";
             case "state_monitoring":
                 return "Госмониторинг";
@@ -118,7 +119,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                         alignItems={"center"}
                     >
                         {getNameTabs()}
-                        {valueTabs === "fields" && allArea ? (
+                        {(valueTabs === "fields" || valueTabs === "fields_v2") && allArea ? (
                             <Typography color={"grey"}>{allArea} га</Typography>
                         ) : null}
                     </Typography>

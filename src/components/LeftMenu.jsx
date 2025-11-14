@@ -1,5 +1,5 @@
 import {Box, Divider, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography,} from "@mui/material";
-import React from "react";
+import React, {memo} from "react";
 import ListItems from "./dashboard/listItems";
 import {useNavigate} from "react-router-dom";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
@@ -8,35 +8,35 @@ import styled from "@emotion/styled";
 import logo from "../images/agro_logo.svg"
 import {defaultTheme} from "./dashboard/Dashboard";
 
-
-const LeftMenu = ({drawerWidth}) => {
-    const navigate = useNavigate();
-
-    const Drawer = styled(MuiDrawer, {
-        shouldForwardProp: (prop) => prop !== "open",
-    })(({theme, open}) => ({
-        "& .MuiDrawer-paper": {
-            position: "relative",
-            whiteSpace: "nowrap",
-            width: drawerWidth,
+// Выносим styled компонент за пределы компонента, чтобы он не пересоздавался при каждом рендере
+const Drawer = styled(MuiDrawer, {
+    shouldForwardProp: (prop) => prop !== "open",
+})(({theme, open}) => ({
+    "& .MuiDrawer-paper": {
+        position: "relative",
+        whiteSpace: "nowrap",
+        width: "180px",
+        transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        boxSizing: "border-box",
+        ...(!open && {
+            overflowX: "hidden",
             transition: theme.transitions.create("width", {
                 easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
+                duration: theme.transitions.duration.leavingScreen,
             }),
-            boxSizing: "border-box",
-            ...(!open && {
-                overflowX: "hidden",
-                transition: theme.transitions.create("width", {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.leavingScreen,
-                }),
-                width: theme.spacing(7),
-                [theme.breakpoints.up("sm")]: {
-                    width: theme.spacing(9),
-                },
-            }),
-        },
-    }));
+            width: theme.spacing(7),
+            [theme.breakpoints.up("sm")]: {
+                width: theme.spacing(9),
+            },
+        }),
+    },
+}));
+
+const LeftMenu = memo(({drawerWidth}) => {
+    const navigate = useNavigate();
 
     return (
         <>
@@ -118,6 +118,8 @@ const LeftMenu = ({drawerWidth}) => {
             </Drawer>
         </>
     );
-};
+});
+
+LeftMenu.displayName = 'LeftMenu';
 
 export default LeftMenu;

@@ -2,7 +2,7 @@ import React, {memo, useEffect, useState} from "react";
 import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMap} from "react-leaflet";
 import {Typography} from "@mui/material";
 
-const Layers = memo(({ layer, activeArea, setActiveArea, year, onFieldClick, isModalOpen, hoveredFieldId }) => {
+const Layers = memo(({ layer, activeArea, setActiveArea, year, onFieldClick, isModalOpen, hoveredFieldId, hideLayerControl = false }) => {
   const [tooltipKey, setTooltipKey] = useState(0);
   const map = useMap();
 
@@ -74,64 +74,75 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year, onFieldClick, isM
 
   return (
     <>
-      <LayersControl position="topright">
-        <LayersControl.BaseLayer checked name="Basic Map">
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
-            ext="png"
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="Topo Map">
-          <TileLayer
-            attribution='Map data: &amp;copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &amp;copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-            url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="WorldImagery">
-          <TileLayer
-            attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-          />
-        </LayersControl.BaseLayer>
-        {layer.features &&
-          layer.features.map((item, key) => {
-            const isHovered = hoveredFieldId === item.properties.id;
-            return (
-              <LayerGroup key={key}>
-                <GeoJSON
-                  key={item.properties.id}
-                  data={item}
-                  pathOptions={{ 
-                    color: item.properties.color,
-                    opacity: isHovered ? 1 : 0.8,
-                    weight: isHovered ? 4 : 2,
-                    fillOpacity: isHovered ? 0.6 : 0.3
-                  }}
-                  eventHandlers={{
-                    click: (e) => {
-                      // При клике на поле на карте - открываем модальное окно
-                      if (onFieldClick) {
-                        onFieldClick(item);
-                      }
-                    },
-                  }}
-                >
-                  <Tooltip key={`${item.properties.id}-${tooltipKey}`} permanent={false} sticky={false}>
-                    <Typography>
-                      {item.properties.crop.charAt(0).toUpperCase() +
-                        item.properties.crop.slice(1)}
-                    </Typography>
-                    <Typography>{item.properties.area} га</Typography>
-                    {
-                      item.properties?.productivity_value && <Typography>Урожайность (физ.вес) - {Math.round(item.properties?.productivity_value)} ц/га</Typography>
+      {hideLayerControl ? (
+        /* Базовый слой когда LayersControl скрыт */
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
+          ext="png"
+        />
+      ) : (
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer checked name="Basic Map">
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
+              ext="png"
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Topo Map">
+            <TileLayer
+              attribution='Map data: &amp;copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &amp;copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+              url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="WorldImagery">
+            <TileLayer
+              attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            />
+          </LayersControl.BaseLayer>
+        </LayersControl>
+      )}
+      
+      {/* Поля всегда отображаются */}
+      {layer.features &&
+        layer.features.map((item, key) => {
+          const isHovered = hoveredFieldId === item.properties.id;
+          return (
+            <LayerGroup key={key}>
+              <GeoJSON
+                key={item.properties.id}
+                data={item}
+                pathOptions={{ 
+                  color: item.properties.color,
+                  opacity: isHovered ? 1 : 0.8,
+                  weight: isHovered ? 4 : 2,
+                  fillOpacity: isHovered ? 0.6 : 0.3
+                }}
+                eventHandlers={{
+                  click: (e) => {
+                    // При клике на поле на карте - открываем модальное окно
+                    if (onFieldClick) {
+                      onFieldClick(item);
                     }
-                  </Tooltip>
-                </GeoJSON>
-              </LayerGroup>
-            );
-          })}
-      </LayersControl>
+                  },
+                }}
+              >
+                <Tooltip key={`${item.properties.id}-${tooltipKey}`} permanent={false} sticky={false}>
+                  <Typography>
+                    {item.properties.crop.charAt(0).toUpperCase() +
+                      item.properties.crop.slice(1)}
+                  </Typography>
+                  <Typography>{item.properties.area} га</Typography>
+                  {
+                    item.properties?.productivity_value && <Typography>Урожайность (физ.вес) - {Math.round(item.properties?.productivity_value)} ц/га</Typography>
+                  }
+                </Tooltip>
+              </GeoJSON>
+            </LayerGroup>
+          );
+        })}
     </>
   );
 });

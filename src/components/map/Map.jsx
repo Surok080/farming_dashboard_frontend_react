@@ -178,7 +178,9 @@ const Map = memo(({ year, setAllArea }) => {
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%", position: "relative" }}
         >
-          <ZoomControl position="topright" className="custom-zoom-control" />
+          {tabValue !== "2" && (
+            <ZoomControl position="topright" className="custom-zoom-control" />
+          )}
           {layer && (
             <Layers
               year={year}
@@ -188,11 +190,12 @@ const Map = memo(({ year, setAllArea }) => {
               onFieldClick={modals.fieldInfo.openModal}
               isModalOpen={modals.fieldInfo.open}
               hoveredFieldId={hoveredFieldId}
+              hideLayerControl={tabValue === "2"}
             />
           )}
         </MapContainer>
         
-        {layer && (
+        {layer && tabValue !== "2" && (
           <>
             <MapLegend
               statistics={statistics}
