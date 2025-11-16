@@ -34,3 +34,22 @@ export function moveStringToSecondPositionImmutable(array, targetString) {
     // Если строка не найдена, возвращаем исходный массив
     return array;
 }
+
+export function moveStringToFirstPositionImmutable(array, targetString) {
+    // Фильтруем массив, исключая целевую строку
+    const filteredArray = array.filter(item => item !== targetString);
+
+    // Если строка была в исходном массиве
+    if (filteredArray.length !== array.length) {
+        // Создаём новый массив:
+        // - целевая строка на первой позиции
+        // - все остальные элементы из отфильтрованного массива
+        return [
+            targetString,      // Вставляем целевую строку на первую позицию
+            ...filteredArray   // Все остальные элементы
+        ];
+    }
+
+    // Если строка не найдена, возвращаем исходный массив
+    return array;
+}

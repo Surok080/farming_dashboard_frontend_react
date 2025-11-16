@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useContext, useEffect, useState, memo, useMemo, useCallback} from "react";
+import {memo, useCallback, useContext, useEffect, useState} from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -11,7 +11,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import {useSelector} from "react-redux";
-import {appBarName, moveStringToSecondPositionImmutable} from "../../utils/appBar";
+import {appBarName, moveStringToFirstPositionImmutable, moveStringToSecondPositionImmutable} from "../../utils/appBar";
 import {defaultTheme} from "./Dashboard";
 import Typography from "@mui/material/Typography";
 
@@ -29,7 +29,17 @@ const ListItems = memo(() => {
                 tabNames = tabNames.filter(name => name !== 'fields');
             }
             
-            setMenu(moveStringToSecondPositionImmutable(tabNames, 'tech_map'))
+            // Если есть вкладка Поля (fields или fields_v2), перемещаем её на первую позицию в массиве menu
+            // чтобы она была второй после "Обзор" в общем меню
+            const fieldsTab = tabNames.find(tab => tab === 'fields' || tab === 'fields_v2');
+            if (fieldsTab) {
+                tabNames = moveStringToFirstPositionImmutable(tabNames, fieldsTab);
+            } else {
+                // Если нет вкладки Поля, перемещаем tech_map на вторую позицию (как было раньше)
+                tabNames = moveStringToSecondPositionImmutable(tabNames, 'tech_map');
+            }
+            
+            setMenu(tabNames);
         }
     }, [user]);
 
@@ -88,7 +98,7 @@ const ListItems = memo(() => {
                 />
             </ListItemButton>
             {
-                menu.map((item, index) => {
+                menu.map((item) => {
                     return (
                         <ListItemButton sx={{
                             [defaultTheme.breakpoints.down("lg")]: {
