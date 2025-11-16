@@ -46,12 +46,18 @@ const LeftMenu = memo(({drawerWidth}) => {
                     height: "100%",
                     "& .MuiPaper-root": {
                         width: 180,
+                        [defaultTheme.breakpoints.down("lg")]: {
+                            width: "120px !important",
+                        },
                     },
                 }}
                 variant="permanent"
                 PaperProps={{
                     sx: {
                         width: "180",
+                        [defaultTheme.breakpoints.down("lg")]: {
+                            width: "120px !important",
+                        },
                     },
                 }}
                 open={true}
@@ -85,7 +91,8 @@ const LeftMenu = memo(({drawerWidth}) => {
                                     variant="h6"
                                     color="inherit"
                                     noWrap
-                                    sx={{flexGrow: 1,
+                                    sx={{
+                                        flexGrow: 1,
                                         [defaultTheme.breakpoints.down("lg")]: {
                                             fontSize: "14px",
                                         },
