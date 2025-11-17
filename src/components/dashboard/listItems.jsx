@@ -11,7 +11,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import {useSelector} from "react-redux";
-import {appBarName, moveStringToFirstPositionImmutable, moveStringToSecondPositionImmutable} from "../../utils/appBar";
+import {appBarName, sortTabsByFixedOrder} from "../../utils/appBar";
 import {defaultTheme} from "./Dashboard";
 import Typography from "@mui/material/Typography";
 
@@ -24,20 +24,12 @@ const ListItems = memo(() => {
         if (user.userInfo.tabs && user.userInfo.tabs.length > 0) {
             let tabNames = user.userInfo.tabs.map(tab => tab.name);
             
-            // Если есть fields_v2, убираем fields чтобы не было дубликатов
-            if (tabNames.includes('fields_v2')) {
-                tabNames = tabNames.filter(name => name !== 'fields');
-            }
-            
-            // Если есть вкладка Поля (fields или fields_v2), перемещаем её на первую позицию в массиве menu
-            // чтобы она была второй после "Обзор" в общем меню
-            const fieldsTab = tabNames.find(tab => tab === 'fields' || tab === 'fields_v2');
-            if (fieldsTab) {
-                tabNames = moveStringToFirstPositionImmutable(tabNames, fieldsTab);
-            } else {
-                // Если нет вкладки Поля, перемещаем tech_map на вторую позицию (как было раньше)
-                tabNames = moveStringToSecondPositionImmutable(tabNames, 'tech_map');
-            }
+            // Сортируем вкладки по фиксированному порядку:
+            // 1. tech_map (ТехКарта)
+            // 2. fields/fields_v2 (Поля)
+            // 3. cartogram (Картограммы)
+            // 4. state_monitoring (Госмониторинг)
+            tabNames = sortTabsByFixedOrder(tabNames);
             
             setMenu(tabNames);
         }
