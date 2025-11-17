@@ -141,6 +141,8 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
     const loadCulturesData = async () => {
       // Загружаем данные культур только если есть валидные значения
       if (year && techcardValue && techcardValue.trim() !== "" && planTypes.length > 0) {
+        // Очищаем старые данные культур перед загрузкой новых, чтобы предотвратить запросы со старыми данными
+        setCropsData([]);
         await fetchCulturesData();
       }
     };
@@ -149,9 +151,12 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
   }, [year, techcardValue]);
 
   // Автоматическое получение данных при изменении выбранных культур или полей
+  // Важно: не включаем techcardValue в зависимости, так как он уже учтен через cropsData
+  // Это предотвращает отправку запроса со старыми данными при смене techcardValue
   useEffect(() => {
     const loadDashboardData = async () => {
       // Загружаем данные только если есть валидные значения
+      // cropsData уже содержит данные для текущего techcardValue после загрузки
       if (year && techcardValue && techcardValue.trim() !== "" && cropsData.length > 0) {
         await fetchDashboardData();
         
@@ -179,7 +184,7 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
     };
     
     loadDashboardData();
-  }, [checked, checkedFields, year, techcardValue, cropsData]);
+  }, [checked, checkedFields, year, cropsData]);
 
 
   const handleCheckboxChange = (cropId) => {
