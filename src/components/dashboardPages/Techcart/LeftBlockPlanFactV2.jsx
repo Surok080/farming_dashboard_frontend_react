@@ -17,7 +17,7 @@ import {
   Collapse,
   IconButton
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { httpService } from "../../../api/setup";
 
@@ -28,6 +28,8 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
   const [expandedRows, setExpandedRows] = useState({});
   const [cropsData, setCropsData] = useState([]);
   const [planTypes, setPlanTypes] = useState([]);
+  // Ref для отслеживания techcardValue, для которого были загружены cropsData
+  const cropsDataForTechcardRef = useRef("");
 
   // Функция для получения типов планов с сервера
   const fetchPlanTypes = async () => {
@@ -57,11 +59,15 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
           plan_type: techcardValue
         }
       });
-      setCropsData(response.data || []);
-      return response.data;
+      const data = response.data || [];
+      setCropsData(data);
+      // Сохраняем techcardValue, для которого были загружены данные
+      cropsDataForTechcardRef.current = techcardValue;
+      return data;
     } catch (error) {
       console.error('Ошибка при получении данных культур:', error);
       setCropsData([]);
+      cropsDataForTechcardRef.current = "";
       return null;
     }
   };
@@ -143,6 +149,8 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
       if (year && techcardValue && techcardValue.trim() !== "" && planTypes.length > 0) {
         // Очищаем старые данные культур перед загрузкой новых, чтобы предотвратить запросы со старыми данными
         setCropsData([]);
+        // Сбрасываем ref, чтобы предотвратить запросы со старыми данными
+        cropsDataForTechcardRef.current = "";
         await fetchCulturesData();
       }
     };
@@ -155,9 +163,12 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
   // Это предотвращает отправку запроса со старыми данными при смене techcardValue
   useEffect(() => {
     const loadDashboardData = async () => {
-      // Загружаем данные только если есть валидные значения
-      // cropsData уже содержит данные для текущего techcardValue после загрузки
-      if (year && techcardValue && techcardValue.trim() !== "" && cropsData.length > 0) {
+      // Проверяем, что cropsData соответствуют текущему techcardValue
+      // Это предотвращает отправку запроса со старыми данными при смене techcardValue
+      const isCropsDataValid = cropsDataForTechcardRef.current === techcardValue;
+      
+      // Загружаем данные только если есть валидные значения и cropsData соответствуют текущему techcardValue
+      if (year && techcardValue && techcardValue.trim() !== "" && cropsData.length > 0 && isCropsDataValid) {
         await fetchDashboardData();
         
         // Уведомляем родительский компонент об изменении выбора
@@ -184,7 +195,7 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
     };
     
     loadDashboardData();
-  }, [checked, checkedFields, year, cropsData]);
+  }, [checked, checkedFields, year, cropsData, techcardValue]);
 
 
   const handleCheckboxChange = (cropId) => {
