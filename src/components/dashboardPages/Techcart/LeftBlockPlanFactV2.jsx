@@ -18,8 +18,9 @@ import {
   IconButton
 } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import { ExpandMore, ExpandLess, Info } from "@mui/icons-material";
 import { httpService } from "../../../api/setup";
+import FieldDetailModal from "./FieldDetailModal";
 
 const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
   const [techcardValue, setTechcardValue] = useState("");
@@ -28,6 +29,8 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
   const [expandedRows, setExpandedRows] = useState({});
   const [cropsData, setCropsData] = useState([]);
   const [planTypes, setPlanTypes] = useState([]);
+  const [openFieldDetailModal, setOpenFieldDetailModal] = useState(false);
+  const [selectedStructureId, setSelectedStructureId] = useState(null);
   // Ref для отслеживания techcardValue, для которого были загружены cropsData
   const cropsDataForTechcardRef = useRef("");
 
@@ -466,6 +469,16 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
                                 <Typography variant="caption">
                                   {field.name}
                                 </Typography>
+                                <IconButton
+                                  size={"small"}
+                                  sx={{ padding: "2px", marginLeft: "auto", minWidth: "20px", width: "20px", height: "20px" }}
+                                  onClick={() => {
+                                    setSelectedStructureId(field.id);
+                                    setOpenFieldDetailModal(true);
+                                  }}
+                                >
+                                  <Info fontSize="small"/>
+                                </IconButton>
                               </Box>
                             ))}
                           </Box>
@@ -518,6 +531,17 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
           </Table>
                 </TableContainer>
       </Box>
+
+      {/* Модальное окно с детальной информацией о поле */}
+      <FieldDetailModal
+        open={openFieldDetailModal}
+        onClose={() => {
+          setOpenFieldDetailModal(false);
+          setSelectedStructureId(null);
+        }}
+        structureId={selectedStructureId}
+        year={year}
+      />
     </Box>
   );
 };
