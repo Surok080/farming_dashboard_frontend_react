@@ -93,7 +93,7 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
     };
 
     const formatNumber = (num) => {
-        return new Intl.NumberFormat("ru-RU").format(num);
+        return new Intl.NumberFormat("ru-RU").format(Math.round(num));
     };
 
     // Функция для получения деталей по категории
