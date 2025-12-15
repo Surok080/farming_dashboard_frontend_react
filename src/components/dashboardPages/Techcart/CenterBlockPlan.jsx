@@ -405,6 +405,8 @@ const CenterBlockPlan = ({data}) => {
                     >
                         <BarChart
                             height={300}
+                            skipAnimation={true}
+                            disableAxisListener={true}
                             margin={{ // Добавляем отступы для осей
                                 left: 20, // Увеличиваем место для подписей Y
                                 right: 20,
