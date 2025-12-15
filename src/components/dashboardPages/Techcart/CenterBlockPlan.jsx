@@ -1,5 +1,5 @@
 import {Box, Typography} from "@mui/material";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useMemo} from "react";
 import {BarChart} from "@mui/x-charts/BarChart";
 
 const CenterBlockPlan = ({data}) => {
@@ -32,15 +32,32 @@ const CenterBlockPlan = ({data}) => {
         }
     }, [data]);
 
-    const xLabels = [0, 1, 2, 3, 4, 5];
-    const xAxisLabels = [
+    // Мемоизация массивов для оптимизации производительности
+    const xLabels = useMemo(() => [0, 1, 2, 3, 4, 5], []);
+    const xAxisLabels = useMemo(() => [
         "Семена",
         "Удобрения",
         "СХЗР",
         "ГСМ",
         "Оплата труда",
         "Прочие затраты",
-    ];
+    ], []);
+
+    // Мемоизация данных для серий графика
+    const chartSeries = useMemo(() => [
+        {
+            data: safeUData,
+            label: "План",
+            color: "#82F865",
+            type: "bar",
+        },
+        {
+            data: safeXData,
+            label: "Факт",
+            color: "#D9D9D9",
+            type: "bar",
+        },
+    ], [safeUData, safeXData]);
 
     return (
         <Box display={"flex"} flexDirection={"column"} gap={1} minHeight={"100%"}>
@@ -402,20 +419,7 @@ const CenterBlockPlan = ({data}) => {
                                     transform: "translate(-10px, 0)" // Сдвигаем подпись оси Y влево
                                 }
                             }}
-                            series={[
-                                {
-                                    data: safeUData,
-                                    label: "План",
-                                    color: "#82F865",
-                                    type: "bar",
-                                },
-                                {
-                                    data: safeXData,
-                                    label: "Факт",
-                                    color: "#D9D9D9",
-                                    type: "bar",
-                                },
-                            ]}
+                            series={chartSeries}
                             xAxis={[
                                 {
                                     data: xLabels,

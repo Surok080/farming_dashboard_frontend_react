@@ -11,7 +11,7 @@ import {
     Modal,
     Button
 } from "@mui/material";
-import React, {useState} from "react";
+import React, {useState, useEffect, useMemo, useRef} from "react";
 import {BarChart} from "@mui/x-charts/BarChart";
 import {httpService} from "../../../api/setup";
 
@@ -20,6 +20,8 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [detailsData, setDetailsData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [chartHeight, setChartHeight] = useState(400);
+    const chartContainerRef = useRef(null);
 
     // Данные из API
     const totalCostsData = dashboardData?.summary ? {
@@ -84,13 +86,13 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
         {category: "Прочие затраты", plan: 0, fact: 0, percentage: 0}
     ];
 
-    // Данные для графика
-    const chartData = {
+    // Мемоизация данных для графика для оптимизации производительности
+    const chartData = useMemo(() => ({
         plan: materialCostsData.map(item => item.plan),
         fact: materialCostsData.map(item => item.fact),
         percentages: materialCostsData.map(item => item.percentage),
         categories: materialCostsData.map(item => item.category)
-    };
+    }), [materialCostsData]);
 
     const formatNumber = (num) => {
         return new Intl.NumberFormat("ru-RU").format(Math.round(num));
@@ -152,8 +154,47 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
         }
     };
 
+    // Вычисление высоты графика асинхронно через useEffect для оптимизации производительности
+    useEffect(() => {
+        const calculateChartHeight = () => {
+            // Используем requestAnimationFrame для отложенного вычисления после рендера
+            requestAnimationFrame(() => {
+                if (chartContainerRef.current) {
+                    // Вычисляем высоту на основе контейнера, а не всего документа
+                    const containerHeight = chartContainerRef.current.offsetHeight;
+                    const calculatedHeight = Math.max(300, containerHeight - 100);
+                    setChartHeight(calculatedHeight);
+                } else {
+                    // Fallback: используем высоту окна, если контейнер еще не готов
+                    const windowHeight = window.innerHeight;
+                    const calculatedHeight = Math.max(300, windowHeight - 680);
+                    setChartHeight(calculatedHeight);
+                }
+            });
+        };
 
-    const h = document.documentElement.scrollHeight - 680;
+        // Вычисляем высоту при монтировании и изменении данных
+        calculateChartHeight();
+
+        // Обработчик изменения размера окна
+        const handleResize = () => {
+            calculateChartHeight();
+        };
+
+        // Используем debounce для оптимизации обработки resize
+        let resizeTimeout;
+        const debouncedResize = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(handleResize, 150);
+        };
+
+        window.addEventListener('resize', debouncedResize);
+
+        return () => {
+            window.removeEventListener('resize', debouncedResize);
+            clearTimeout(resizeTimeout);
+        };
+    }, [dashboardData]);
     return (
         <Box display={"flex"} flexDirection={"column"} gap={2} minHeight={"100%"}>
             {/* Верхние блоки - расположены горизонтально */}
@@ -516,9 +557,12 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
                         План-фактный анализ по затратам, в руб.
                     </Typography>
                 </Box>
-                <Box sx={{padding: "16px", height: "100%", position: "relative"}}>
+                <Box 
+                    ref={chartContainerRef}
+                    sx={{padding: "16px", height: "100%", position: "relative"}}
+                >
                     <BarChart
-                        height={h}
+                        height={chartHeight}
                         margin={{
                             left: 10,
                             right: 10,
