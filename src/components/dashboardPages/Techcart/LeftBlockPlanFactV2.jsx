@@ -154,6 +154,10 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
         setCropsData([]);
         // Сбрасываем ref, чтобы предотвратить запросы со старыми данными
         cropsDataForTechcardRef.current = "";
+        // Сбрасываем dashboardData при изменении типа плана, чтобы график не показывал старые данные
+        if (onDataReceived) {
+          onDataReceived(null);
+        }
         await fetchCulturesData();
       }
     };
@@ -338,6 +342,10 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
               // Сбрасываем выбор при смене типа плана
               setChecked([]);
               setCheckedFields([]);
+              // Сбрасываем dashboardData при смене типа плана, чтобы график не показывал старые данные
+              if (onDataReceived) {
+                onDataReceived(null);
+              }
             }}
           >
             {planTypes.map((planType) => (
