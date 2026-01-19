@@ -131,8 +131,9 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year, onFieldClick, isM
               >
                 <Tooltip key={`${item.properties.id}-${tooltipKey}`} permanent={false} sticky={false}>
                   <Typography>
-                    {item.properties.crop.charAt(0).toUpperCase() +
-                      item.properties.crop.slice(1)}
+                    {item.properties.crop 
+                      ? item.properties.crop.charAt(0).toUpperCase() + item.properties.crop.slice(1)
+                      : item.properties.name || 'Поле'}
                   </Typography>
                   <Typography>{item.properties.area} га</Typography>
                   {

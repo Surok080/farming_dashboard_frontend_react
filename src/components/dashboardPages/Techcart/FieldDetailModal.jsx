@@ -22,6 +22,54 @@ import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { httpService } from "../../../api/setup";
 
+// Функция для вычисления bounding box из SVG path данных
+const getPathBounds = (pathData) => {
+  if (!pathData) return null;
+  
+  try {
+    // Извлекаем все числа, включая отрицательные и десятичные
+    // Регулярное выражение ищет числа в формате: -123.456 или +123.456 или 123.456
+    const numbers = pathData.match(/[-+]?(?:\d+\.?\d*|\.\d+)/g);
+    if (!numbers || numbers.length < 2) return null;
+    
+    const coords = numbers.map(Number).filter(n => !isNaN(n));
+    if (coords.length < 2) return null;
+    
+    // Находим минимальные и максимальные значения для X и Y
+    let minX = coords[0];
+    let maxX = coords[0];
+    let minY = coords[1] !== undefined ? coords[1] : coords[0];
+    let maxY = coords[1] !== undefined ? coords[1] : coords[0];
+    
+    // Обрабатываем координаты парами (x, y)
+    for (let i = 0; i < coords.length - 1; i += 2) {
+      const x = coords[i];
+      const y = coords[i + 1];
+      if (x !== undefined && !isNaN(x) && y !== undefined && !isNaN(y)) {
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+      }
+    }
+    
+    // Проверяем, что получились валидные размеры
+    if (isNaN(minX) || isNaN(maxX) || isNaN(minY) || isNaN(maxY)) {
+      return null;
+    }
+    
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
+  } catch (error) {
+    console.error("Ошибка при вычислении границ SVG path:", error);
+    return null;
+  }
+};
+
 const FieldDetailModal = ({ open, onClose, structureId, year }) => {
   const [loading, setLoading] = useState(false);
   const [fieldData, setFieldData] = useState(null);
@@ -138,15 +186,71 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
                   border: "1px solid rgba(76, 175, 80, 0.2)",
                 }}
               >
-                <Box
-                  sx={{
-                    width: "12px",
-                    height: "12px",
-                    borderRadius: "2px",
-                    backgroundColor: "#4caf50",
-                    flexShrink: 0,
-                  }}
-                />
+                {fieldData.svg ? (() => {
+                  const bounds = getPathBounds(fieldData.svg);
+                  
+                  if (!bounds) {
+                    // Если не удалось вычислить границы, показываем квадратик
+                    return (
+                      <Box
+                        sx={{
+                          width: "12px",
+                          height: "12px",
+                          borderRadius: "2px",
+                          backgroundColor: "#4caf50",
+                          flexShrink: 0,
+                        }}
+                      />
+                    );
+                  }
+                  
+                  // Вычисляем viewBox с небольшим отступом для лучшей видимости
+                  const padding = Math.max(bounds.width, bounds.height) * 0.02;
+                  const viewBox = `${bounds.x - padding} ${bounds.y - padding} ${bounds.width + padding * 2} ${bounds.height + padding * 2}`;
+                  
+                  return (
+                    <Box
+                      sx={{
+                        width: "40px",
+                        height: "40px",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        overflow: "hidden",
+                        border: "1px solid rgba(76, 175, 80, 0.2)",
+                        borderRadius: "4px",
+                        backgroundColor: "rgba(76, 175, 80, 0.05)",
+                      }}
+                    >
+                      <svg
+                        viewBox={viewBox}
+                        preserveAspectRatio="xMidYMid meet"
+                        style={{ 
+                          width: "100%", 
+                          height: "100%",
+                          display: "block"
+                        }}
+                      >
+                        <path 
+                          d={fieldData.svg} 
+                          fill="#4caf50"
+                          fillOpacity="0.6"
+                        />
+                      </svg>
+                    </Box>
+                  );
+                })() : (
+                  <Box
+                    sx={{
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "2px",
+                      backgroundColor: "#4caf50",
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
                 <Typography
                   variant="body2"
                   sx={{ fontWeight: 500, fontSize: "0.875rem", flexGrow: 1 }}
