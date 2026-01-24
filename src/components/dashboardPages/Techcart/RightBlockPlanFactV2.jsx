@@ -562,6 +562,7 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
                     sx={{padding: "16px", height: "100%", position: "relative"}}
                 >
                     <BarChart
+                        key={`chart-${planType}-${year}`}
                         height={chartHeight}
                         margin={{
                             left: 10,
