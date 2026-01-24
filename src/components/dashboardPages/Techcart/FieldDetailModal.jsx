@@ -3,6 +3,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
+  DialogContentText,
   Box,
   Typography,
   IconButton,
@@ -17,10 +19,19 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import { httpService } from "../../../api/setup";
+import { useSnackbar } from "notistack";
 
 // Функция для вычисления bounding box из SVG path данных
 const getPathBounds = (pathData) => {
@@ -78,7 +89,37 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
   const [expandedFertilizer, setExpandedFertilizer] = useState(true);
   const [expandedSevooborot, setExpandedSevooborot] = useState(true);
   const [expandedShzr, setExpandedShzr] = useState(true);
+  
+  // Состояния для добавления записи севооборота
+  const [sevooborotData, setSevooborotData] = useState({ years: [], crops: [] });
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedCropId, setSelectedCropId] = useState("");
+  const [addingSevooborot, setAddingSevooborot] = useState(false);
+  const [deletingSevooborot, setDeletingSevooborot] = useState(null);
+  
+  // Состояния для модального окна подтверждения удаления
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [sevooborotToDelete, setSevooborotToDelete] = useState(null);
+  const [sevooborotToDeleteInfo, setSevooborotToDeleteInfo] = useState(null);
+  
+  const { enqueueSnackbar } = useSnackbar();
 
+  // Загрузка данных для селектов (годы и культуры)
+  useEffect(() => {
+    if (open) {
+      const fetchSevooborotData = async () => {
+        try {
+          const response = await httpService.get('/plan_fact_v2/sevooborot');
+          setSevooborotData(response.data || { years: [], crops: [] });
+        } catch (err) {
+          console.error("Ошибка при получении данных для севооборота:", err);
+        }
+      };
+      fetchSevooborotData();
+    }
+  }, [open]);
+
+  // Загрузка данных поля
   useEffect(() => {
     if (open && structureId && year) {
       const fetchFieldDetail = async () => {
@@ -108,8 +149,119 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
       // Сбрасываем данные при закрытии модального окна
       setFieldData(null);
       setError(null);
+      setSelectedYear("");
+      setSelectedCropId("");
     }
   }, [open, structureId, year]);
+
+  // Сброс выбранного года, если он больше не доступен (уже используется в севообороте)
+  useEffect(() => {
+    if (fieldData?.sevooborot && selectedYear) {
+      const usedYears = fieldData.sevooborot.map(item => item.year);
+      if (usedYears.includes(parseInt(selectedYear))) {
+        setSelectedYear("");
+      }
+    }
+  }, [fieldData?.sevooborot, selectedYear]);
+
+  // Функция для обновления данных поля
+  const refreshFieldData = async () => {
+    if (!structureId || !year) return;
+    
+    try {
+      const response = await httpService.get(
+        `/plan_fact_v2/detail_field/${structureId}`,
+        {
+          params: {
+            year: year,
+          },
+        }
+      );
+      setFieldData(response.data);
+    } catch (err) {
+      console.error("Ошибка при обновлении данных поля:", err);
+    }
+  };
+
+  // Функция добавления записи севооборота
+  const handleAddSevooborot = async () => {
+    if (!selectedYear || !selectedCropId || !structureId) {
+      enqueueSnackbar("Пожалуйста, выберите год и культуру", {
+        variant: "warning",
+      });
+      return;
+    }
+
+    setAddingSevooborot(true);
+    try {
+      await httpService.post('/plan_fact_v2/sevooborot', {
+        structure_id: structureId,
+        year: parseInt(selectedYear),
+        crop_id: parseInt(selectedCropId),
+      });
+      
+      enqueueSnackbar("Запись успешно добавлена", {
+        variant: "success",
+      });
+      
+      // Очищаем форму
+      setSelectedYear("");
+      setSelectedCropId("");
+      
+      // Обновляем данные
+      await refreshFieldData();
+    } catch (err) {
+      console.error("Ошибка при добавлении записи севооборота:", err);
+      enqueueSnackbar("Ошибка при добавлении записи", {
+        variant: "error",
+      });
+    } finally {
+      setAddingSevooborot(false);
+    }
+  };
+
+  // Функция открытия модального окна подтверждения удаления
+  const handleDeleteSevooborot = (sevooborotId, row) => {
+    if (!sevooborotId) return;
+    setSevooborotToDelete(sevooborotId);
+    setSevooborotToDeleteInfo(row);
+    setConfirmDeleteOpen(true);
+  };
+
+  // Функция закрытия модального окна подтверждения
+  const handleCloseConfirmDelete = () => {
+    setConfirmDeleteOpen(false);
+    setSevooborotToDelete(null);
+    setSevooborotToDeleteInfo(null);
+  };
+
+  // Функция фактического удаления записи севооборота
+  const confirmDeleteSevooborot = async () => {
+    if (!sevooborotToDelete) return;
+
+    setDeletingSevooborot(sevooborotToDelete);
+    try {
+      // DELETE запрос на /plan_fact_v2/sevooborot/{sevooborot_id}
+      await httpService.delete(`/plan_fact_v2/sevooborot/${sevooborotToDelete}`);
+      
+      enqueueSnackbar("Запись успешно удалена", {
+        variant: "success",
+      });
+      
+      // Обновляем данные
+      await refreshFieldData();
+      
+      // Закрываем модальное окно
+      handleCloseConfirmDelete();
+    } catch (err) {
+      console.error("Ошибка при удалении записи севооборота:", err);
+      enqueueSnackbar("Ошибка при удалении записи", {
+        variant: "error",
+      });
+    } finally {
+      setDeletingSevooborot(null);
+    }
+  };
 
 
   return (
@@ -368,57 +520,165 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
                       Севооборот
                     </Typography>
                   </AccordionSummary>
-                  <AccordionDetails sx={{ px: 2, pb: 2, pt: 0 }}>
-                    {fieldData.sevooborot && fieldData.sevooborot.length > 0 ? (
-                      <TableContainer
-                        component={Paper}
+                  <AccordionDetails sx={{ px: 2, pb: 1.5, pt: 0 }}>
+                    <Box display="flex" flexDirection="column" gap={1}>
+                      {/* Форма добавления новой записи */}
+                      <Box
                         sx={{
-                          maxHeight: 300,
-                          boxShadow: "none",
-                          border: "none",
+                          p: 1,
+                          backgroundColor: "#f5f5f5",
+                          borderRadius: 1,
+                          border: "1px solid #e0e0e0",
                         }}
                       >
-                        <Table size="small" sx={{ "& .MuiTableCell-root": { borderBottom: "1px solid #f0f0f0" } }}>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 600, fontSize: "0.8rem", py: 1 }}>
-                                Год
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 600, fontSize: "0.8rem", py: 1 }}>
-                                Культура
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {fieldData.sevooborot.map((row, index) => (
-                              <TableRow
-                                key={index}
-                                sx={{
-                                  "&:hover": {
-                                    backgroundColor: "rgba(0, 0, 0, 0.02)",
-                                  },
-                                }}
-                              >
-                                <TableCell sx={{ fontSize: "0.8rem", py: 1 }}>
-                                  {row.year || "-"}
+                        <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
+                          {(() => {
+                            // Получаем список годов, которые уже используются в севообороте
+                            const usedYears = fieldData?.sevooborot?.map(item => parseInt(item.year)) || [];
+                            // Фильтруем доступные годы, исключая уже использованные
+                            const availableYears = sevooborotData.years.filter(year => !usedYears.includes(year));
+                            
+                            return (
+                              <FormControl size="small" sx={{ minWidth: 100, flex: "0 0 auto", width: "100%" }} >
+                                <InputLabel  id="sevooborot-year-label" sx={{ fontSize: "0.75rem" }}>
+                                  Год
+                                </InputLabel>
+                                <Select
+                                    fullWidth
+                                  labelId="sevooborot-year-label"
+                                  id="sevooborot-year"
+                                  value={selectedYear}
+                                  label="Год"
+                                  onChange={(e) => setSelectedYear(e.target.value)}
+                                  sx={{ fontSize: "0.8rem", height: "32px" }}
+                                >
+                                  {availableYears.length > 0 ? (
+                                    availableYears.map((year) => (
+                                      <MenuItem key={year} value={year} sx={{ fontSize: "0.8rem" }}>
+                                        {year}
+                                      </MenuItem>
+                                    ))
+                                  ) : (
+                                    <MenuItem disabled sx={{ fontSize: "0.8rem" }}>
+                                      Нет доступных годов
+                                    </MenuItem>
+                                  )}
+                                </Select>
+                              </FormControl>
+                            );
+                          })()}
+                          <FormControl size="small" sx={{ minWidth: 150, flex: 1 }}>
+                            <InputLabel id="sevooborot-crop-label" sx={{ fontSize: "0.75rem" }}>
+                              Культура
+                            </InputLabel>
+                            <Select
+                              labelId="sevooborot-crop-label"
+                              id="sevooborot-crop"
+                              value={selectedCropId}
+                              label="Культура"
+                              onChange={(e) => setSelectedCropId(e.target.value)}
+                              sx={{ fontSize: "0.8rem", height: "32px" }}
+                            >
+                              {sevooborotData.crops.map((crop) => (
+                                <MenuItem key={crop.id} value={crop.id} sx={{ fontSize: "0.8rem" }}>
+                                  {crop.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            startIcon={<AddIcon sx={{ fontSize: "1rem" }} />}
+                            onClick={handleAddSevooborot}
+                            disabled={addingSevooborot || !selectedYear || !selectedCropId}
+                            sx={{
+                              backgroundColor: "#62A65D",
+                              "&:hover": { backgroundColor: "#4caf50" },
+                              fontSize: "0.75rem",
+                              minWidth: "auto",
+                              px: 1.5,
+                              height: "32px",
+                            }}
+                          >
+                            {addingSevooborot ? "..." : "Добавить"}
+                          </Button>
+                        </Box>
+                      </Box>
+
+                      {/* Таблица записей */}
+                      {fieldData.sevooborot && fieldData.sevooborot.length > 0 ? (
+                        <TableContainer
+                          component={Paper}
+                          sx={{
+                            maxHeight: 250,
+                            boxShadow: "none",
+                            border: "none",
+                          }}
+                        >
+                          <Table size="small" sx={{ "& .MuiTableCell-root": { borderBottom: "1px solid #f0f0f0" } }}>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600, fontSize: "0.75rem", py: 0.5, px: 1 }}>
+                                  Год
                                 </TableCell>
-                                <TableCell sx={{ fontSize: "0.8rem", py: 1 }}>
-                                  {row.culture_name || "-"}
+                                <TableCell sx={{ fontWeight: 600, fontSize: "0.75rem", py: 0.5, px: 1 }}>
+                                  Культура
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600, fontSize: "0.75rem", py: 0.5, px: 1, width: 50 }}>
+                                  Действия
                                 </TableCell>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    ) : (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ fontStyle: "italic", fontSize: "0.85rem" }}
-                      >
-                        История севооборота недоступна
-                      </Typography>
-                    )}
+                            </TableHead>
+                            <TableBody>
+                              {fieldData.sevooborot.map((row, index) => {
+                                // Используем sevooborot_id или id в зависимости от того, что возвращает API
+                                const sevooborotId = row.sevooborot_id || row.id;
+                                return (
+                                  <TableRow
+                                    key={sevooborotId || index}
+                                    sx={{
+                                      "&:hover": {
+                                        backgroundColor: "rgba(0, 0, 0, 0.02)",
+                                      },
+                                    }}
+                                  >
+                                    <TableCell sx={{ fontSize: "0.75rem", py: 0.5, px: 1 }}>
+                                      {row.year || "-"}
+                                    </TableCell>
+                                    <TableCell sx={{ fontSize: "0.75rem", py: 0.5, px: 1 }}>
+                                      {row.culture_name || "-"}
+                                    </TableCell>
+                                    <TableCell sx={{ fontSize: "0.75rem", py: 0.5, px: 1 }}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleDeleteSevooborot(sevooborotId, row)}
+                                        disabled={deletingSevooborot === sevooborotId}
+                                      sx={{
+                                        color: "#d32f2f",
+                                        padding: "4px",
+                                        "&:hover": { backgroundColor: "rgba(211, 47, 47, 0.1)" },
+                                      }}
+                                    >
+                                      <DeleteIcon sx={{ fontSize: "1rem" }} />
+                                    </IconButton>
+                                  </TableCell>
+                                </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontStyle: "italic", fontSize: "0.85rem" }}
+                        >
+                          История севооборота недоступна
+                        </Typography>
+                      )}
+                    </Box>
                   </AccordionDetails>
                 </Accordion>
               </Box>
@@ -606,6 +866,52 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
           </Box>
         )}
       </DialogContent>
+      
+      {/* Модальное окно подтверждения удаления */}
+      <Dialog
+        open={confirmDeleteOpen}
+        onClose={handleCloseConfirmDelete}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Вы уверены, что хотите удалить запись?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {sevooborotToDeleteInfo && (
+              <>
+                Запись севооборота будет удалена безвозвратно:
+                <br />
+                <strong>Год: {sevooborotToDeleteInfo.year}</strong>
+                <br />
+                <strong>Культура: {sevooborotToDeleteInfo.culture_name}</strong>
+                <br />
+                <br />
+                Вы уверены, что хотите это сделать?
+              </>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={handleCloseConfirmDelete}
+            disabled={deletingSevooborot !== null}
+          >
+            Отмена
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={confirmDeleteSevooborot}
+            disabled={deletingSevooborot !== null}
+            autoFocus
+          >
+            {deletingSevooborot !== null ? "Удаление..." : "Удалить"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
