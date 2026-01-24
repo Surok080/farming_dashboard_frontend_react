@@ -81,7 +81,7 @@ const getPathBounds = (pathData) => {
   }
 };
 
-const FieldDetailModal = ({ open, onClose, structureId, year }) => {
+const FieldDetailModal = ({ open, onClose, structureId, year, planType }) => {
   const [loading, setLoading] = useState(false);
   const [fieldData, setFieldData] = useState(null);
   const [error, setError] = useState(null);
@@ -121,7 +121,7 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
 
   // Загрузка данных поля
   useEffect(() => {
-    if (open && structureId && year) {
+    if (open && structureId && year && planType) {
       const fetchFieldDetail = async () => {
         setLoading(true);
         setError(null);
@@ -132,6 +132,7 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
             {
               params: {
                 year: year,
+                plan_type: planType,
               },
             }
           );
@@ -152,7 +153,7 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
       setSelectedYear("");
       setSelectedCropId("");
     }
-  }, [open, structureId, year]);
+  }, [open, structureId, year, planType]);
 
   // Сброс выбранного года, если он больше не доступен (уже используется в севообороте)
   useEffect(() => {
@@ -166,7 +167,7 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
 
   // Функция для обновления данных поля
   const refreshFieldData = async () => {
-    if (!structureId || !year) return;
+    if (!structureId || !year || !planType) return;
     
     try {
       const response = await httpService.get(
@@ -174,6 +175,7 @@ const FieldDetailModal = ({ open, onClose, structureId, year }) => {
         {
           params: {
             year: year,
+            plan_type: planType,
           },
         }
       );
