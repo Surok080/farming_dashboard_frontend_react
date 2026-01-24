@@ -549,6 +549,7 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
         }}
         structureId={selectedStructureId}
         year={year}
+        planType={techcardValue}
       />
     </Box>
   );
