@@ -40,8 +40,9 @@ const MapSidebar = ({
                         year,
                         tabValue,
                         onTabChange,
+                        hideStructure = false,
                     }) => {
-    const isStructureTab = tabValue === "2";
+    const isStructureTab = !hideStructure && tabValue === "2";
     const sidebarWidth = hideMenu 
         ? "0px" 
         : isStructureTab 
@@ -50,11 +51,11 @@ const MapSidebar = ({
                 ? "300px" 
             : "400px";
     
-    // Загрузка данных для вкладки "Структура"
+    // Загрузка данных для вкладки "Структура" (только если вкладка доступна)
     const [structureReportData, setStructureReportData] = useState(null);
     
     useEffect(() => {
-        if (tabValue === "2" && year) {
+        if (!hideStructure && tabValue === "2" && year) {
             httpService.get(`/fields_v2/report?year=${year}`)
                 .then((res) => {
                     if (res.status && res.status === 200) {
@@ -67,7 +68,57 @@ const MapSidebar = ({
                     setStructureReportData(null);
                 });
         }
-    }, [tabValue, year]);
+    }, [hideStructure, tabValue, year]);
+
+    const fieldsPanelContent = (
+        <>
+            <FormControl  sx={{marginTop: "20px"}} fullWidth>
+                <InputLabel id="grouping-select-label">Группировка</InputLabel>
+                <Select
+                    labelId="grouping-select-label"
+                    id="grouping-select"
+                    value={grouping}
+                    label="Группировка"
+                    onChange={onGroupingChange}
+                    size="small"
+                >
+                    <MenuItem value="crop">По культуре</MenuItem>
+                    <MenuItem value="crop_group">По группе</MenuItem>
+                </Select>
+            </FormControl>
+
+            <TextField
+                size="small"
+                sx={{marginTop: "20px"}}
+                onChange={(e) => onSearchChange(e.target.value)}
+                fullWidth
+                id="search-field"
+                label="Поиск"
+                variant="outlined"
+            />
+
+            <Box
+                display="flex"
+                flexDirection="column"
+                overflow="hidden"
+                sx={{overflowY: "scroll"}}
+            >
+                {layerSearch?.length ? (
+                    <ListArea
+                        layer={layerSearch}
+                        setActiveArea={setActiveArea}
+                        setDeleteIdArea={setDeleteIdArea}
+                        handleOpenConfirmDelete={handleOpenConfirmDelete}
+                        grouping={grouping}
+                        onFieldClick={onFieldClick}
+                        setHoveredFieldId={setHoveredFieldId}
+                    />
+                ) : (
+                    <p>Нет данных</p>
+                )}
+            </Box>
+        </>
+    );
 
     return (
         <Box
@@ -105,132 +156,104 @@ const MapSidebar = ({
                     width: "100%",
                     typography: "body1",
                     height: "100%",
-                    overflow: tabValue === "2" ? "visible" : "hidden",
+                    overflow: hideStructure ? "hidden" : (tabValue === "2" ? "visible" : "hidden"),
                 }}
             >
-                <TabContext value={tabValue}>
-                    <TabList
-                        textColor="primary"
-                        onChange={onTabChange}
-                        aria-label="lab API tabs example"
-                        sx={{
-                            '& .MuiTabs-indicator': {
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                height: '2px',
-                            },
-                            '& .MuiTab-root': {
-                                minWidth: 'auto',
-                                padding: '12px 24px',
-                                flex: '0 1 auto',
-                            },
-                            '& .MuiTabs-flexContainer': {
-                                justifyContent: 'flex-start',
-                            },
-                        }}
-                    >
-                        <Tab label="Поля" value="1"/>
-                        <Tab label="Структура" value="2"/>
-                    </TabList>
-
-                    <TabPanel
+                {hideStructure ? (
+                    <Box
                         sx={{
                             display: "flex",
                             flexDirection: "column",
                             maxHeight: "96%",
+                            height: "100%",
                             [defaultTheme.breakpoints.down("lg")]: {
                                 padding: "10px 5px"
                             },
-
                         }}
-                        value="1"
                     >
-                        <FormControl fullWidth>
-                            <InputLabel id="grouping-select-label">Группировка</InputLabel>
-                            <Select
-                                labelId="grouping-select-label"
-                                id="grouping-select"
-                                value={grouping}
-                                label="Группировка"
-                                onChange={onGroupingChange}
-                                size="small"
+                        {fieldsPanelContent}
+                    </Box>
+                ) : (
+                    <TabContext value={tabValue}>
+                        <TabList
+                            textColor="primary"
+                            onChange={onTabChange}
+                            aria-label="lab API tabs example"
+                            sx={{
+                                '& .MuiTabs-indicator': {
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    height: '2px',
+                                },
+                                '& .MuiTab-root': {
+                                    minWidth: 'auto',
+                                    padding: '12px 24px',
+                                    flex: '0 1 auto',
+                                },
+                                '& .MuiTabs-flexContainer': {
+                                    justifyContent: 'flex-start',
+                                },
+                            }}
+                        >
+                            <Tab label="Поля" value="1"/>
+                            <Tab label="Структура" value="2"/>
+                        </TabList>
+
+                        <TabPanel
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                maxHeight: "96%",
+                                [defaultTheme.breakpoints.down("lg")]: {
+                                    padding: "10px 5px"
+                                },
+
+                            }}
+                            value="1"
+                        >
+                            {fieldsPanelContent}
+                        </TabPanel>
+
+                        <TabPanel 
+                            sx={{
+                                marginTop: "-40px",
+                                padding: "0",
+                                height: "100%",
+                                display: "flex",
+                                gap: "10px",
+                                overflow: "visible",
+                                position: "relative",
+                            }} 
+                            value="2"
+                        >
+                            {/* Левый блок - 60% */}
+                            <Box
+                                sx={{
+                                    width: "60%",
+                                    height: "100%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    overflow: "auto",
+                                    paddingBottom: "150px",
+                                }}
                             >
-                                <MenuItem value="crop">По культуре</MenuItem>
-                                <MenuItem value="crop_group">По группе</MenuItem>
-                            </Select>
-                        </FormControl>
+                                <StructureContent key={`structure-${tabValue}-${year}`} year={year} reportData={structureReportData} />
+                            </Box>
 
-                        <TextField
-                            size="small"
-                            sx={{marginTop: "20px"}}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                            fullWidth
-                            id="search-field"
-                            label="Поиск"
-                            variant="outlined"
-                        />
-
-                        <Box
-                            display="flex"
-                            flexDirection="column"
-                            overflow="hidden"
-                            sx={{overflowY: "scroll"}}
-                        >
-                            {layerSearch?.length ? (
-                                <ListArea
-                                    layer={layerSearch}
-                                    setActiveArea={setActiveArea}
-                                    setDeleteIdArea={setDeleteIdArea}
-                                    handleOpenConfirmDelete={handleOpenConfirmDelete}
-                                    grouping={grouping}
-                                    onFieldClick={onFieldClick}
-                                    setHoveredFieldId={setHoveredFieldId}
-                                />
-                            ) : (
-                                <p>Нет данных</p>
-                            )}
-                        </Box>
-                    </TabPanel>
-
-                    <TabPanel 
-                        sx={{
-                            marginTop: "-40px",
-                            padding: "0",
-                            height: "100%",
-                            display: "flex",
-                            gap: "10px",
-                            overflow: "visible",
-                            position: "relative",
-                        }} 
-                        value="2"
-                    >
-                        {/* Левый блок - 60% */}
-                        <Box
-                            sx={{
-                                width: "60%",
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
-                                overflow: "auto",
-                                paddingBottom: "150px",
-                            }}
-                        >
-                            <StructureContent key={`structure-${tabValue}-${year}`} year={year} reportData={structureReportData} />
-                        </Box>
-
-                        {/* Правый блок - 40% */}
-                        <Box
-                            sx={{
-                                width: "40%",
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
-                                overflow: "auto",
-                            }}
-                        >
-                            <StructureTable reportData={structureReportData} />
-                        </Box>
-                    </TabPanel>
-                </TabContext>
+                            {/* Правый блок - 40% */}
+                            <Box
+                                sx={{
+                                    width: "40%",
+                                    height: "100%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    overflow: "auto",
+                                }}
+                            >
+                                <StructureTable reportData={structureReportData} />
+                            </Box>
+                        </TabPanel>
+                    </TabContext>
+                )}
             </Box>
         </Box>
     );
