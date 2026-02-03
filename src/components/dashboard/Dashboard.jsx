@@ -48,8 +48,10 @@ export default function Dashboard() {
     const [year, setYear] = React.useState(localStorage.getItem('year') ?? new Date().getFullYear());
     const [allArea, setAllArea] = React.useState(null);
 
-    // Загрузка текущего года с сервера
     useEffect(() => {
+        if (localStorage.getItem('year')) {
+            return;
+        }
         httpService.get('/year')
             .then((res) => {
                 if (res?.status === 200 && res.data?.year) {
@@ -60,7 +62,6 @@ export default function Dashboard() {
             })
             .catch((error) => {
                 console.error('Ошибка при загрузке года:', error);
-                // В случае ошибки используем значение по умолчанию
             });
     }, []);
 
