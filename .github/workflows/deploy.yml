@@ -36,3 +36,4 @@ jobs:
           yarn build
           sudo scp -r build/* /var/www/html/dashboard/
           sudo rm -R node_modules
+          yarn cache clean
