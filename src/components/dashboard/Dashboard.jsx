@@ -49,12 +49,16 @@ export default function Dashboard() {
     const [allArea, setAllArea] = React.useState(null);
 
     useEffect(() => {
+        console.log('year')
         if (localStorage.getItem('year')) {
+            console.log('year localStorage')
             return;
         }
         httpService.get('/year')
             .then((res) => {
+                console.log('year res')
                 if (res?.status === 200 && res.data?.year) {
+                    console.log('year setYear')
                     const serverYear = res.data.year;
                     setYear(serverYear);
                     localStorage.setItem('year', serverYear.toString());
