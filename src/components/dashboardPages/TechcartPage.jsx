@@ -7,6 +7,7 @@ import FactComponent from "./Techcart/FactComponent";
 import PlanFactComponent from "./Techcart/PlanFactComponent";
 import PlanFactV2Component from "./Techcart/PlanFactV2Component";
 import PlanFactMap from "./Techcart/PlanFactMap";
+import PlanFactStructure from "./Techcart/PlanFactStructure";
 
 const TechcartPage = ({year}) => {
     const [value, setValue] = useState('1');
@@ -59,7 +60,7 @@ const TechcartPage = ({year}) => {
                     <TabList onChange={handleChange} aria-label="lab API tabs example">
                         <Tab sx={{color: 'black !important'}} label="План-Факт" value="1"/>
                         <Tab sx={{color: 'black !important'}} label="Карта-Полей" value="2"/>
-                        {/* <Tab sx={{color: 'black !important'}} label="Фактический" value="2"/> */}
+                        <Tab sx={{color: 'black !important'}} label="Структура" value="3"/>
                     </TabList>
                     {
                         value === '2' && <Typography sx={{position: "absolute", right: 0, top: 0}} variant={"body2"}>
@@ -92,9 +93,27 @@ const TechcartPage = ({year}) => {
                         </Box>
                     )}
                 </TabPanel>
-                {/* <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="3">
-                    <FactComponent year={year} fact={value === '3'}/>
-                </TabPanel> */}
+                <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="3">
+                    {hasPermission('plan_fact_v2') ? (
+                        <PlanFactStructure year={year} />
+                    ) : (
+                        <Box
+                            sx={{
+                                width: "100%",
+                                height: "100%",
+                                background: "#f0f0f0",
+                                padding: "10px 10px 18px 10px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Typography variant="h4" color="text.secondary">
+                                У вас нет доступа к разделу Структура
+                            </Typography>
+                        </Box>
+                    )}
+                </TabPanel>
             </TabContext>
         </Box>
     );

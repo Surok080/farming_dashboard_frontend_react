@@ -21,8 +21,8 @@ const ListArea = ({
 
     // Группировка данных
     const groupedData = useMemo(() => {
-        // Если группировка по культуре или урожайности - не группируем, показываем все поля в одном списке
-        if (grouping === 'crop' || grouping === 'productivity') {
+        // Без группировки или по урожайности — один список «Все поля»
+        if (grouping === 'all' || grouping === 'productivity') {
             return {
                 'all': {
                     groupName: 'Все поля',
@@ -30,43 +30,46 @@ const ListArea = ({
                 }
             };
         }
-        
-        // Если группировка по группе - группируем по группам культур
-        if (grouping === 'crop_group') {
+
+        // По культуре — группируем по культуре (Горох, Лен, Люцерна и т.д.)
+        if (grouping === 'crop') {
             const groups = {};
-            
             layer.forEach((item) => {
-                const cropGroup = item.properties.crop_group || 'Другие';
-                const groupKey = cropGroup;
-                const groupName = cropGroup;
-
+                const cultureName = item.properties?.crop_name || item.properties?.crop || 'Другие';
+                const groupKey = cultureName;
                 if (!groups[groupKey]) {
-                    groups[groupKey] = {
-                        groupName: groupName,
-                        items: []
-                    };
+                    groups[groupKey] = { groupName: cultureName, items: [] };
                 }
-
                 groups[groupKey].items.push(item);
             });
-
             return groups;
         }
 
-        // По умолчанию - без группировки
+        // По группе — группируем по группам культур
+        if (grouping === 'crop_group') {
+            const groups = {};
+            layer.forEach((item) => {
+                const cropGroup = item.properties?.crop_group || 'Другие';
+                const groupKey = cropGroup;
+                if (!groups[groupKey]) {
+                    groups[groupKey] = { groupName: cropGroup, items: [] };
+                }
+                groups[groupKey].items.push(item);
+            });
+            return groups;
+        }
+
+        // По умолчанию — один список
         return {
-            'all': {
-                groupName: 'Все поля',
-                items: layer
-            }
+            'all': { groupName: 'Все поля', items: layer }
         };
     }, [layer, grouping]);
 
     // Инициализируем состояние групп при изменении данных или группировки
     React.useEffect(() => {
         if (Object.keys(groupedData).length > 0) {
-            // При группировке по группе - все группы свернуты, иначе - развернуты
-            const defaultExpanded = grouping !== 'crop_group';
+            // При группировке по культуре или по группе — группы свернуты; иначе — развернуты
+            const defaultExpanded = grouping !== 'crop_group' && grouping !== 'crop';
             const updated = {};
             Object.keys(groupedData).forEach(key => {
                 updated[key] = defaultExpanded;
@@ -155,12 +158,12 @@ const ListArea = ({
                 {Object.keys(groupedData).map((groupKey) => {
                     const group = groupedData[groupKey];
                     const isExpanded = expandedGroups[groupKey] !== false;
-                    // Скрываем заголовок группы, если группировка по культуре или урожайности
-                    const showGroupHeader = grouping === 'crop_group';
+                    // Заголовок группы показываем при группировке по культуре или по группе
+                    const showGroupHeader = grouping === 'crop' || grouping === 'crop_group';
 
                     return (
                         <Box key={groupKey}>
-                            {/* Заголовок группы - показываем только при группировке по группе */}
+                            {/* Заголовок группы — при группировке по культуре или по группе */}
                             {showGroupHeader && (
                                 <Box
                                     sx={{
