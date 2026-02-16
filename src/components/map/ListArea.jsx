@@ -112,39 +112,45 @@ const ListArea = ({
     // Check if all items are selected
     const isAllSelected = layer.length === selectedItems.length;
 
+    // Режим без выбора и удаления (например, раздел "Карта-полей")
+    const hideSelectionAndDelete = setDeleteIdArea == null || handleOpenConfirmDelete == null;
+
     return (
         <>
-            <Box
-                sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    p: 0,
-                }}
-            >
-                <Box display={"flex"} gap={4} alignItems={"center"}>
-                    <Checkbox
-                        sx={{padding: 0, marginLeft: "-2px"}}
-                        edge="end"
-                        onChange={handleSelectAll}
-                        checked={isAllSelected}
-                        inputProps={{"aria-label": "select all areas"}}
-                    />
-                    <Typography variant="body">Выбрать все</Typography>
-                </Box>
-                <IconButton
-                    disabled={selectedItems?.length === 0}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        // e.preventDefault()
-                        setDeleteIdArea(selectedItems);
-                        handleOpenConfirmDelete();
-                    }}
-                >
-                    <DeleteForeverIcon/>
-                </IconButton>
-            </Box>
-            <Divider/>
+            {!hideSelectionAndDelete && (
+                <>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            p: 0,
+                        }}
+                    >
+                        <Box display={"flex"} gap={4} alignItems={"center"}>
+                            <Checkbox
+                                sx={{padding: 0, marginLeft: "-2px"}}
+                                edge="end"
+                                onChange={handleSelectAll}
+                                checked={isAllSelected}
+                                inputProps={{"aria-label": "select all areas"}}
+                            />
+                            <Typography variant="body">Выбрать все</Typography>
+                        </Box>
+                        <IconButton
+                            disabled={selectedItems?.length === 0}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteIdArea(selectedItems);
+                                handleOpenConfirmDelete();
+                            }}
+                        >
+                            <DeleteForeverIcon/>
+                        </IconButton>
+                    </Box>
+                    <Divider/>
+                </>
+            )}
             <List
                 sx={{
                     width: "100%",
@@ -208,14 +214,16 @@ const ListArea = ({
 
                                         return (
                                             <Box display={"flex"} key={index}>
-                                                <Checkbox
-                                                    edge="start"
-                                                    checked={selectedItems.indexOf(item.properties.id) !== -1}
-                                                    tabIndex={-1}
-                                                    disableRipple
-                                                    inputProps={{"aria-labelledby": labelId}}
-                                                    onChange={() => handleToggle(item.properties.id)}
-                                                />
+                                                {!hideSelectionAndDelete && (
+                                                    <Checkbox
+                                                        edge="start"
+                                                        checked={selectedItems.indexOf(item.properties.id) !== -1}
+                                                        tabIndex={-1}
+                                                        disableRipple
+                                                        inputProps={{"aria-labelledby": labelId}}
+                                                        onChange={() => handleToggle(item.properties.id)}
+                                                    />
+                                                )}
                                                 <ListItemButton
                                                     key={index}
                                                     style={{
@@ -281,16 +289,18 @@ const ListArea = ({
                                                     <Typography variant="caption">
                                                         {item.properties.area} га
                                                     </Typography>
-                                                    <IconButton
-                                                        disabled={selectedItems.indexOf(item.properties.id) !== -1}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setDeleteIdArea(item.properties.id);
-                                                            handleOpenConfirmDelete();
-                                                        }}
-                                                    >
-                                                        <DeleteForeverIcon/>
-                                                    </IconButton>
+                                                    {!hideSelectionAndDelete && (
+                                                        <IconButton
+                                                            disabled={selectedItems.indexOf(item.properties.id) !== -1}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setDeleteIdArea(item.properties.id);
+                                                                handleOpenConfirmDelete();
+                                                            }}
+                                                        >
+                                                            <DeleteForeverIcon/>
+                                                        </IconButton>
+                                                    )}
                                                 </ListItemButton>
                                             </Box>
                                         );

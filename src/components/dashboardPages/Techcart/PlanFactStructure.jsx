@@ -265,7 +265,7 @@ const PlanFactStructure = ({ year }) => {
                         <Box component="ul" sx={{ m: 0, pl: 2, py: 0 }}>
                           {row.cultures.map((c, i) => (
                             <li key={i}>
-                              {c.culture_name || "—"} —{" "}
+                              {c?.culture_name + ` (${c?.fields_count}) ` || "—"} —{" "}
                               {c.area != null
                                 ? `${Number(c.area).toFixed(1)} га`
                                 : "—"}
