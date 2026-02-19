@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -30,10 +31,13 @@ const FieldInfoModal = ({ open, onClose, field, year, rotationHistory = [] }) =>
 
   const properties = field.properties;
   
-  // Используем rotationHistory из prop или из properties
-  const actualRotationHistory = rotationHistory && rotationHistory.length > 0 
-    ? rotationHistory 
-    : (properties.rotation_history || []);
+  // Используем rotationHistory из prop, затем rotation_history, затем sevooborot из ответа API
+  const actualRotationHistory =
+    (rotationHistory && rotationHistory.length > 0)
+      ? rotationHistory
+      : (properties.rotation_history && properties.rotation_history.length > 0)
+        ? properties.rotation_history
+        : (Array.isArray(properties.sevooborot) ? properties.sevooborot : []);
   
   // Формируем строку для отображения поля (как в списке)
   const fieldDisplayName = `${properties.crop_name || properties.crop || ""} ${
@@ -112,6 +116,12 @@ const FieldInfoModal = ({ open, onClose, field, year, rotationHistory = [] }) =>
               {fieldDisplayName}
             </Typography>
           </Box>
+
+          {properties.has_geometry === false && (
+            <Alert severity="info" sx={{ mt: 0 }}>
+              Отсутствуют координаты поля — на карте оно не отображается.
+            </Alert>
+          )}
 
           {/* Секция "Паспорт поле" */}
           <Accordion
@@ -244,7 +254,7 @@ const FieldInfoModal = ({ open, onClose, field, year, rotationHistory = [] }) =>
                     <TableBody>
                       {actualRotationHistory.map((row, index) => {
                         const isCurrentYear = row.year === year;
-                        const cropDisplay = `${row.crop_name || row.crop || "Нет данных"} ${
+                        const cropDisplay = `${row.crop_name || row.crop || row.culture_name || "Нет данных"} ${
                           row.cultivar || row.crop_kind || ""
                         } ${row.field_number || row.field_id || row.name || ""}`.trim();
 

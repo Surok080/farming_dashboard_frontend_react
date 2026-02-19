@@ -9,6 +9,18 @@ const DEFAULT_COLORS = [
 ];
 
 /**
+ * Собирает отображаемое имя поля из новой структуры (cultivar + field_name) или старой (name).
+ */
+function getFieldDisplayName(props) {
+  if (!props) return '';
+  if (props.name) return props.name;
+  const cultivar = (props.cultivar || '').trim();
+  const fieldName = (props.field_name || '').trim();
+  if (cultivar && fieldName) return `${cultivar} (${fieldName})`;
+  return fieldName || cultivar || '';
+}
+
+/**
  * Маппинг группировки в view_type для API: null | 'by_culture' | 'by_group'
  */
 export const groupingToViewType = (grouping) => {
@@ -121,26 +133,28 @@ export const usePlanFactFieldsData = (year, grouping, onError) => {
         const { fieldToCulture, fieldToGroup, cultureColors, groupColors } = buildMapsFromResponse(d, viewTypeFromResponse);
 
         const features = (d.features || []).map((feature, index) => {
-          const fieldId = feature.properties?.id ?? feature.id;
-          const name = feature.properties?.name || '';
-          const cropName = fieldToCulture[fieldId] || name.split(' ')[0] || 'Неизвестно';
+          const props = feature.properties || {};
+          const fieldId = props.id ?? feature.id;
+          const displayName = getFieldDisplayName(props);
+          const cropName = fieldToCulture[fieldId] || props.culture_name || (displayName ? displayName.split(' ')[0] : '') || 'Неизвестно';
           const cropGroup = fieldToGroup[fieldId] || cropName;
 
           const useGroupColor = (viewTypeFromResponse === 'by_group' && groupColors[cropGroup]);
           const color = useGroupColor
             ? groupColors[cropGroup]
-            : (cultureColors[cropName] || feature.properties?.color || DEFAULT_COLORS[index % DEFAULT_COLORS.length]);
+            : (cultureColors[cropName] || props.color || DEFAULT_COLORS[index % DEFAULT_COLORS.length]);
 
           return {
             ...feature,
             properties: {
-              ...feature.properties,
+              ...props,
               id: fieldId ?? index,
+              name: displayName,
               crop: cropName,
               crop_name: cropName,
               crop_group: cropGroup,
               color,
-              center: feature.properties?.center || feature.geometry?.center || null,
+              center: props.center || feature.geometry?.center || null,
             }
           };
         });

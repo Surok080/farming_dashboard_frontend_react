@@ -14,10 +14,13 @@ const ListArea = ({
                       grouping = "crop",
                       onFieldClick,
                       setHoveredFieldId,
+                      wrapNameInParens = true,
                   }) => {
     // State to track selected items
     const [selectedItems, setSelectedItems] = useState([]);
     const [expandedGroups, setExpandedGroups] = useState({});
+    // Для полей с координатами: первый клик — камера на поле, второй клик по тому же полю — модалка
+    const [lastClickedFieldId, setLastClickedFieldId] = useState(null);
 
     // Группировка данных
     const groupedData = useMemo(() => {
@@ -252,8 +255,19 @@ const ListArea = ({
                                                     }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        // При клике на поле в списке - только перемещаем карту к полю
-                                                        setActiveArea(item);
+                                                        const hasGeometry = item.properties?.has_geometry !== false;
+                                                        const fieldId = item.properties?.id;
+                                                        if (!hasGeometry) {
+                                                            if (onFieldClick) onFieldClick(item);
+                                                            return;
+                                                        }
+                                                        if (fieldId === lastClickedFieldId && onFieldClick) {
+                                                            setLastClickedFieldId(null);
+                                                            onFieldClick(item);
+                                                        } else {
+                                                            setActiveArea(item);
+                                                            setLastClickedFieldId(fieldId ?? null);
+                                                        }
                                                     }}
                                                 >
                                                     <Box
@@ -279,11 +293,13 @@ const ListArea = ({
                                                             {state
                                                                 ? item.properties.plot_form_owner
                                                                 : item.properties.crop_kind}
-                                                            (
-                                                            {state
-                                                                ? item.properties.plot_land_category
-                                                                : item.properties.name}
-                                                            )
+                                                            {state ? (
+                                                                <> ({item.properties.plot_land_category})</>
+                                                            ) : wrapNameInParens ? (
+                                                                item.properties.name ? ` (${item.properties.name})` : null
+                                                            ) : (
+                                                                item.properties.name ? (item.properties.crop_kind ? ` ${item.properties.name}` : item.properties.name) : null
+                                                            )}
                                                         </Typography>
                                                     </Box>
                                                     <Typography variant="caption">

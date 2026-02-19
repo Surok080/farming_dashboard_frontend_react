@@ -132,6 +132,7 @@ const PlanFactMap = memo(({ year, planType, setAllArea }) => {
           tabValue={tabValue}
           onTabChange={handleTabChange}
           hideStructure
+          wrapNameInParens={false}
         />
         
         <MapContainer
