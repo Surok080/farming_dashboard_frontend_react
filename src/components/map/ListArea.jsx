@@ -14,15 +14,18 @@ const ListArea = ({
                       grouping = "crop",
                       onFieldClick,
                       setHoveredFieldId,
+                      wrapNameInParens = true,
                   }) => {
     // State to track selected items
     const [selectedItems, setSelectedItems] = useState([]);
     const [expandedGroups, setExpandedGroups] = useState({});
+    // Для полей с координатами: первый клик — камера на поле, второй клик по тому же полю — модалка
+    const [lastClickedFieldId, setLastClickedFieldId] = useState(null);
 
     // Группировка данных
     const groupedData = useMemo(() => {
-        // Если группировка по культуре или урожайности - не группируем, показываем все поля в одном списке
-        if (grouping === 'crop' || grouping === 'productivity') {
+        // Без группировки или по урожайности — один список «Все поля»
+        if (grouping === 'all' || grouping === 'productivity') {
             return {
                 'all': {
                     groupName: 'Все поля',
@@ -30,43 +33,46 @@ const ListArea = ({
                 }
             };
         }
-        
-        // Если группировка по группе - группируем по группам культур
-        if (grouping === 'crop_group') {
+
+        // По культуре — группируем по культуре (Горох, Лен, Люцерна и т.д.)
+        if (grouping === 'crop') {
             const groups = {};
-            
             layer.forEach((item) => {
-                const cropGroup = item.properties.crop_group || 'Другие';
-                const groupKey = cropGroup;
-                const groupName = cropGroup;
-
+                const cultureName = item.properties?.crop_name || item.properties?.crop || 'Другие';
+                const groupKey = cultureName;
                 if (!groups[groupKey]) {
-                    groups[groupKey] = {
-                        groupName: groupName,
-                        items: []
-                    };
+                    groups[groupKey] = { groupName: cultureName, items: [] };
                 }
-
                 groups[groupKey].items.push(item);
             });
-
             return groups;
         }
 
-        // По умолчанию - без группировки
+        // По группе — группируем по группам культур
+        if (grouping === 'crop_group') {
+            const groups = {};
+            layer.forEach((item) => {
+                const cropGroup = item.properties?.crop_group || 'Другие';
+                const groupKey = cropGroup;
+                if (!groups[groupKey]) {
+                    groups[groupKey] = { groupName: cropGroup, items: [] };
+                }
+                groups[groupKey].items.push(item);
+            });
+            return groups;
+        }
+
+        // По умолчанию — один список
         return {
-            'all': {
-                groupName: 'Все поля',
-                items: layer
-            }
+            'all': { groupName: 'Все поля', items: layer }
         };
     }, [layer, grouping]);
 
     // Инициализируем состояние групп при изменении данных или группировки
     React.useEffect(() => {
         if (Object.keys(groupedData).length > 0) {
-            // При группировке по группе - все группы свернуты, иначе - развернуты
-            const defaultExpanded = grouping !== 'crop_group';
+            // При группировке по культуре или по группе — группы свернуты; иначе — развернуты
+            const defaultExpanded = grouping !== 'crop_group' && grouping !== 'crop';
             const updated = {};
             Object.keys(groupedData).forEach(key => {
                 updated[key] = defaultExpanded;
@@ -109,39 +115,45 @@ const ListArea = ({
     // Check if all items are selected
     const isAllSelected = layer.length === selectedItems.length;
 
+    // Режим без выбора и удаления (например, раздел "Карта-полей")
+    const hideSelectionAndDelete = setDeleteIdArea == null || handleOpenConfirmDelete == null;
+
     return (
         <>
-            <Box
-                sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    p: 0,
-                }}
-            >
-                <Box display={"flex"} gap={4} alignItems={"center"}>
-                    <Checkbox
-                        sx={{padding: 0, marginLeft: "-2px"}}
-                        edge="end"
-                        onChange={handleSelectAll}
-                        checked={isAllSelected}
-                        inputProps={{"aria-label": "select all areas"}}
-                    />
-                    <Typography variant="body">Выбрать все</Typography>
-                </Box>
-                <IconButton
-                    disabled={selectedItems?.length === 0}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        // e.preventDefault()
-                        setDeleteIdArea(selectedItems);
-                        handleOpenConfirmDelete();
-                    }}
-                >
-                    <DeleteForeverIcon/>
-                </IconButton>
-            </Box>
-            <Divider/>
+            {!hideSelectionAndDelete && (
+                <>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            p: 0,
+                        }}
+                    >
+                        <Box display={"flex"} gap={4} alignItems={"center"}>
+                            <Checkbox
+                                sx={{padding: 0, marginLeft: "-2px"}}
+                                edge="end"
+                                onChange={handleSelectAll}
+                                checked={isAllSelected}
+                                inputProps={{"aria-label": "select all areas"}}
+                            />
+                            <Typography variant="body">Выбрать все</Typography>
+                        </Box>
+                        <IconButton
+                            disabled={selectedItems?.length === 0}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteIdArea(selectedItems);
+                                handleOpenConfirmDelete();
+                            }}
+                        >
+                            <DeleteForeverIcon/>
+                        </IconButton>
+                    </Box>
+                    <Divider/>
+                </>
+            )}
             <List
                 sx={{
                     width: "100%",
@@ -155,12 +167,12 @@ const ListArea = ({
                 {Object.keys(groupedData).map((groupKey) => {
                     const group = groupedData[groupKey];
                     const isExpanded = expandedGroups[groupKey] !== false;
-                    // Скрываем заголовок группы, если группировка по культуре или урожайности
-                    const showGroupHeader = grouping === 'crop_group';
+                    // Заголовок группы показываем при группировке по культуре или по группе
+                    const showGroupHeader = grouping === 'crop' || grouping === 'crop_group';
 
                     return (
                         <Box key={groupKey}>
-                            {/* Заголовок группы - показываем только при группировке по группе */}
+                            {/* Заголовок группы — при группировке по культуре или по группе */}
                             {showGroupHeader && (
                                 <Box
                                     sx={{
@@ -205,14 +217,16 @@ const ListArea = ({
 
                                         return (
                                             <Box display={"flex"} key={index}>
-                                                <Checkbox
-                                                    edge="start"
-                                                    checked={selectedItems.indexOf(item.properties.id) !== -1}
-                                                    tabIndex={-1}
-                                                    disableRipple
-                                                    inputProps={{"aria-labelledby": labelId}}
-                                                    onChange={() => handleToggle(item.properties.id)}
-                                                />
+                                                {!hideSelectionAndDelete && (
+                                                    <Checkbox
+                                                        edge="start"
+                                                        checked={selectedItems.indexOf(item.properties.id) !== -1}
+                                                        tabIndex={-1}
+                                                        disableRipple
+                                                        inputProps={{"aria-labelledby": labelId}}
+                                                        onChange={() => handleToggle(item.properties.id)}
+                                                    />
+                                                )}
                                                 <ListItemButton
                                                     key={index}
                                                     style={{
@@ -241,8 +255,19 @@ const ListArea = ({
                                                     }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        // При клике на поле в списке - только перемещаем карту к полю
-                                                        setActiveArea(item);
+                                                        const hasGeometry = item.properties?.has_geometry !== false;
+                                                        const fieldId = item.properties?.id;
+                                                        if (!hasGeometry) {
+                                                            if (onFieldClick) onFieldClick(item);
+                                                            return;
+                                                        }
+                                                        if (fieldId === lastClickedFieldId && onFieldClick) {
+                                                            setLastClickedFieldId(null);
+                                                            onFieldClick(item);
+                                                        } else {
+                                                            setActiveArea(item);
+                                                            setLastClickedFieldId(fieldId ?? null);
+                                                        }
                                                     }}
                                                 >
                                                     <Box
@@ -268,26 +293,30 @@ const ListArea = ({
                                                             {state
                                                                 ? item.properties.plot_form_owner
                                                                 : item.properties.crop_kind}
-                                                            (
-                                                            {state
-                                                                ? item.properties.plot_land_category
-                                                                : item.properties.name}
-                                                            )
+                                                            {state ? (
+                                                                <> ({item.properties.plot_land_category})</>
+                                                            ) : wrapNameInParens ? (
+                                                                item.properties.name ? ` (${item.properties.name})` : null
+                                                            ) : (
+                                                                item.properties.name ? (item.properties.crop_kind ? ` ${item.properties.name}` : item.properties.name) : null
+                                                            )}
                                                         </Typography>
                                                     </Box>
                                                     <Typography variant="caption">
                                                         {item.properties.area} га
                                                     </Typography>
-                                                    <IconButton
-                                                        disabled={selectedItems.indexOf(item.properties.id) !== -1}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setDeleteIdArea(item.properties.id);
-                                                            handleOpenConfirmDelete();
-                                                        }}
-                                                    >
-                                                        <DeleteForeverIcon/>
-                                                    </IconButton>
+                                                    {!hideSelectionAndDelete && (
+                                                        <IconButton
+                                                            disabled={selectedItems.indexOf(item.properties.id) !== -1}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setDeleteIdArea(item.properties.id);
+                                                                handleOpenConfirmDelete();
+                                                            }}
+                                                        >
+                                                            <DeleteForeverIcon/>
+                                                        </IconButton>
+                                                    )}
                                                 </ListItemButton>
                                             </Box>
                                         );

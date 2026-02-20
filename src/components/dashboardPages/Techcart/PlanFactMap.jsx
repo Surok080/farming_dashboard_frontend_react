@@ -47,7 +47,7 @@ const PlanFactMap = memo(({ year, planType, setAllArea }) => {
     totalArea,
     center: mapCenter,
     refetch: refetchFields 
-  } = usePlanFactFieldsData(year, planType, grouping, handleDataError);
+  } = usePlanFactFieldsData(year, grouping, handleDataError);
   
   // Центр карты по умолчанию или из данных
   // В API center приходит как [lng, lat], а для MapContainer нужен [lat, lng]
@@ -132,6 +132,7 @@ const PlanFactMap = memo(({ year, planType, setAllArea }) => {
           tabValue={tabValue}
           onTabChange={handleTabChange}
           hideStructure
+          wrapNameInParens={false}
         />
         
         <MapContainer

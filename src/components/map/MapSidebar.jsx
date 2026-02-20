@@ -41,6 +41,7 @@ const MapSidebar = ({
                         tabValue,
                         onTabChange,
                         hideStructure = false,
+                        wrapNameInParens = true,
                     }) => {
     const isStructureTab = !hideStructure && tabValue === "2";
     const sidebarWidth = hideMenu 
@@ -82,6 +83,7 @@ const MapSidebar = ({
                     onChange={onGroupingChange}
                     size="small"
                 >
+                    <MenuItem value="all">Без группировки</MenuItem>
                     <MenuItem value="crop">По культуре</MenuItem>
                     <MenuItem value="crop_group">По группе</MenuItem>
                 </Select>
@@ -112,6 +114,7 @@ const MapSidebar = ({
                         grouping={grouping}
                         onFieldClick={onFieldClick}
                         setHoveredFieldId={setHoveredFieldId}
+                        wrapNameInParens={wrapNameInParens}
                     />
                 ) : (
                     <p>Нет данных</p>
