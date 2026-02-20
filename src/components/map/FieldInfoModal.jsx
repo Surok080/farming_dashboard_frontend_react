@@ -246,9 +246,6 @@ const FieldInfoModal = ({ open, onClose, field, year, rotationHistory = [] }) =>
                         <TableCell sx={{ fontWeight: 600, fontSize: "0.8rem", py: 1 }}>
                           Культура
                         </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 600, fontSize: "0.8rem", py: 1 }}>
-                          Площадь
-                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -277,9 +274,6 @@ const FieldInfoModal = ({ open, onClose, field, year, rotationHistory = [] }) =>
                             </TableCell>
                             <TableCell sx={{ fontSize: "0.8rem", py: 1 }}>
                               {cropDisplay}
-                            </TableCell>
-                            <TableCell align="right" sx={{ fontSize: "0.8rem", py: 1 }}>
-                              {row.area ? `${row.area} га` : "-"}
                             </TableCell>
                           </TableRow>
                         );
