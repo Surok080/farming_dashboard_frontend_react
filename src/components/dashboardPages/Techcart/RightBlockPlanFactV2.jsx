@@ -722,7 +722,7 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
                                                         <TableCell
                                                             colSpan={3}
                                                             sx={{
-                                                                backgroundColor: 'white',
+                                                                backgroundColor: '#eeeeee',
                                                                 color: 'black',
                                                                 fontWeight: 'bold',
                                                                 textAlign: 'center',
@@ -852,31 +852,13 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
                                                             >
                                                                 {detailsData.summary.percent || 0}
                                                             </TableCell>
-                                                            <TableCell
-                                                                sx={{
-                                                                    fontWeight: 'bold',
-                                                                    textAlign: 'right',
-                                                                    border: '1px solid #d0d0d0'
-                                                                }}
-                                                            >
+                                                            <TableCell sx={{ fontWeight: 'bold', textAlign: 'right', border: '1px solid #d0d0d0', backgroundColor: 'rgba(232,232,232,0.32)' }}>
                                                                 {formatNumber(detailsData.summary.plan_per_ha || 0)}
                                                             </TableCell>
-                                                            <TableCell
-                                                                sx={{
-                                                                    fontWeight: 'bold',
-                                                                    textAlign: 'right',
-                                                                    border: '1px solid #d0d0d0'
-                                                                }}
-                                                            >
+                                                            <TableCell sx={{ fontWeight: 'bold', textAlign: 'right', border: '1px solid #d0d0d0', backgroundColor: 'rgba(232,232,232,0.32)' }}>
                                                                 {formatNumber(detailsData.summary.fact_per_ha || 0)}
                                                             </TableCell>
-                                                            <TableCell
-                                                                sx={{
-                                                                    fontWeight: 'bold',
-                                                                    textAlign: 'right',
-                                                                    border: '1px solid #d0d0d0'
-                                                                }}
-                                                            >
+                                                            <TableCell sx={{ fontWeight: 'bold', textAlign: 'right', border: '1px solid #d0d0d0', backgroundColor: 'rgba(232,232,232,0.32)' }}>
                                                                 {detailsData.summary.percent_per_ha || 0}
                                                             </TableCell>
                                                         </TableRow>
@@ -918,28 +900,13 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
                                                             >
                                                                 {item.percent || 0}
                                                             </TableCell>
-                                                            <TableCell
-                                                                sx={{
-                                                                    textAlign: 'right',
-                                                                    border: '1px solid #d0d0d0'
-                                                                }}
-                                                            >
+                                                            <TableCell sx={{ textAlign: 'right', border: '1px solid #d0d0d0', backgroundColor: 'rgba(232,232,232,0.32)' }}>
                                                                 {formatNumber(item.plan_per_ha || 0)}
                                                             </TableCell>
-                                                            <TableCell
-                                                                sx={{
-                                                                    textAlign: 'right',
-                                                                    border: '1px solid #d0d0d0'
-                                                                }}
-                                                            >
+                                                            <TableCell sx={{ textAlign: 'right', border: '1px solid #d0d0d0', backgroundColor: 'rgba(232,232,232,0.32)' }}>
                                                                 {formatNumber(item.fact_per_ha || 0)}
                                                             </TableCell>
-                                                            <TableCell
-                                                                sx={{
-                                                                    textAlign: 'right',
-                                                                    border: '1px solid #d0d0d0'
-                                                                }}
-                                                            >
+                                                            <TableCell sx={{ textAlign: 'right', border: '1px solid #d0d0d0', backgroundColor: 'rgba(232,232,232,0.32)' }}>
                                                                 {item.percent_per_ha || 0}
                                                             </TableCell>
                                                         </TableRow>
