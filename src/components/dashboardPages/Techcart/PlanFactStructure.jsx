@@ -92,6 +92,15 @@ const PlanFactStructure = ({ year }) => {
     return Math.ceil((Math.max(...values) || 0) * 1.1);
   }, [barChartData]);
 
+  // Цвета групп как в графике "Распределение по группам культур" (хук до early return)
+  const groupColorMap = React.useMemo(() => {
+    const map = {};
+    (data?.groups || []).forEach((g, i) => {
+      map[g.group_name] = colorPalette[i % colorPalette.length];
+    });
+    return map;
+  }, [data?.groups]);
+
   if (loading) {
     return (
       <Box
@@ -248,10 +257,33 @@ const PlanFactStructure = ({ year }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {tableRows.map((row, idx) => (
+              {tableRows.map((row, idx) => {
+                const groupColor = groupColorMap[row.group_name] || "transparent";
+                return (
                 <React.Fragment key={idx}>
                   <TableRow>
-                    <TableCell>{row.group_name || "—"}</TableCell>
+                    <TableCell sx={{ p: 0, verticalAlign: "middle" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          minHeight: "100%",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 10,
+                            minHeight: 40,
+                            backgroundColor: groupColor,
+                            flexShrink: 0,
+                            borderRadius: "5px",
+                          }}
+                        />
+                        <Box sx={{ py: 1.25, pl: 1.5, pr: 2 }}>
+                          {row.group_name || "—"}
+                        </Box>
+                      </Box>
+                    </TableCell>
                     <TableCell align="right">
                       {row.area != null ? Number(row.area).toFixed(1) : "—"}
                     </TableCell>
@@ -280,7 +312,8 @@ const PlanFactStructure = ({ year }) => {
                     </TableCell>
                   </TableRow>
                 </React.Fragment>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
