@@ -158,10 +158,19 @@ const LeftBlockPlanFactV2 = ({ year, onDataReceived, onSelectionChange }) => {
         if (onDataReceived) {
           onDataReceived(null);
         }
-        await fetchCulturesData();
+        const data = await fetchCulturesData();
+        // Сразу выбираем все культуры и поля, чтобы высота графика подстроилась с первого рендера
+        if (data && data.length > 0) {
+          const allCultureIds = data.map((c) => c.id);
+          const allStructureIds = data.flatMap((c) =>
+            c.children ? c.children.map((child) => child.id) : []
+          );
+          setChecked(allCultureIds);
+          setCheckedFields(allStructureIds);
+        }
       }
     };
-    
+
     loadCulturesData();
   }, [year, techcardValue]);
 

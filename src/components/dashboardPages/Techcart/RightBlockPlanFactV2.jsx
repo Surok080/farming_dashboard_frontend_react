@@ -154,43 +154,36 @@ const RightBlockPlanFactV2 = ({dashboardData, selectedCultures, selectedFields, 
         }
     };
 
-    // Вычисление высоты графика асинхронно через useEffect для оптимизации производительности
+    // Вычисление высоты графика при монтировании, изменении данных и при изменении размера контейнера (ResizeObserver)
     useEffect(() => {
+        const chartContainer = chartContainerRef.current;
+        if (!chartContainer) return;
+
         const calculateChartHeight = () => {
-            // Используем requestAnimationFrame для отложенного вычисления после рендера
-            requestAnimationFrame(() => {
-                if (chartContainerRef.current) {
-                    // Вычисляем высоту на основе контейнера, а не всего документа
-                    const containerHeight = chartContainerRef.current.offsetHeight;
-                    const calculatedHeight = Math.max(300, containerHeight - 100);
-                    setChartHeight(calculatedHeight);
-                } else {
-                    // Fallback: используем высоту окна, если контейнер еще не готов
-                    const windowHeight = window.innerHeight;
-                    const calculatedHeight = Math.max(300, windowHeight - 680);
-                    setChartHeight(calculatedHeight);
-                }
-            });
+            const containerHeight = chartContainer.offsetHeight;
+            const calculatedHeight = Math.max(300, containerHeight - 100);
+            setChartHeight(calculatedHeight);
         };
 
-        // Вычисляем высоту при монтировании и изменении данных
+        // Первый расчёт сразу и после отрисовки
         calculateChartHeight();
+        const rafId = requestAnimationFrame(calculateChartHeight);
 
-        // Обработчик изменения размера окна
-        const handleResize = () => {
-            calculateChartHeight();
-        };
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(calculateChartHeight);
+        });
+        resizeObserver.observe(chartContainer);
 
-        // Используем debounce для оптимизации обработки resize
         let resizeTimeout;
         const debouncedResize = () => {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(handleResize, 150);
+            resizeTimeout = setTimeout(calculateChartHeight, 150);
         };
-
         window.addEventListener('resize', debouncedResize);
 
         return () => {
+            cancelAnimationFrame(rafId);
+            resizeObserver.disconnect();
             window.removeEventListener('resize', debouncedResize);
             clearTimeout(resizeTimeout);
         };
