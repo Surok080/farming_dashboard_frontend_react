@@ -159,7 +159,7 @@ export default function Dashboard() {
                                 maxWidth: "100%",
                                 marginTop: "5px",
                                 marginLeft: "200px",
-                                height: "calc(100% - 50px)",
+                                height: "calc(100% - 70px)",
                                 width: "calc(100% - 220px)",
                                 padding: "0",
                                 overflow: 'hidden',
