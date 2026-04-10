@@ -17,6 +17,7 @@ import MonitoringSettingsDialog from "./MonitoringSettingsDialog";
 import MonitoringRowDialog from "./MonitoringRowDialog";
 import MonitoringStatusConfirmDialog from "./MonitoringStatusConfirmDialog";
 import {
+  MONITORING_DEFAULT_PAGE_SIZE,
   MONITORING_MAX_PAGE_SIZE,
   MONITORING_NON_EDITABLE_SENT_STATUSES,
   MONITORING_STATUS_CANCELED,
@@ -45,7 +46,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [tabValue, setTabValue] = useState("1");
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(MONITORING_MAX_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState(MONITORING_DEFAULT_PAGE_SIZE);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);

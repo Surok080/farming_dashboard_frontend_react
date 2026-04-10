@@ -14,7 +14,7 @@ import {
 import { MONITORING_PAGE_SIZE_OPTIONS } from "./monitoringConstants";
 import { MONITORING_TABLE_COLUMNS } from "./monitoringColumns";
 import MonitoringStatusCell from "./MonitoringStatusCell";
-import { formatNumberForDisplay, formatPeriodStartDisplay } from "./monitoringUtils";
+import { formatNumberForDisplay, getPeriodRangeDisplayParts } from "./monitoringUtils";
 
 const displayText = (v) => {
   if (v === null || v === undefined || v === "") return "—";
@@ -30,6 +30,26 @@ const displayNum = (v) => {
         {f.display}
       </Box>
     </Tooltip>
+  );
+};
+
+/** Дата и время на двух строках; у каждой строки nowrap — время не разъезжается на третью. */
+const periodCellContent = (periodStart, periodStop) => {
+  const { dateLine, timeLine } = getPeriodRangeDisplayParts(periodStart, periodStop);
+  if (!dateLine && !timeLine) return "—";
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.25, gap: 0.25, minWidth: "max-content" }}>
+      {dateLine ? (
+        <Box component="span" sx={{ whiteSpace: "nowrap" }}>
+          {dateLine}
+        </Box>
+      ) : null}
+      {timeLine ? (
+        <Box component="span" sx={{ whiteSpace: "nowrap" }}>
+          {timeLine}
+        </Box>
+      ) : null}
+    </Box>
   );
 };
 
@@ -98,8 +118,8 @@ const MonitoringTable = ({
                     onCheckedChange={(checked) => onRowCheckedChange?.(row.id, checked)}
                   />
                 </TableCell>
-                <TableCell sx={{ fontSize: 12 }} align="left">
-                  {formatPeriodStartDisplay(row.period_start)}
+                <TableCell sx={{ fontSize: 12, verticalAlign: "top" }} align="left">
+                  {periodCellContent(row.period_start, row.period_stop)}
                 </TableCell>
                 <TableCell sx={{ fontSize: 12 }} align="left">
                   {displayText(row.field_name)}

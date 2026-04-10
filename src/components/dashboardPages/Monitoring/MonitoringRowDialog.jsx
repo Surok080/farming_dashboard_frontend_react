@@ -12,7 +12,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -21,15 +20,7 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ParkOutlinedIcon from "@mui/icons-material/ParkOutlined";
 import IconButton from "@mui/material/IconButton";
-import { formatNumberForDisplay, formatPeriodStartDisplay } from "./monitoringUtils";
-
-const statCardSx = {
-  border: "1px solid #d7d7d7",
-  borderRadius: "8px",
-  minWidth: 130,
-  px: 2,
-  py: 1,
-};
+import { formatNumberForDisplay, formatPeriodRangeDisplay } from "./monitoringUtils";
 
 const outlinedActionSx = {
   textTransform: "uppercase",
@@ -87,18 +78,10 @@ const MonitoringRowDialog = ({
 
   const areaFmt = row ? formatNumberForDisplay(row.area, 3) : null;
   const trailerWidthFmt = row ? formatNumberForDisplay(row.trailer_width, 3) : null;
-
-  const renderNumericValue = (value) => {
-    const f = formatNumberForDisplay(value, 3);
-    if (!f.hasTooltip) return f.display;
-    return (
-      <Tooltip title={f.full} enterDelay={300} arrow placement="top">
-        <Box component="span" sx={{ cursor: "help", borderBottom: "1px dotted rgba(0,0,0,0.25)" }}>
-          {f.display}
-        </Box>
-      </Tooltip>
-    );
-  };
+  const fuelFmt = row ? formatNumberForDisplay(row.fuel, 3) : null;
+  const durationFmt = row ? formatNumberForDisplay(row.duration_hours, 3) : null;
+  const areaWorkedFmt = row ? formatNumberForDisplay(row.area_worked, 3) : null;
+  const periodRangeDisplay = row ? formatPeriodRangeDisplay(row.period_start, row.period_stop) : "";
 
   return (
     <Dialog
@@ -226,31 +209,49 @@ const MonitoringRowDialog = ({
           </Box>
         ) : row ? (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-              <Box sx={statCardSx}>
-                <Typography variant="caption" color="text.secondary">
-                  Период
-                </Typography>
-                <Typography variant="body1">{formatPeriodStartDisplay(row.period_start)}</Typography>
-              </Box>
-              <Box sx={statCardSx}>
-                <Typography variant="caption" color="text.secondary">
-                  Расход (л)
-                </Typography>
-                <Typography variant="body1">{renderNumericValue(row.fuel)}</Typography>
-              </Box>
-              <Box sx={statCardSx}>
-                <Typography variant="caption" color="text.secondary">
-                  Моточасы
-                </Typography>
-                <Typography variant="body1">{renderNumericValue(row.duration_hours)}</Typography>
-              </Box>
-              <Box sx={{ ...statCardSx, borderWidth: 2 }}>
-                <Typography variant="caption" color="text.secondary">
-                  Выработка, га
-                </Typography>
-                <Typography variant="body1">{renderNumericValue(row.area_worked)}</Typography>
-              </Box>
+            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 2, pt:1 }}>
+              <TextField
+                disabled
+                size="small"
+                label="Период"
+                value={periodRangeDisplay === "—" ? "" : periodRangeDisplay}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                disabled
+                size="small"
+                label="Расход (л)"
+                value={fuelFmt?.display === "—" ? "" : fuelFmt?.display ?? ""}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  title: fuelFmt?.hasTooltip ? fuelFmt.full : undefined,
+                }}
+              />
+              <TextField
+                disabled
+                size="small"
+                label="Моточасы"
+                value={durationFmt?.display === "—" ? "" : durationFmt?.display ?? ""}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  title: durationFmt?.hasTooltip ? durationFmt.full : undefined,
+                }}
+              />
+              <TextField
+                disabled
+                size="small"
+                label="Выработка, га"
+                value={areaWorkedFmt?.display === "—" ? "" : areaWorkedFmt?.display ?? ""}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  title: areaWorkedFmt?.hasTooltip ? areaWorkedFmt.full : undefined,
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderWidth: 2,
+                  },
+                }}
+              />
             </Box>
 
             <Divider />
@@ -259,9 +260,22 @@ const MonitoringRowDialog = ({
               Работа в агрозоне
             </Typography>
             <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(200px, 1fr))", gap: 2 }}>
-              <TextField size="small" label="Геозона, поле" value={row.field_name ?? ""} InputLabelProps={{ shrink: true }} />
-              <TextField size="small" label="Культура" value={row.culture_name ?? ""} InputLabelProps={{ shrink: true }} />
               <TextField
+                disabled
+                size="small"
+                label="Геозона, поле"
+                value={row.field_name ?? ""}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                disabled
+                size="small"
+                label="Культура"
+                value={row.culture_name ?? ""}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                disabled
                 size="small"
                 label="Площадь, га"
                 value={areaFmt?.display === "—" ? "" : areaFmt?.display ?? ""}
@@ -307,6 +321,7 @@ const MonitoringRowDialog = ({
                 </Select>
               </FormControl>
               <TextField
+                disabled
                 size="small"
                 label="Ширина, м"
                 value={trailerWidthFmt?.display === "—" ? "" : trailerWidthFmt?.display ?? ""}

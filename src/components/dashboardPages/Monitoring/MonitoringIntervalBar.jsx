@@ -1,25 +1,10 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 
-function openDatetimePicker(inputEl) {
-  if (!inputEl) return;
-  if (typeof inputEl.showPicker === "function") {
-    try {
-      inputEl.showPicker();
-      return;
-    } catch {
-      // см. ниже
-    }
-  }
-  inputEl.focus();
-  inputEl.click();
-}
-
-const pickerInputSx = {
-  cursor: "pointer",
-  "& .MuiOutlinedInput-input": { cursor: "pointer" },
+const datetimeLocalInputSx = {
+  "& .MuiOutlinedInput-input": { cursor: "text" },
 };
 
 const MonitoringIntervalBar = ({
@@ -30,9 +15,6 @@ const MonitoringIntervalBar = ({
   onRun,
   onOpenSettings,
 }) => {
-  const fromInputRef = useRef(null);
-  const toInputRef = useRef(null);
-
   const handleFromChange = useCallback(
     (e) => {
       const next = e.target.value;
@@ -75,16 +57,12 @@ const MonitoringIntervalBar = ({
             label="Дата и время начала"
             value={intervalFrom}
             onChange={handleFromChange}
-            inputRef={fromInputRef}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
             inputProps={{
               max: intervalTo || undefined,
             }}
-            InputProps={{
-              sx: pickerInputSx,
-              onClick: () => openDatetimePicker(fromInputRef.current),
-            }}
+            InputProps={{ sx: datetimeLocalInputSx }}
           />
           <TextField
             size="small"
@@ -92,16 +70,12 @@ const MonitoringIntervalBar = ({
             label="Дата и время окончания"
             value={intervalTo}
             onChange={handleToChange}
-            inputRef={toInputRef}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
             inputProps={{
               min: intervalFrom || undefined,
             }}
-            InputProps={{
-              sx: pickerInputSx,
-              onClick: () => openDatetimePicker(toInputRef.current),
-            }}
+            InputProps={{ sx: datetimeLocalInputSx }}
           />
 
           <Button

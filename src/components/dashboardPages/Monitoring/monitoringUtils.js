@@ -49,6 +49,59 @@ export const formatPeriodStartDisplay = (isoString) => {
   return formatDateTime(d);
 };
 
+const formatDateOnly = (dt) => {
+  if (!dt || Number.isNaN(dt.getTime())) return "";
+  const dd = String(dt.getDate()).padStart(2, "0");
+  const mm = String(dt.getMonth() + 1).padStart(2, "0");
+  const yyyy = dt.getFullYear();
+  return `${dd}.${mm}.${yyyy}`;
+};
+
+const formatTimeHm = (dt) => {
+  if (!dt || Number.isNaN(dt.getTime())) return "";
+  const hh = String(dt.getHours()).padStart(2, "0");
+  const min = String(dt.getMinutes()).padStart(2, "0");
+  return `${hh}:${min}`;
+};
+
+/** Первая строка — дата, вторая — время в скобках (для вёрстки в 2 строки). */
+export const getPeriodRangeDisplayParts = (periodStart, periodStop) => {
+  const dStart = periodStart ? new Date(periodStart) : null;
+  const dStop = periodStop ? new Date(periodStop) : null;
+  const okStart = dStart && !Number.isNaN(dStart.getTime());
+  const okStop = dStop && !Number.isNaN(dStop.getTime());
+
+  if (!okStart && !okStop) {
+    return { dateLine: null, timeLine: null };
+  }
+
+  if (okStart && okStop) {
+    return {
+      dateLine: formatDateOnly(dStart),
+      timeLine: `(${formatTimeHm(dStart)}-${formatTimeHm(dStop)})`,
+    };
+  }
+
+  if (okStart) {
+    return {
+      dateLine: formatDateOnly(dStart),
+      timeLine: `(${formatTimeHm(dStart)})`,
+    };
+  }
+
+  return {
+    dateLine: formatDateOnly(dStop),
+    timeLine: `(${formatTimeHm(dStop)})`,
+  };
+};
+
+/** Одна строка: `01.01.1999 (14:30-17:00)` — для модалки и подписей */
+export const formatPeriodRangeDisplay = (periodStart, periodStop) => {
+  const { dateLine, timeLine } = getPeriodRangeDisplayParts(periodStart, periodStop);
+  if (!dateLine && !timeLine) return "—";
+  return [dateLine, timeLine].filter(Boolean).join(" ");
+};
+
 export const formatDateTime = (dt) => {
   if (!dt) return "";
   const dd = String(dt.getDate()).padStart(2, "0");

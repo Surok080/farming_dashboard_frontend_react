@@ -22,9 +22,12 @@ export const MONITORING_STATUS_LABEL = {
 };
 
 /** Максимум строк на странице в запросе /monitoring */
-export const MONITORING_MAX_PAGE_SIZE = 20;
+export const MONITORING_MAX_PAGE_SIZE = 100;
 
-export const MONITORING_PAGE_SIZE_OPTIONS = [5, 10, 20];
+/** Значение по умолчанию при первом открытии */
+export const MONITORING_DEFAULT_PAGE_SIZE = 10;
+
+export const MONITORING_PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 export const MONITORING_STATUS_OPTIONS = [
   { value: "all", label: "Все" },
