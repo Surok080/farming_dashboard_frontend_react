@@ -15,6 +15,7 @@ import {useNavigate} from "react-router-dom";
 import AppBarHeader from "../AppBarHeader";
 import LeftMenu from "../LeftMenu";
 import StateMonitoringPages from "../dashboardPages/StateMonitoringPages";
+import MonitoringPages from "../dashboardPages/Monitoring/MonitoringPages";
 import CartogramsPage from "../dashboardPages/CartogramsPage";
 import TechcartPage from "../dashboardPages/TechcartPage";
 import SettingsPage from "../dashboardPages/SettingsPage";
@@ -70,11 +71,14 @@ export default function Dashboard() {
     const drawerWidth = isSmallScreen ? 120 : 180; // Меняем ширину в зависимости от экрана
 
     useEffect(() => {
-        if (localStorage.getItem('tabs') !== 'dashboard'
-            && localStorage.getItem('tabs')
-            && user?.userInfo?.module?.length > 0
-            && user.userInfo.module.includes(localStorage.getItem('tabs'))) {
-            setValueTabs(localStorage.getItem('tabs'))
+        const savedTabs = localStorage.getItem('tabs');
+        if (savedTabs && savedTabs !== 'dashboard') {
+            const allowedByModule = user?.userInfo?.module?.includes(savedTabs);
+            const allowedByTabs = user?.userInfo?.tabs?.some((tab) => tab?.name === savedTabs);
+
+            if (allowedByModule || allowedByTabs) {
+                setValueTabs(savedTabs);
+            }
         }
     }, [user]);
 
@@ -112,6 +116,8 @@ export default function Dashboard() {
                 return <DashboardPages setAllArea={setAllArea} year={year}/>;
             case "state_monitoring":
                 return <StateMonitoringPages setAllArea={setAllArea} year={year}/>;
+            case "monitoring":
+                return <MonitoringPages setAllArea={setAllArea} year={year}/>;
             case "cartogram":
                 return <CartogramsPage setAllArea={setAllArea} year={year}/>;
             case "menu_settings":

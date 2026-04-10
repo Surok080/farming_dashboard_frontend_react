@@ -1,0 +1,89 @@
+/** Значение для input type="datetime-local": YYYY-MM-DDTHH:mm */
+export const toDatetimeLocalValue = (value) => {
+  if (!value) return "";
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+};
+
+/** Вчера 00:00 — сегодня 23:59 (локальное время). */
+export const getDefaultMonitoringInterval = () => {
+  const now = new Date();
+  const yesterdayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0, 0);
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 0, 0);
+  return {
+    from: toDatetimeLocalValue(yesterdayStart),
+    to: toDatetimeLocalValue(todayEnd),
+  };
+};
+
+export const parseDatetimeLocal = (value) => {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+
+/** Для query: DD-MM-YYYY HH:MM:SS */
+export const toApiDateTimeString = (datetimeLocalValue) => {
+  const d = parseDatetimeLocal(datetimeLocalValue);
+  if (!d) return "";
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  const ss = String(d.getSeconds()).padStart(2, "0");
+  return `${dd}-${mm}-${yyyy} ${hh}:${min}:${ss}`;
+};
+
+/** Отображение ISO периода в таблице */
+export const formatPeriodStartDisplay = (isoString) => {
+  if (!isoString) return "—";
+  const d = new Date(isoString);
+  if (Number.isNaN(d.getTime())) return isoString;
+  return formatDateTime(d);
+};
+
+export const formatDateTime = (dt) => {
+  if (!dt) return "";
+  const dd = String(dt.getDate()).padStart(2, "0");
+  const mm = String(dt.getMonth() + 1).padStart(2, "0");
+  const yyyy = dt.getFullYear();
+  const hh = String(dt.getHours()).padStart(2, "0");
+  const min = String(dt.getMinutes()).padStart(2, "0");
+  return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
+};
+
+/**
+ * Ограничение до 3 знаков после запятой.
+ * Если у исходного значения больше 3 знаков после запятой, можно показывать tooltip с полным значением.
+ */
+export const formatNumberForDisplay = (value, precision = 3) => {
+  if (value === null || value === undefined || value === "") {
+    return { display: "—", full: "", hasTooltip: false };
+  }
+
+  const num = Number(value);
+  if (Number.isNaN(num)) {
+    return { display: String(value), full: String(value), hasTooltip: false };
+  }
+
+  const full = String(value).trim();
+  const normalized = full.replace(",", ".");
+  const dotIdx = normalized.lastIndexOf(".");
+  const fractional = dotIdx >= 0 ? normalized.slice(dotIdx + 1) : "";
+  const hasTooltip = fractional.length > precision;
+  const limited = num.toFixed(precision).replace(/\.?0+$/, "");
+
+  return {
+    display: hasTooltip ? limited : full,
+    full,
+    hasTooltip,
+  };
+};
+

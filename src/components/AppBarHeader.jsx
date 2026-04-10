@@ -32,7 +32,6 @@ const StyledAppBar = styled(MuiAppBar, {
 }));
 
 const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => {
-    const navigate = useNavigate();
     const [anchorElUserInfo, setAnchorElUserInfo] = React.useState(null);
     const openUserInfo = Boolean(anchorElUserInfo);
     const [anchorElHelp, setAnchorElHelp] = React.useState(null);
@@ -71,6 +70,8 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                 return "Поля";
             case "state_monitoring":
                 return "Госмониторинг";
+            case "monitoring":
+                return "Мониторинг";
             case "cartogram":
                 return "Картограммы";
             case "menu_settings":

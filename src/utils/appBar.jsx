@@ -5,6 +5,8 @@ export const appBarName = (menu) => {
       case 'fields':
       case 'fields_v2':
           return "Поля"
+      case 'monitoring':
+          return "Мониторинг"
       case 'state_monitoring':
           return "Госмониторинг"
       case 'tech_map':
@@ -58,8 +60,9 @@ export function moveStringToFirstPositionImmutable(array, targetString) {
  * Сортирует массив вкладок по фиксированному порядку:
  * 1. tech_map (ТехКарта)
  * 2. fields/fields_v2 (Поля)
- * 3. cartogram (Картограммы)
- * 4. state_monitoring (Госмониторинг)
+ * 3. monitoring (Мониторинг)
+ * 4. cartogram (Картограммы)
+ * 5. state_monitoring (Госмониторинг)
  * Остальные вкладки добавляются в конец
  */
 export function sortTabsByFixedOrder(tabs) {
@@ -80,7 +83,7 @@ export function sortTabsByFixedOrder(tabs) {
  */
 function sortTabsByOrder(tabs) {
     // Определяем порядок вкладок
-    const order = ['tech_map', 'fields', 'fields_v2', 'cartogram', 'state_monitoring'];
+    const order = ['tech_map', 'fields', 'fields_v2', 'monitoring', 'cartogram', 'state_monitoring'];
     
     // Создаём Map для быстрого поиска индекса
     const orderMap = new Map();

@@ -10,6 +10,7 @@ import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import NavigationOutlinedIcon from '@mui/icons-material/NavigationOutlined';
 import {useSelector} from "react-redux";
 import {appBarName, sortTabsByFixedOrder} from "../../utils/appBar";
 import {defaultTheme} from "./Dashboard";
@@ -19,6 +20,15 @@ const ListItems = memo(() => {
     const {valueTabs, setValueTabs} = useContext(Context);
     const user = useSelector((state) => state.user)
     const [menu, setMenu] = useState([]);
+    const menuItemSx = {
+        '&:hover': {
+            backgroundColor: 'rgba(130, 248, 101, 0.14)',
+        },
+        [defaultTheme.breakpoints.down("lg")]: {
+            flexDirection: 'column',
+            justifyContent: 'center',
+        },
+    };
 
     useEffect(() => {
         if (user.userInfo.tabs && user.userInfo.tabs.length > 0) {
@@ -27,8 +37,9 @@ const ListItems = memo(() => {
             // Сортируем вкладки по фиксированному порядку:
             // 1. tech_map (ТехКарта)
             // 2. fields/fields_v2 (Поля)
-            // 3. cartogram (Картограммы)
-            // 4. state_monitoring (Госмониторинг)
+            // 3. monitoring (Мониторинг)
+            // 4. cartogram (Картограммы)
+            // 5. state_monitoring (Госмониторинг)
             tabNames = sortTabsByFixedOrder(tabNames);
             
             setMenu(tabNames);
@@ -52,6 +63,9 @@ const ListItems = memo(() => {
             case 'state_monitoring':
                 return <DashboardOutlinedIcon
                     sx={{color: valueTabs === "state_monitoring" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+            case 'monitoring':
+                return <NavigationOutlinedIcon
+                    sx={{color: valueTabs === "monitoring" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             case 'tech_map':
                 return <DescriptionOutlinedIcon
                     sx={{color: valueTabs === "tech_map" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
@@ -62,12 +76,7 @@ const ListItems = memo(() => {
 
     return (
         <>
-            <ListItemButton sx={{
-                [defaultTheme.breakpoints.down("lg")]: {
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                },
-            }} onClick={() => setTabs("dashboard")}>
+            <ListItemButton sx={menuItemSx} onClick={() => setTabs("dashboard")}>
                 <ListItemIcon sx={{
                     minWidth: '36px',
                     [defaultTheme.breakpoints.down("lg")]: {
@@ -92,12 +101,7 @@ const ListItems = memo(() => {
             {
                 menu.map((item) => {
                     return (
-                        <ListItemButton sx={{
-                            [defaultTheme.breakpoints.down("lg")]: {
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                            },
-                        }} key={item} onClick={() => setTabs(item)}>
+                        <ListItemButton sx={menuItemSx} key={item} onClick={() => setTabs(item)}>
                             <ListItemIcon sx={{
                                 minWidth: '36px',
                                 [defaultTheme.breakpoints.down("lg")]: {
@@ -121,12 +125,7 @@ const ListItems = memo(() => {
                     )
                 })
             }
-            <ListItemButton sx={{
-                [defaultTheme.breakpoints.down("lg")]: {
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                },
-            }} onClick={() => setTabs("menu_settings")}>
+            <ListItemButton sx={menuItemSx} onClick={() => setTabs("menu_settings")}>
                 <ListItemIcon sx={{
                     minWidth: '36px',
                     [defaultTheme.breakpoints.down("lg")]: {

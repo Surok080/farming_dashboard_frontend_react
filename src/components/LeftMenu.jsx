@@ -35,7 +35,7 @@ const Drawer = styled(MuiDrawer, {
     },
 }));
 
-const LeftMenu = memo(({drawerWidth}) => {
+const LeftMenu = memo(() => {
     const navigate = useNavigate();
 
     return (
@@ -109,6 +109,11 @@ const LeftMenu = memo(({drawerWidth}) => {
                     </Box>
                     <Box>
                         <ListItemButton
+                            sx={{
+                                '&:hover': {
+                                    backgroundColor: 'rgba(130, 248, 101, 0.14)',
+                                },
+                            }}
                             onClick={() => {
                                 localStorage.removeItem("access_token");
                                 localStorage.removeItem("refresh_token");
