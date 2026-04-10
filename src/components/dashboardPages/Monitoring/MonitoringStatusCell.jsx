@@ -7,6 +7,7 @@ import PublishedWithChangesOutlinedIcon from "@mui/icons-material/PublishedWithC
 
 const MonitoringStatusCell = ({ status, checked = false, onCheckedChange }) => {
   const common = { fontSize: "small" };
+  let icon;
 
   switch (status) {
     case "CONFIRMED":
