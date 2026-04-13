@@ -6,7 +6,7 @@ import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import PublishedWithChangesOutlinedIcon from "@mui/icons-material/PublishedWithChangesOutlined";
 
 const MonitoringStatusCell = ({ status, checked = false, onCheckedChange }) => {
-  const common = { fontSize: "small" };
+  const common = { fontSize: 24 };
   let icon;
 
   switch (status) {

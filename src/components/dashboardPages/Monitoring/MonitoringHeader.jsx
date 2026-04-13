@@ -60,11 +60,10 @@ const MonitoringHeader = ({
         disabled={publishDisabled}
         variant="contained"
         sx={{
-          backgroundColor: "#f5f5f5",
-          border: "1px solid #ddd",
-          color: "#666",
+          backgroundColor: "#1565c0",
+          color: "#fff",
           boxShadow: "none",
-          "&:hover": { backgroundColor: "#eaeaea", boxShadow: "none" },
+          "&:hover": { backgroundColor: "#0d47a1", boxShadow: "none" },
           textTransform: "none",
         }}
         startIcon={<PublishedWithChangesOutlinedIcon />}

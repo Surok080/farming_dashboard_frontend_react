@@ -16,9 +16,9 @@ export const MONITORING_STATUS_LABEL = {
   [MONITORING_STATUS_RAW]: "Сырой",
   [MONITORING_STATUS_CONFIRMED]: "Подтверждённый",
   [MONITORING_STATUS_CANCELED]: "Отклонённый",
-  [MONITORING_STATUS_READY_FOR_1C]: "Готово к отправке в 1С",
-  SENT: "Отправлено в 1С",
-  SENT_TO_1C: "Отправлено в 1С",
+  [MONITORING_STATUS_READY_FOR_1C]: "Опубликованно в 1с",
+  SENT: "Опубликованно в 1с",
+  SENT_TO_1C: "Опубликованно в 1с",
 };
 
 /** Максимум строк на странице в запросе /monitoring */

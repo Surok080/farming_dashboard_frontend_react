@@ -90,6 +90,7 @@ const MonitoringIntervalBar = ({
               px: 2,
               boxShadow: "none",
               "&:hover": { backgroundColor: "#569a51", boxShadow: "none" },
+              padding: '8px 16px',
             }}
             startIcon={<PlayArrowOutlinedIcon />}
           >
@@ -109,6 +110,7 @@ const MonitoringIntervalBar = ({
             boxShadow: "none",
             flexShrink: 0,
             alignSelf: "flex-end",
+            padding: '8px 16px',
           }}
           startIcon={<SettingsOutlinedIcon />}
         >

@@ -33,9 +33,9 @@ const statusLabelMap = {
   RAW: "Сырой статус",
   CANCELED: "Отклоненный статус",
   CONFIRMED: "Подтвержденный статус",
-  READY_FOR_1C: "Отправлено в 1С",
-  SENT: "Отправлено в 1С",
-  SENT_TO_1C: "Отправлено в 1С",
+  READY_FOR_1C: "Опубликованно в 1с",
+  SENT: "Опубликованно в 1с",
+  SENT_TO_1C: "Опубликованно в 1с",
 };
 
 const MonitoringRowDialog = ({
@@ -50,12 +50,14 @@ const MonitoringRowDialog = ({
   canConfirm = true,
   canReject = true,
   canReturn = true,
+  canPublish1C = true,
   onRowChange,
   onSave,
   saveLoading = false,
   onReturn,
   onReject,
   onConfirm,
+  onPublish1C,
 }) => {
   const row = data?.row;
   const drivers = data?.drivers ?? [];
@@ -183,6 +185,21 @@ const MonitoringRowDialog = ({
                 >
                   Подтвержденный статус
                 </Button>
+                <Button
+                  variant="outlined"
+                  disabled={actionLoading || !canPublish1C}
+                  onClick={onPublish1C}
+                  startIcon={
+                    actionLoading && activeAction === "publish_1c" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />
+                  }
+                  sx={{
+                    ...outlinedActionSx,
+                    borderColor: "#1565c0",
+                    color: "#1565c0",
+                  }}
+                >
+                  Опубликовать в 1с
+                </Button>
               </Box>
             ) : (
               <Box
@@ -194,7 +211,7 @@ const MonitoringRowDialog = ({
                   backgroundColor: "#f5f5f5",
                 }}
               >
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }} p={'3px'} color={'#1565c0'}>
                   {statusLabelMap[row?.status] ?? "Отправлено в 1С"}
                 </Typography>
               </Box>
@@ -209,6 +226,21 @@ const MonitoringRowDialog = ({
           </Box>
         ) : row ? (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {row.is_created_by_merge ? (
+              <Box
+                sx={{
+                  border: "1px solid #90caf9",
+                  borderRadius: 1,
+                  px: 1.5,
+                  py: 1,
+                  backgroundColor: "#e3f2fd",
+                }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: 600, color: "#1565c0" }}>
+                  Поле состоит из объединённых полей
+                </Typography>
+              </Box>
+            ) : null}
             <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 2, pt:1 }}>
               <TextField
                 disabled
@@ -293,6 +325,7 @@ const MonitoringRowDialog = ({
               <FormControl size="small">
                 <InputLabel id="dlg-tech-op-label">Техоперация</InputLabel>
                 <Select
+                  disabled={!canEditStatus}
                   labelId="dlg-tech-op-label"
                   label="Техоперация"
                   value={row.tech_operation_id ?? ""}
@@ -308,6 +341,7 @@ const MonitoringRowDialog = ({
               <FormControl size="small">
                 <InputLabel id="dlg-trailer-label">Прицепное устройство</InputLabel>
                 <Select
+                  disabled={!canEditStatus}
                   labelId="dlg-trailer-label"
                   label="Прицепное устройство"
                   value={row.trailer_id ?? ""}
@@ -339,6 +373,7 @@ const MonitoringRowDialog = ({
               <FormControl size="small" fullWidth>
                 <InputLabel id="dlg-driver-label">Водитель</InputLabel>
                 <Select
+                  disabled={!canEditStatus}
                   labelId="dlg-driver-label"
                   label="Водитель"
                   value={row.driver_id ?? ""}

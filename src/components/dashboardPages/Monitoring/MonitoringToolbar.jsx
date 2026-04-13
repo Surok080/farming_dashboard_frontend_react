@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { MONITORING_SORT_BY_OPTIONS, MONITORING_SORT_ORDER_OPTIONS, MONITORING_STATUS_OPTIONS } from "./monitoringConstants";
 
 const MonitoringToolbar = ({
@@ -11,6 +11,8 @@ const MonitoringToolbar = ({
   onSortOrderChange,
   statusCounts,
   total,
+  hasSelection = false,
+  onClearSelection,
 }) => {
   const statusMetrics = MONITORING_STATUS_OPTIONS.filter((o) => o.value !== "all").map((o) => ({
     ...o,
@@ -83,6 +85,28 @@ const MonitoringToolbar = ({
           py: 0.75,
         }}
       >
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={onClearSelection}
+          disabled={!hasSelection}
+          sx={{
+            marginRight: 'auto',
+            borderColor: "rgba(255,255,255,0.8)",
+            color: "#fff",
+            textTransform: "none",
+            "&:hover": {
+              borderColor: "#fff",
+              backgroundColor: "rgba(255,255,255,0.12)",
+            },
+            "&.Mui-disabled": {
+              borderColor: "rgba(255,255,255,0.35)",
+              color: "rgba(255,255,255,0.6)",
+            },
+          }}
+        >
+          Очистить выбор
+        </Button>
         <Box sx={{ fontWeight: 700 }}>Количество обработок: {Number(total ?? 0)}</Box>
         {statusMetrics.map((metric) => (
           <Box

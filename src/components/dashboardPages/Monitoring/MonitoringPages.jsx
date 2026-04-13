@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, LinearProgress, Tab, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useSnackbar } from "notistack";
@@ -22,6 +22,7 @@ import {
   MONITORING_NON_EDITABLE_SENT_STATUSES,
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CONFIRMED,
+  MONITORING_STATUS_READY_FOR_1C,
   MONITORING_STATUS_RAW,
 } from "./monitoringConstants";
 import { getDefaultMonitoringInterval, parseDatetimeLocal, toApiDateTimeString } from "./monitoringUtils";
@@ -56,6 +57,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [dialogActiveAction, setDialogActiveAction] = useState(null);
   const [dialogSaveLoading, setDialogSaveLoading] = useState(false);
   const [mergeLoading, setMergeLoading] = useState(false);
+  const hasExecutedSearchRef = useRef(false);
   /** { activeKey, nextStatus, successMessage } | null — ожидание подтверждения смены статуса */
   const [statusConfirm, setStatusConfirm] = useState(null);
 
@@ -115,9 +117,16 @@ const MonitoringPages = ({ year: yearProp }) => {
   );
 
   const onRun = () => {
+    hasExecutedSearchRef.current = true;
     setPage(1);
     fetchMonitoringData({ targetPage: 1, targetPageSize: pageSize });
   };
+
+  useEffect(() => {
+    if (!hasExecutedSearchRef.current) return;
+    setPage(1);
+    fetchMonitoringData({ targetPage: 1 });
+  }, [status, sortBy, sortOrder, fetchMonitoringData]);
 
   const handlePageChange = (nextPage) => {
     setPage(nextPage);
@@ -259,6 +268,14 @@ const MonitoringPages = ({ year: yearProp }) => {
       return { ok: true };
     });
 
+  const handleDialogPublish1C = () =>
+    openStatusConfirmIfValid("publish_1c", MONITORING_STATUS_READY_FOR_1C, "Статус изменён", (row) => {
+      if (row?.status !== MONITORING_STATUS_CONFIRMED) {
+        return { ok: false, message: "Публикация в 1С доступна только для подтверждённой строки" };
+      }
+      return { ok: true };
+    });
+
   const handleDialogSave = async () => {
     const row = dialogData?.row;
     if (!row?.id) return;
@@ -325,7 +342,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const canMerge = selectedRowIds.length > 1 && selectedRows.length === selectedConfirmedRows.length;
   const canPublish1C = selectedRowIds.length >= 1 && selectedRows.length === selectedConfirmedRows.length;
 
-  const onPublish1C = () => {
+  const onPublish1C = async () => {
     if (!canPublish1C) {
       enqueueSnackbar("Для публикации выберите минимум 1 подтвержденную строку", {
         variant: "warning",
@@ -333,7 +350,51 @@ const MonitoringPages = ({ year: yearProp }) => {
       });
       return;
     }
-    enqueueSnackbar("Функционал временно недоступен", { variant: "info", autoHideDuration: 3500 });
+    const rowIds = selectedRowIds.map((id) => Number(id)).filter((n) => Number.isFinite(n));
+    if (!rowIds.length) {
+      enqueueSnackbar("Не выбраны строки для публикации", {
+        variant: "warning",
+        autoHideDuration: 2500,
+      });
+      return;
+    }
+
+    setMergeLoading(true);
+    try {
+      const results = await Promise.allSettled(
+        rowIds.map((rowId) => postMonitoringStatus(rowId, MONITORING_STATUS_READY_FOR_1C))
+      );
+      const successCount = results.filter((result) => result.status === "fulfilled").length;
+      const failed = results.filter((result) => result.status === "rejected");
+
+      if (successCount > 0) {
+        enqueueSnackbar(
+          successCount === rowIds.length
+            ? "Строки успешно опубликованы в 1с"
+            : `Опубликовано в 1с: ${successCount} из ${rowIds.length}`,
+          { variant: "success", autoHideDuration: 3000 }
+        );
+      }
+
+      if (failed.length > 0) {
+        const firstError = failed[0]?.reason;
+        enqueueSnackbar(getErrorMessage(firstError, "Не удалось опубликовать часть строк в 1с"), {
+          variant: "error",
+          autoHideDuration: 4500,
+        });
+      }
+
+      setSelectedRowIds([]);
+      await fetchMonitoringData({ targetPage: page, targetPageSize: pageSize });
+    } catch (err) {
+      console.error(err);
+      enqueueSnackbar(getErrorMessage(err, "Не удалось выполнить публикацию в 1с"), {
+        variant: "error",
+        autoHideDuration: 4000,
+      });
+    } finally {
+      setMergeLoading(false);
+    }
   };
 
   const handleApplySettings = () => {
@@ -424,6 +485,8 @@ const MonitoringPages = ({ year: yearProp }) => {
                 onSortOrderChange={setSortOrder}
                 statusCounts={statusCounts}
                 total={total}
+                hasSelection={selectedRowIds.length > 0}
+                onClearSelection={() => setSelectedRowIds([])}
               />
             </Box>
 
@@ -468,12 +531,14 @@ const MonitoringPages = ({ year: yearProp }) => {
         canConfirm={dialogData?.row?.status === MONITORING_STATUS_RAW}
         canReject={[MONITORING_STATUS_RAW, MONITORING_STATUS_CONFIRMED].includes(dialogData?.row?.status)}
         canReturn={[MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_CANCELED].includes(dialogData?.row?.status)}
+        canPublish1C={dialogData?.row?.status === MONITORING_STATUS_CONFIRMED}
         onRowChange={handleDialogRowChange}
         onSave={handleDialogSave}
         saveLoading={dialogSaveLoading}
         onReturn={handleDialogReturn}
         onReject={handleDialogReject}
         onConfirm={handleDialogConfirm}
+        onPublish1C={handleDialogPublish1C}
       />
       <MonitoringStatusConfirmDialog
         open={Boolean(statusConfirm)}

@@ -104,7 +104,6 @@ const MonitoringTable = ({
                 key={row.id}
                 onClick={() => onRowClick?.(row)}
                 sx={{
-                  backgroundColor: row.is_created_by_merge ? "rgba(76,175,80,0.18)" : "transparent",
                   cursor: "pointer",
                   "&:hover": {
                     backgroundColor: "rgba(98, 166, 93, 0.08)",
