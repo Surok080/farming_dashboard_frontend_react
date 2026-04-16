@@ -25,7 +25,28 @@ const grayInactiveSx = {
     borderColor: "#bdbdbd",
     backgroundColor: "rgba(0, 0, 0, 0.04)",
   },
+  "& .MuiButton-startIcon": { color: "#9e9e9e" },
 };
+
+/** Текст «как у дизейбла», рамка — цвет кнопки; по hover текст и иконка — в цвет кнопки */
+const MUTED_TEXT = "#9e9e9e";
+
+const enabledInteractiveAccentSx = (accent, hoverBg) => ({
+  borderColor: accent,
+  color: MUTED_TEXT,
+  "& .MuiButton-startIcon": {
+    color: MUTED_TEXT,
+  },
+  "&:hover": {
+    borderWidth: 1,
+    borderColor: accent,
+    color: accent,
+    backgroundColor: hoverBg,
+    "& .MuiButton-startIcon": {
+      color: accent,
+    },
+  },
+});
 
 const statusLabelMap = {
   RAW: "Сырой статус",
@@ -56,8 +77,32 @@ const activeDisabledOverrideSx = (borderColor, color, bgMuted) => ({
     color,
     backgroundColor: bgMuted,
     WebkitTextFillColor: color,
+    "& .MuiButton-startIcon": {
+      color,
+    },
   },
 });
+
+const mergeStatusButtonSx = (accent, hoverBg, isCurrentStatus, disabled) => {
+  if (disabled && isCurrentStatus) {
+    return {
+      ...outlinedActionSx,
+      ...activeDisabledOverrideSx(accent, accent, hoverBg),
+    };
+  }
+  if (disabled && !isCurrentStatus) {
+    return {
+      ...outlinedActionSx,
+      ...grayInactiveSx,
+      ...disabledCursorSx,
+    };
+  }
+  return {
+    ...outlinedActionSx,
+    ...enabledInteractiveAccentSx(accent, hoverBg),
+    cursor: "pointer",
+  };
+};
 
 const MonitoringStatusActions = ({
   row,
@@ -113,21 +158,7 @@ const MonitoringStatusActions = ({
         disabled={disabledReturn}
         onClick={onReturn}
         startIcon={actionLoading && activeAction === "return" ? <CircularProgress size={16} /> : <HelpOutlineOutlinedIcon />}
-        sx={{
-          ...outlinedActionSx,
-          ...(activeRaw
-            ? {
-                borderColor: "#000000",
-                color: "#000000",
-                "&:hover": { borderWidth: 1, borderColor: "#000000", backgroundColor: "rgba(0, 0, 0, 0.06)" },
-              }
-            : grayInactiveSx),
-          ...(disabledReturn
-            ? activeRaw
-              ? activeDisabledOverrideSx("#000000", "#000000", "rgba(0, 0, 0, 0.06)")
-              : disabledCursorSx
-            : { cursor: "pointer" }),
-        }}
+        sx={mergeStatusButtonSx("#000000", "rgba(0, 0, 0, 0.06)", activeRaw, disabledReturn)}
       >
         Сырой статус
       </Button>
@@ -136,21 +167,7 @@ const MonitoringStatusActions = ({
         disabled={disabledReject}
         onClick={onReject}
         startIcon={actionLoading && activeAction === "reject" ? <CircularProgress size={16} /> : <CancelOutlinedIcon />}
-        sx={{
-          ...outlinedActionSx,
-          ...(activeReject
-            ? {
-                borderColor: "#d32f2f",
-                color: "#d32f2f",
-                "&:hover": { borderWidth: 1, borderColor: "#d32f2f", backgroundColor: "rgba(211, 47, 47, 0.08)" },
-              }
-            : grayInactiveSx),
-          ...(disabledReject
-            ? activeReject
-              ? activeDisabledOverrideSx("#d32f2f", "#d32f2f", "rgba(211, 47, 47, 0.08)")
-              : disabledCursorSx
-            : { cursor: "pointer" }),
-        }}
+        sx={mergeStatusButtonSx("#d32f2f", "rgba(211, 47, 47, 0.08)", activeReject, disabledReject)}
       >
         Отклоненный
       </Button>
@@ -159,21 +176,7 @@ const MonitoringStatusActions = ({
         disabled={disabledConfirm}
         onClick={onConfirm}
         startIcon={actionLoading && activeAction === "confirm" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
-        sx={{
-          ...outlinedActionSx,
-          ...(activeConfirm
-            ? {
-                borderColor: "#62A65D",
-                color: "#62A65D",
-                "&:hover": { borderWidth: 1, borderColor: "#62A65D", backgroundColor: "rgba(98, 166, 93, 0.12)" },
-              }
-            : grayInactiveSx),
-          ...(disabledConfirm
-            ? activeConfirm
-              ? activeDisabledOverrideSx("#62A65D", "#62A65D", "rgba(98, 166, 93, 0.12)")
-              : disabledCursorSx
-            : { cursor: "pointer" }),
-        }}
+        sx={mergeStatusButtonSx("#62A65D", "rgba(98, 166, 93, 0.12)", activeConfirm, disabledConfirm)}
       >
         Подтвержденный
       </Button>
@@ -182,21 +185,7 @@ const MonitoringStatusActions = ({
         disabled={disabledPublish}
         onClick={onPublish1C}
         startIcon={actionLoading && activeAction === "publish_1c" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
-        sx={{
-          ...outlinedActionSx,
-          ...(activePublish
-            ? {
-                borderColor: "#1565c0",
-                color: "#1565c0",
-                "&:hover": { borderWidth: 1, borderColor: "#1565c0", backgroundColor: "rgba(21, 101, 192, 0.08)" },
-              }
-            : grayInactiveSx),
-          ...(disabledPublish
-            ? activePublish
-              ? activeDisabledOverrideSx("#1565c0", "#1565c0", "rgba(21, 101, 192, 0.08)")
-              : disabledCursorSx
-            : { cursor: "pointer" }),
-        }}
+        sx={mergeStatusButtonSx("#1565c0", "rgba(21, 101, 192, 0.08)", activePublish, disabledPublish)}
       >
         Опубликовать в 1с
       </Button>
