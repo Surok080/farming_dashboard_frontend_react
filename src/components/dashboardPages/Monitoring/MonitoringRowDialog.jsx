@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Chip, Dialog, DialogTitle, Typography } from "@mui/material";
+import { Box, Dialog, DialogTitle, Typography } from "@mui/material";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import ParkOutlinedIcon from "@mui/icons-material/ParkOutlined";
 import IconButton from "@mui/material/IconButton";
@@ -10,7 +10,6 @@ import {
   MONITORING_NON_EDITABLE_SENT_STATUSES,
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CONFIRMED,
-  MONITORING_STATUS_LABEL,
   MONITORING_STATUS_RAW,
 } from "./monitoringConstants";
 
@@ -20,14 +19,6 @@ const getDialogBorderColor = (status) => {
   if (status === MONITORING_STATUS_CANCELED) return "#d32f2f";
   if (MONITORING_NON_EDITABLE_SENT_STATUSES.includes(status)) return "#1565c0";
   return "#62A65D";
-};
-
-const getStatusChipBackground = (borderColor) => {
-  if (borderColor === "#000000") return "rgba(0, 0, 0, 0.06)";
-  if (borderColor === "#62A65D") return "rgba(98, 166, 93, 0.12)";
-  if (borderColor === "#d32f2f") return "rgba(211, 47, 47, 0.08)";
-  if (borderColor === "#1565c0") return "rgba(21, 101, 192, 0.08)";
-  return "rgba(98, 166, 93, 0.12)";
 };
 
 const MonitoringRowDialog = ({
@@ -71,14 +62,6 @@ const MonitoringRowDialog = ({
   };
 
   const dialogBorderColor = getDialogBorderColor(row?.status);
-  const statusChipLabel = row?.status ? MONITORING_STATUS_LABEL[row.status] ?? row.status : null;
-  const statusChip = statusChipLabel
-    ? {
-        label: statusChipLabel,
-        borderColor: dialogBorderColor,
-        backgroundColor: getStatusChipBackground(dialogBorderColor),
-      }
-    : null;
 
   return (
     <Dialog
@@ -151,24 +134,9 @@ const MonitoringRowDialog = ({
               />
             </Box>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>
-            {statusChip ? (
-              <Chip
-                size="small"
-                label={statusChip.label}
-                sx={{
-                  fontWeight: 600,
-                  border: `1px solid ${statusChip.borderColor}`,
-                  color: statusChip.borderColor,
-                  backgroundColor: statusChip.backgroundColor,
-                  "& .MuiChip-label": { px: 1 },
-                }}
-              />
-            ) : null}
-            <IconButton onClick={onClose} size="small" sx={{ color: "#d32f2f" }}>
-              <CloseOutlinedIcon />
-            </IconButton>
-          </Box>
+          <IconButton onClick={onClose} size="small" sx={{ color: "#d32f2f" }}>
+            <CloseOutlinedIcon />
+          </IconButton>
         </Box>
       </DialogTitle>
       <MonitoringRowDialogContent
