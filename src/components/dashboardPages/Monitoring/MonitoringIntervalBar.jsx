@@ -19,22 +19,16 @@ const MonitoringIntervalBar = ({
     (e) => {
       const next = e.target.value;
       setIntervalFrom(next);
-      if (next && intervalTo && next > intervalTo) {
-        setIntervalTo(next);
-      }
     },
-    [intervalTo, setIntervalFrom, setIntervalTo]
+    [setIntervalFrom]
   );
 
   const handleToChange = useCallback(
     (e) => {
       const next = e.target.value;
       setIntervalTo(next);
-      if (next && intervalFrom && next < intervalFrom) {
-        setIntervalFrom(next);
-      }
     },
-    [intervalFrom, setIntervalFrom, setIntervalTo]
+    [setIntervalTo]
   );
 
   return (
@@ -59,9 +53,6 @@ const MonitoringIntervalBar = ({
             onChange={handleFromChange}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
-            inputProps={{
-              max: intervalTo || undefined,
-            }}
             InputProps={{ sx: datetimeLocalInputSx }}
           />
           <TextField
@@ -72,9 +63,6 @@ const MonitoringIntervalBar = ({
             onChange={handleToChange}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
-            inputProps={{
-              min: intervalFrom || undefined,
-            }}
             InputProps={{ sx: datetimeLocalInputSx }}
           />
 

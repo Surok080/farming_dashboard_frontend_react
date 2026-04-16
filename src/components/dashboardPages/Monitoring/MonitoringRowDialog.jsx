@@ -1,42 +1,11 @@
 import React from "react";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Dialog, DialogTitle, Typography } from "@mui/material";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ParkOutlinedIcon from "@mui/icons-material/ParkOutlined";
 import IconButton from "@mui/material/IconButton";
-import { formatNumberForDisplay, formatPeriodRangeDisplay } from "./monitoringUtils";
-
-const outlinedActionSx = {
-  textTransform: "uppercase",
-  fontWeight: 600,
-  borderWidth: 2,
-  "&:hover": { borderWidth: 2 },
-};
-
-const statusLabelMap = {
-  RAW: "Сырой статус",
-  CANCELED: "Отклоненный статус",
-  CONFIRMED: "Подтвержденный статус",
-  READY_FOR_1C: "Опубликованно в 1с",
-  SENT: "Опубликованно в 1с",
-  SENT_TO_1C: "Опубликованно в 1с",
-};
+import MonitoringFieldGeometryPreview from "./MonitoringFieldGeometryPreview";
+import MonitoringStatusActions from "./MonitoringStatusActions";
+import MonitoringRowDialogContent from "./MonitoringRowDialogContent";
 
 const MonitoringRowDialog = ({
   open,
@@ -78,13 +47,6 @@ const MonitoringRowDialog = ({
     });
   };
 
-  const areaFmt = row ? formatNumberForDisplay(row.area, 3) : null;
-  const trailerWidthFmt = row ? formatNumberForDisplay(row.trailer_width, 3) : null;
-  const fuelFmt = row ? formatNumberForDisplay(row.fuel, 3) : null;
-  const durationFmt = row ? formatNumberForDisplay(row.duration_hours, 3) : null;
-  const areaWorkedFmt = row ? formatNumberForDisplay(row.area_worked, 3) : null;
-  const periodRangeDisplay = row ? formatPeriodRangeDisplay(row.period_start, row.period_stop) : "";
-
   return (
     <Dialog
       open={open}
@@ -100,313 +62,77 @@ const MonitoringRowDialog = ({
     >
       <DialogTitle sx={{ pb: 1 }}>
         <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2 }}>
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Регистрация обработки, Сезон {year ?? new Date().getFullYear()}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Редактирование, отклонения и подтверждения потенциальной обработки
-            </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, minWidth: 0 }}>
+            {row ? (
+              <Box
+                sx={{
+                  width: 200,
+                  border: "2px solid #62A65D",
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.75,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {row?.field_geometry_json ? (
+                  <MonitoringFieldGeometryPreview geometry={row.field_geometry_json} />
+                ) : (
+                  <ParkOutlinedIcon sx={{ color: "#62A65D", flexShrink: 0, fontSize: 66 }} />
+                )}
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 0.5, fontWeight: 600, width: "100%", textAlign: "center", overflow: "hidden", textOverflow: "ellipsis" }}
+                >
+                  {row.field_name ?? "—"}
+                </Typography>
+              </Box>
+            ) : null}
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Регистрация обработки, Сезон {year ?? new Date().getFullYear()}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Редактирование, отклонения и подтверждения потенциальной обработки
+              </Typography>
+              <MonitoringStatusActions
+                row={row}
+                canEditStatus={canEditStatus}
+                actionLoading={actionLoading}
+                activeAction={activeAction}
+                canReturn={canReturn}
+                canReject={canReject}
+                canConfirm={canConfirm}
+                canPublish1C={canPublish1C}
+                onReturn={onReturn}
+                onReject={onReject}
+                onConfirm={onConfirm}
+                onPublish1C={onPublish1C}
+              />
+            </Box>
           </Box>
           <IconButton onClick={onClose} size="small" sx={{ color: "#d32f2f" }}>
             <CloseOutlinedIcon />
           </IconButton>
         </Box>
-
-        {row ? (
-          <Box
-            sx={{
-              mt: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 2,
-              flexWrap: "wrap",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                border: "2px solid #62A65D",
-                borderRadius: 1,
-                px: 1.5,
-                py: 0.75,
-                minWidth: 0,
-                flex: "1 1 240px",
-              }}
-            >
-              <ParkOutlinedIcon sx={{ color: "#62A65D", flexShrink: 0 }} />
-              <Typography variant="body2" sx={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}>
-                {row.field_name ?? "—"}
-              </Typography>
-            </Box>
-            {canEditStatus ? (
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                <Button
-                  variant="outlined"
-                  disabled={actionLoading || !canReturn}
-                  onClick={onReturn}
-                  startIcon={
-                    actionLoading && activeAction === "return" ? <CircularProgress size={16} /> : <HelpOutlineOutlinedIcon />
-                  }
-                  sx={{
-                    ...outlinedActionSx,
-                    borderColor: "#62A65D",
-                    color: "#62A65D",
-                  }}
-                >
-                  Сырой статус
-                </Button>
-                <Button
-                  variant="outlined"
-                  disabled={actionLoading || !canReject}
-                  onClick={onReject}
-                  startIcon={actionLoading && activeAction === "reject" ? <CircularProgress size={16} /> : <CancelOutlinedIcon />}
-                  sx={{
-                    ...outlinedActionSx,
-                    borderColor: "#d32f2f",
-                    color: "#d32f2f",
-                  }}
-                >
-                  Отклоненный статус
-                </Button>
-                <Button
-                  variant="outlined"
-                  disabled={actionLoading || !canConfirm}
-                  onClick={onConfirm}
-                  startIcon={actionLoading && activeAction === "confirm" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
-                  sx={{
-                    ...outlinedActionSx,
-                    borderColor: "#62A65D",
-                    color: "#62A65D",
-                  }}
-                >
-                  Подтвержденный статус
-                </Button>
-                <Button
-                  variant="outlined"
-                  disabled={actionLoading || !canPublish1C}
-                  onClick={onPublish1C}
-                  startIcon={
-                    actionLoading && activeAction === "publish_1c" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />
-                  }
-                  sx={{
-                    ...outlinedActionSx,
-                    borderColor: "#1565c0",
-                    color: "#1565c0",
-                  }}
-                >
-                  Опубликовать в 1с
-                </Button>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  border: "1px solid #bdbdbd",
-                  borderRadius: 1,
-                  px: 1.5,
-                  py: 0.75,
-                  backgroundColor: "#f5f5f5",
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 600 }} p={'3px'} color={'#1565c0'}>
-                  {statusLabelMap[row?.status] ?? "Отправлено в 1С"}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-        ) : null}
       </DialogTitle>
-      <DialogContent sx={{ pt: 1 }}>
-        {loading ? (
-          <Box sx={{ py: 6, display: "flex", justifyContent: "center" }}>
-            <CircularProgress />
-          </Box>
-        ) : row ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {row.is_created_by_merge ? (
-              <Box
-                sx={{
-                  border: "1px solid #90caf9",
-                  borderRadius: 1,
-                  px: 1.5,
-                  py: 1,
-                  backgroundColor: "#e3f2fd",
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 600, color: "#1565c0" }}>
-                  Поле состоит из объединённых полей
-                </Typography>
-              </Box>
-            ) : null}
-            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 2, pt:1 }}>
-              <TextField
-                disabled
-                size="small"
-                label="Период"
-                value={periodRangeDisplay === "—" ? "" : periodRangeDisplay}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                disabled
-                size="small"
-                label="Расход (л)"
-                value={fuelFmt?.display === "—" ? "" : fuelFmt?.display ?? ""}
-                InputLabelProps={{ shrink: true }}
-                inputProps={{
-                  title: fuelFmt?.hasTooltip ? fuelFmt.full : undefined,
-                }}
-              />
-              <TextField
-                disabled
-                size="small"
-                label="Моточасы"
-                value={durationFmt?.display === "—" ? "" : durationFmt?.display ?? ""}
-                InputLabelProps={{ shrink: true }}
-                inputProps={{
-                  title: durationFmt?.hasTooltip ? durationFmt.full : undefined,
-                }}
-              />
-              <TextField
-                disabled
-                size="small"
-                label="Выработка, га"
-                value={areaWorkedFmt?.display === "—" ? "" : areaWorkedFmt?.display ?? ""}
-                InputLabelProps={{ shrink: true }}
-                inputProps={{
-                  title: areaWorkedFmt?.hasTooltip ? areaWorkedFmt.full : undefined,
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderWidth: 2,
-                  },
-                }}
-              />
-            </Box>
-
-            <Divider />
-
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Работа в агрозоне
-            </Typography>
-            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(200px, 1fr))", gap: 2 }}>
-              <TextField
-                disabled
-                size="small"
-                label="Геозона, поле"
-                value={row.field_name ?? ""}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                disabled
-                size="small"
-                label="Культура"
-                value={row.culture_name ?? ""}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                disabled
-                size="small"
-                label="Площадь, га"
-                value={areaFmt?.display === "—" ? "" : areaFmt?.display ?? ""}
-                InputLabelProps={{ shrink: true }}
-                inputProps={{
-                  title: areaFmt?.hasTooltip ? areaFmt.full : undefined,
-                }}
-              />
-            </Box>
-
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Движение
-            </Typography>
-            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(200px, 1fr))", gap: 2 }}>
-              <FormControl size="small">
-                <InputLabel id="dlg-tech-op-label">Техоперация</InputLabel>
-                <Select
-                  disabled={!canEditStatus}
-                  labelId="dlg-tech-op-label"
-                  label="Техоперация"
-                  value={row.tech_operation_id ?? ""}
-                  onChange={handleFieldChange("tech_operation_id")}
-                >
-                  {operations.map((o) => (
-                    <MenuItem key={o.id} value={o.id}>
-                      {o.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl size="small">
-                <InputLabel id="dlg-trailer-label">Прицепное устройство</InputLabel>
-                <Select
-                  disabled={!canEditStatus}
-                  labelId="dlg-trailer-label"
-                  label="Прицепное устройство"
-                  value={row.trailer_id ?? ""}
-                  onChange={handleTrailerChange}
-                >
-                  {trailers.map((t) => (
-                    <MenuItem key={t.id} value={t.id}>
-                      {t.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextField
-                disabled
-                size="small"
-                label="Ширина, м"
-                value={trailerWidthFmt?.display === "—" ? "" : trailerWidthFmt?.display ?? ""}
-                InputLabelProps={{ shrink: true }}
-                inputProps={{
-                  title: trailerWidthFmt?.hasTooltip ? trailerWidthFmt.full : undefined,
-                }}
-              />
-            </Box>
-
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Водитель, тракторист-машинист
-            </Typography>
-            <Box sx={{ width: 300 }}>
-              <FormControl size="small" fullWidth>
-                <InputLabel id="dlg-driver-label">Водитель</InputLabel>
-                <Select
-                  disabled={!canEditStatus}
-                  labelId="dlg-driver-label"
-                  label="Водитель"
-                  value={row.driver_id ?? ""}
-                  onChange={handleFieldChange("driver_id")}
-                >
-                  {drivers.map((d) => (
-                    <MenuItem key={d.id} value={d.id}>
-                      {d.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
-              <Button
-                variant="contained"
-                onClick={onSave}
-                disabled={saveLoading || !canEditStatus}
-                startIcon={saveLoading ? <CircularProgress size={16} color="inherit" /> : null}
-                sx={{ backgroundColor: "#62A65D" }}
-              >
-                Сохранить
-              </Button>
-              <Button variant="outlined" onClick={onClose}>
-                Отмена
-              </Button>
-            </Box>
-          </Box>
-        ) : (
-          <Typography color="text.secondary">Нет данных по выбранной строке.</Typography>
-        )}
-      </DialogContent>
+      <MonitoringRowDialogContent
+        loading={loading}
+        row={row}
+        canEditStatus={canEditStatus}
+        operations={operations}
+        trailers={trailers}
+        drivers={drivers}
+        onTechOperationChange={handleFieldChange("tech_operation_id")}
+        onTrailerChange={handleTrailerChange}
+        onDriverChange={handleFieldChange("driver_id")}
+        onSave={onSave}
+        saveLoading={saveLoading}
+        onClose={onClose}
+      />
     </Dialog>
   );
 };

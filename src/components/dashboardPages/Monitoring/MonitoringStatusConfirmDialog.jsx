@@ -15,7 +15,7 @@ const MonitoringStatusConfirmDialog = ({ open, nextStatus, onConfirm, onCancel, 
         </Typography>
         {isPublishTo1C ? (
           <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }} color="error">
-            После публикации в 1с вернуть статус обратно нельзя.
+            После публикации в 1с вернуть статус обратно будет нельзя.
           </Typography>
         ) : null}
       </DialogContent>

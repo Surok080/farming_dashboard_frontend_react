@@ -34,6 +34,8 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const [intervalFrom, setIntervalFrom] = useState(() => getDefaultMonitoringInterval().from);
   const [intervalTo, setIntervalTo] = useState(() => getDefaultMonitoringInterval().to);
+  const [appliedIntervalFrom, setAppliedIntervalFrom] = useState(() => getDefaultMonitoringInterval().from);
+  const [appliedIntervalTo, setAppliedIntervalTo] = useState(() => getDefaultMonitoringInterval().to);
 
   const [status, setStatus] = useState("all");
   const [sortBy, setSortBy] = useState("period_start");
@@ -60,15 +62,13 @@ const MonitoringPages = ({ year: yearProp }) => {
   const hasExecutedSearchRef = useRef(false);
   /** { activeKey, nextStatus, successMessage } | null — ожидание подтверждения смены статуса */
   const [statusConfirm, setStatusConfirm] = useState(null);
+  const [headerPublishConfirmOpen, setHeaderPublishConfirmOpen] = useState(false);
 
   const fetchMonitoringData = useCallback(
-    async ({ targetPage = 1, targetPageSize = pageSize } = {}) => {
-      const start = toApiDateTimeString(intervalFrom);
-      const stop = toApiDateTimeString(intervalTo);
-      if (!start || !stop || !parseDatetimeLocal(intervalFrom) || !parseDatetimeLocal(intervalTo)) {
-        enqueueSnackbar("Укажите корректный интервал дат", { variant: "warning" });
-        return;
-      }
+    async ({ targetPage = 1, targetPageSize = pageSize, from = appliedIntervalFrom, to = appliedIntervalTo } = {}) => {
+      const start = toApiDateTimeString(from);
+      const stop = toApiDateTimeString(to);
+      if (!start || !stop) return;
 
       setLoading(true);
       try {
@@ -113,20 +113,33 @@ const MonitoringPages = ({ year: yearProp }) => {
         setLoading(false);
       }
     },
-    [intervalFrom, intervalTo, status, sortBy, sortOrder, pageSize, enqueueSnackbar, pruneInvalidIds]
+    [appliedIntervalFrom, appliedIntervalTo, status, sortBy, sortOrder, pageSize, pruneInvalidIds]
   );
 
+  const fetchMonitoringDataRef = useRef(fetchMonitoringData);
+  useEffect(() => {
+    fetchMonitoringDataRef.current = fetchMonitoringData;
+  }, [fetchMonitoringData]);
+
   const onRun = () => {
+    const start = toApiDateTimeString(intervalFrom);
+    const stop = toApiDateTimeString(intervalTo);
+    if (!start || !stop || !parseDatetimeLocal(intervalFrom) || !parseDatetimeLocal(intervalTo)) {
+      enqueueSnackbar("Укажите корректный интервал дат", { variant: "warning" });
+      return;
+    }
     hasExecutedSearchRef.current = true;
     setPage(1);
-    fetchMonitoringData({ targetPage: 1, targetPageSize: pageSize });
+    setAppliedIntervalFrom(intervalFrom);
+    setAppliedIntervalTo(intervalTo);
+    fetchMonitoringData({ targetPage: 1, targetPageSize: pageSize, from: intervalFrom, to: intervalTo });
   };
 
   useEffect(() => {
     if (!hasExecutedSearchRef.current) return;
     setPage(1);
-    fetchMonitoringData({ targetPage: 1 });
-  }, [status, sortBy, sortOrder, fetchMonitoringData]);
+    fetchMonitoringDataRef.current({ targetPage: 1 });
+  }, [status, sortBy, sortOrder]);
 
   const handlePageChange = (nextPage) => {
     setPage(nextPage);
@@ -342,7 +355,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const canMerge = selectedRowIds.length > 1 && selectedRows.length === selectedConfirmedRows.length;
   const canPublish1C = selectedRowIds.length >= 1 && selectedRows.length === selectedConfirmedRows.length;
 
-  const onPublish1C = async () => {
+  const executePublish1C = async () => {
     if (!canPublish1C) {
       enqueueSnackbar("Для публикации выберите минимум 1 подтвержденную строку", {
         variant: "warning",
@@ -395,6 +408,26 @@ const MonitoringPages = ({ year: yearProp }) => {
     } finally {
       setMergeLoading(false);
     }
+  };
+
+  const onPublish1C = () => {
+    if (mergeLoading) return;
+    if (!canPublish1C) {
+      enqueueSnackbar("Для публикации выберите минимум 1 подтвержденную строку", {
+        variant: "warning",
+        autoHideDuration: 2500,
+      });
+      return;
+    }
+    const rowIds = selectedRowIds.map((id) => Number(id)).filter((n) => Number.isFinite(n));
+    if (!rowIds.length) {
+      enqueueSnackbar("Не выбраны строки для публикации", {
+        variant: "warning",
+        autoHideDuration: 2500,
+      });
+      return;
+    }
+    setHeaderPublishConfirmOpen(true);
   };
 
   const handleApplySettings = () => {
@@ -460,9 +493,7 @@ const MonitoringPages = ({ year: yearProp }) => {
               />
             </Box>
 
-            {loading ? (
-              <LinearProgress sx={{ mt: 0.5, flexShrink: 0 }} />
-            ) : null}
+            <LinearProgress sx={{ mt: 0.5, flexShrink: 0, visibility: loading ? "visible" : "hidden" }} />
 
             <Box sx={{ flexShrink: 0 }}>
               <MonitoringIntervalBar
@@ -547,6 +578,18 @@ const MonitoringPages = ({ year: yearProp }) => {
         onConfirm={applyStatusChange}
         onCancel={() => {
           if (!dialogActionLoading) setStatusConfirm(null);
+        }}
+      />
+      <MonitoringStatusConfirmDialog
+        open={headerPublishConfirmOpen}
+        nextStatus={MONITORING_STATUS_READY_FOR_1C}
+        loading={mergeLoading}
+        onConfirm={() => {
+          setHeaderPublishConfirmOpen(false);
+          executePublish1C();
+        }}
+        onCancel={() => {
+          if (!mergeLoading) setHeaderPublishConfirmOpen(false);
         }}
       />
     </Box>
