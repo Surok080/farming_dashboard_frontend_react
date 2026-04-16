@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Dialog, DialogTitle, Typography } from "@mui/material";
+import { Box, Chip, Dialog, DialogTitle, Typography } from "@mui/material";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import ParkOutlinedIcon from "@mui/icons-material/ParkOutlined";
 import IconButton from "@mui/material/IconButton";
@@ -151,9 +151,24 @@ const MonitoringRowDialog = ({
               />
             </Box>
           </Box>
-          <IconButton onClick={onClose} size="small" sx={{ color: "#d32f2f" }}>
-            <CloseOutlinedIcon />
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>
+            {statusChip ? (
+              <Chip
+                size="small"
+                label={statusChip.label}
+                sx={{
+                  fontWeight: 600,
+                  border: `1px solid ${statusChip.borderColor}`,
+                  color: statusChip.borderColor,
+                  backgroundColor: statusChip.backgroundColor,
+                  "& .MuiChip-label": { px: 1 },
+                }}
+              />
+            ) : null}
+            <IconButton onClick={onClose} size="small" sx={{ color: "#d32f2f" }}>
+              <CloseOutlinedIcon />
+            </IconButton>
+          </Box>
         </Box>
       </DialogTitle>
       <MonitoringRowDialogContent
@@ -169,7 +184,6 @@ const MonitoringRowDialog = ({
         onSave={onSave}
         saveLoading={saveLoading}
         onClose={onClose}
-        statusChip={statusChip}
       />
     </Dialog>
   );

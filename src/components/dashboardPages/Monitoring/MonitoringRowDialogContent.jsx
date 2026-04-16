@@ -2,7 +2,6 @@ import React from "react";
 import {
     Box,
     Button,
-    Chip,
     CircularProgress,
     DialogContent,
     Divider,
@@ -28,7 +27,6 @@ const MonitoringRowDialogContent = ({
                                         onSave,
                                         saveLoading,
                                         onClose,
-                                        statusChip = null,
                                     }) => {
     const missingOptionsOutlineSx = {
         "& .MuiOutlinedInput-notchedOutline": {
@@ -194,35 +192,19 @@ const MonitoringRowDialogContent = ({
                         </FormControl>
                     </Box>
 
-                    <Box sx={{display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap"}}>
-                        {statusChip ? (
-                            <Chip
-                                size="small"
-                                label={statusChip.label}
-                                sx={{
-                                    fontWeight: 600,
-                                    border: `1px solid ${statusChip.borderColor}`,
-                                    color: statusChip.borderColor,
-                                    backgroundColor: statusChip.backgroundColor,
-                                    "& .MuiChip-label": {px: 1},
-                                }}
-                            />
-                        ) : null}
-                        <Box sx={{flex: 1, minWidth: 8}}/>
-                        <Box sx={{display: "flex", gap: 1, flexShrink: 0}}>
-                            <Button
-                                variant="contained"
-                                onClick={onSave}
-                                disabled={saveLoading || !canEditStatus}
-                                startIcon={saveLoading ? <CircularProgress size={16} color="inherit"/> : null}
-                                sx={{backgroundColor: "#62A65D"}}
-                            >
-                                Сохранить
-                            </Button>
-                            <Button variant="outlined" onClick={onClose}>
-                                Отмена
-                            </Button>
-                        </Box>
+                    <Box sx={{display: "flex", justifyContent: "flex-end", gap: 1}}>
+                        <Button
+                            variant="contained"
+                            onClick={onSave}
+                            disabled={saveLoading || !canEditStatus}
+                            startIcon={saveLoading ? <CircularProgress size={16} color="inherit"/> : null}
+                            sx={{backgroundColor: "#62A65D"}}
+                        >
+                            Сохранить
+                        </Button>
+                        <Button variant="outlined" onClick={onClose}>
+                            Отмена
+                        </Button>
                     </Box>
                 </Box>
             ) : (
