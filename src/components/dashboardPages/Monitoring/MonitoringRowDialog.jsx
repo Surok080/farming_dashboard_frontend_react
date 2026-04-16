@@ -6,6 +6,29 @@ import IconButton from "@mui/material/IconButton";
 import MonitoringFieldGeometryPreview from "./MonitoringFieldGeometryPreview";
 import MonitoringStatusActions from "./MonitoringStatusActions";
 import MonitoringRowDialogContent from "./MonitoringRowDialogContent";
+import {
+  MONITORING_NON_EDITABLE_SENT_STATUSES,
+  MONITORING_STATUS_CANCELED,
+  MONITORING_STATUS_CONFIRMED,
+  MONITORING_STATUS_LABEL,
+  MONITORING_STATUS_RAW,
+} from "./monitoringConstants";
+
+const getDialogBorderColor = (status) => {
+  if (status === MONITORING_STATUS_RAW) return "#000000";
+  if (status === MONITORING_STATUS_CONFIRMED) return "#62A65D";
+  if (status === MONITORING_STATUS_CANCELED) return "#d32f2f";
+  if (MONITORING_NON_EDITABLE_SENT_STATUSES.includes(status)) return "#1565c0";
+  return "#62A65D";
+};
+
+const getStatusChipBackground = (borderColor) => {
+  if (borderColor === "#000000") return "rgba(0, 0, 0, 0.06)";
+  if (borderColor === "#62A65D") return "rgba(98, 166, 93, 0.12)";
+  if (borderColor === "#d32f2f") return "rgba(211, 47, 47, 0.08)";
+  if (borderColor === "#1565c0") return "rgba(21, 101, 192, 0.08)";
+  return "rgba(98, 166, 93, 0.12)";
+};
 
 const MonitoringRowDialog = ({
   open,
@@ -47,6 +70,16 @@ const MonitoringRowDialog = ({
     });
   };
 
+  const dialogBorderColor = getDialogBorderColor(row?.status);
+  const statusChipLabel = row?.status ? MONITORING_STATUS_LABEL[row.status] ?? row.status : null;
+  const statusChip = statusChipLabel
+    ? {
+        label: statusChipLabel,
+        borderColor: dialogBorderColor,
+        backgroundColor: getStatusChipBackground(dialogBorderColor),
+      }
+    : null;
+
   return (
     <Dialog
       open={open}
@@ -55,7 +88,7 @@ const MonitoringRowDialog = ({
       maxWidth="lg"
       PaperProps={{
         sx: {
-          border: "2px solid #62A65D",
+          border: `1px solid ${dialogBorderColor}`,
           borderRadius: 2,
         },
       }}
@@ -67,7 +100,7 @@ const MonitoringRowDialog = ({
               <Box
                 sx={{
                   width: 200,
-                  border: "2px solid #62A65D",
+                  border: `1px solid ${dialogBorderColor}`,
                   borderRadius: 1,
                   px: 1,
                   py: 0.75,
@@ -79,9 +112,13 @@ const MonitoringRowDialog = ({
                 }}
               >
                 {row?.field_geometry_json ? (
-                  <MonitoringFieldGeometryPreview geometry={row.field_geometry_json} />
+                  <MonitoringFieldGeometryPreview
+                    geometry={row.field_geometry_json}
+                    stroke={dialogBorderColor}
+                    fill={dialogBorderColor === "#000000" ? "rgba(0, 0, 0, 0.12)" : undefined}
+                  />
                 ) : (
-                  <ParkOutlinedIcon sx={{ color: "#62A65D", flexShrink: 0, fontSize: 66 }} />
+                  <ParkOutlinedIcon sx={{ color: dialogBorderColor, flexShrink: 0, fontSize: 66 }} />
                 )}
                 <Typography
                   variant="body2"
@@ -132,6 +169,7 @@ const MonitoringRowDialog = ({
         onSave={onSave}
         saveLoading={saveLoading}
         onClose={onClose}
+        statusChip={statusChip}
       />
     </Dialog>
   );
