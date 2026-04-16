@@ -8,6 +8,7 @@ import {
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CONFIRMED,
   MONITORING_STATUS_RAW,
+  MONITORING_STATUS_RAW_COLOR,
 } from "./monitoringConstants";
 
 const outlinedActionSx = {
@@ -158,7 +159,7 @@ const MonitoringStatusActions = ({
         disabled={disabledReturn}
         onClick={onReturn}
         startIcon={actionLoading && activeAction === "return" ? <CircularProgress size={16} /> : <HelpOutlineOutlinedIcon />}
-        sx={mergeStatusButtonSx("#000000", "rgba(0, 0, 0, 0.06)", activeRaw, disabledReturn)}
+        sx={mergeStatusButtonSx(MONITORING_STATUS_RAW_COLOR, "rgba(255, 152, 0, 0.12)", activeRaw, disabledReturn)}
       >
         Сырой статус
       </Button>

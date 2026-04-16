@@ -1,5 +1,8 @@
 /** Коды статусов строк мониторинга (синхронно с бэкендом) */
 export const MONITORING_STATUS_RAW = "RAW";
+/** Акцент сырого статуса: кнопки, рамка модалки, превью поля */
+export const MONITORING_STATUS_RAW_COLOR = "#FF9800";
+export const MONITORING_STATUS_RAW_FILL_SOFT = "rgba(255, 152, 0, 0.14)";
 export const MONITORING_STATUS_CONFIRMED = "CONFIRMED";
 export const MONITORING_STATUS_CANCELED = "CANCELED";
 export const MONITORING_STATUS_READY_FOR_1C = "READY_FOR_1C";

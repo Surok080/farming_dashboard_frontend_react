@@ -11,10 +11,12 @@ import {
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CONFIRMED,
   MONITORING_STATUS_RAW,
+  MONITORING_STATUS_RAW_COLOR,
+  MONITORING_STATUS_RAW_FILL_SOFT,
 } from "./monitoringConstants";
 
 const getDialogBorderColor = (status) => {
-  if (status === MONITORING_STATUS_RAW) return "#000000";
+  if (status === MONITORING_STATUS_RAW) return MONITORING_STATUS_RAW_COLOR;
   if (status === MONITORING_STATUS_CONFIRMED) return "#62A65D";
   if (status === MONITORING_STATUS_CANCELED) return "#d32f2f";
   if (MONITORING_NON_EDITABLE_SENT_STATUSES.includes(status)) return "#1565c0";
@@ -71,7 +73,7 @@ const MonitoringRowDialog = ({
       maxWidth="lg"
       PaperProps={{
         sx: {
-          border: `1px solid ${dialogBorderColor}`,
+          border: `2px solid ${dialogBorderColor}`,
           borderRadius: 2,
         },
       }}
@@ -98,7 +100,7 @@ const MonitoringRowDialog = ({
                   <MonitoringFieldGeometryPreview
                     geometry={row.field_geometry_json}
                     stroke={dialogBorderColor}
-                    fill={dialogBorderColor === "#000000" ? "rgba(0, 0, 0, 0.12)" : undefined}
+                    fill={row?.status === MONITORING_STATUS_RAW ? MONITORING_STATUS_RAW_FILL_SOFT : undefined}
                   />
                 ) : (
                   <ParkOutlinedIcon sx={{ color: dialogBorderColor, flexShrink: 0, fontSize: 66 }} />

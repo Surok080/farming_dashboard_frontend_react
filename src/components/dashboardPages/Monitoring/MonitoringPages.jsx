@@ -447,7 +447,6 @@ const MonitoringPages = ({ year: yearProp }) => {
         minHeight: 0,
         display: "flex",
         flexDirection: "column",
-        border: "2px solid #1976d2",
         background: "#fff",
         p: 1,
         boxSizing: "border-box",
