@@ -28,6 +28,32 @@ import {
 import { getDefaultMonitoringInterval, parseDatetimeLocal, toApiDateTimeString } from "./monitoringUtils";
 import { useMonitoringRowSelection } from "./useMonitoringRowSelection";
 
+/** Обязательные поля строки в том виде, как они сохранены на сервере (последний GET/PATCH). */
+const pickMonitoringDialogSavedIds = (row) =>
+  row
+    ? {
+        driver_id: row.driver_id,
+        tech_operation_id: row.tech_operation_id,
+        trailer_id: row.trailer_id,
+      }
+    : null;
+
+const monitoringIdComparable = (v) => {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isNaN(n) ? String(v) : n;
+};
+
+/** Есть ли несохранённые правки техоперации / прицепа / водителя относительно последнего ответа API. */
+const monitoringSavedIdsDirty = (row, saved) => {
+  if (!row || !saved) return false;
+  return (
+    monitoringIdComparable(row.driver_id) !== monitoringIdComparable(saved.driver_id) ||
+    monitoringIdComparable(row.tech_operation_id) !== monitoringIdComparable(saved.tech_operation_id) ||
+    monitoringIdComparable(row.trailer_id) !== monitoringIdComparable(saved.trailer_id)
+  );
+};
+
 const MonitoringPages = ({ year: yearProp }) => {
   const { enqueueSnackbar } = useSnackbar();
   const year = Number(yearProp ?? localStorage.getItem("year") ?? new Date().getFullYear());
@@ -64,6 +90,8 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [statusConfirm, setStatusConfirm] = useState(null);
   const [headerPublishConfirmOpen, setHeaderPublishConfirmOpen] = useState(false);
   const [mergeConfirmOpen, setMergeConfirmOpen] = useState(false);
+  /** Последние сохранённые на сервере id обязательных полей модалки (для блокировки подтверждения при несохранённых правках). */
+  const [dialogSavedFieldIds, setDialogSavedFieldIds] = useState(null);
 
   const fetchMonitoringData = useCallback(
     async ({ targetPage = 1, targetPageSize = pageSize, from = appliedIntervalFrom, to = appliedIntervalTo } = {}) => {
@@ -158,13 +186,17 @@ const MonitoringPages = ({ year: yearProp }) => {
     if (!row?.id) return;
     setDialogOpen(true);
     setDialogLoading(true);
+    setDialogSavedFieldIds(null);
     try {
       const res = await getMonitoringById(row.id);
-      setDialogData(res?.data ?? null);
+      const data = res?.data ?? null;
+      setDialogData(data);
+      setDialogSavedFieldIds(pickMonitoringDialogSavedIds(data?.row));
     } catch (err) {
       console.error(err);
       enqueueSnackbar("Не удалось загрузить детали обработки", { variant: "error", autoHideDuration: 4000 });
       setDialogData(null);
+      setDialogSavedFieldIds(null);
     } finally {
       setDialogLoading(false);
     }
@@ -198,12 +230,26 @@ const MonitoringPages = ({ year: yearProp }) => {
   const isSentOrReadyStatus = (row) =>
     MONITORING_NON_EDITABLE_SENT_STATUSES.includes(row?.status) || Boolean(row?.sent_to_1c);
 
+  /** Пустой id в селектах модалки (техоперация, прицеп, водитель). */
+  const isMonitoringRequiredIdEmpty = (value) =>
+    value === null || value === undefined || value === "";
+
+  /** Обязательные для перевода в «Подтверждённый» поля — как в форме редактирования. */
   const getMissingRequiredFields = (row) => {
     const missing = [];
-    if (!row?.tech_operation_id) missing.push("технологическая операция");
-    if (!row?.trailer_id) missing.push("прицепное устройство");
-    if (!row?.driver_id) missing.push("водитель");
+    if (isMonitoringRequiredIdEmpty(row?.tech_operation_id)) missing.push("Техоперация");
+    if (isMonitoringRequiredIdEmpty(row?.trailer_id)) missing.push("Прицепное устройство");
+    if (isMonitoringRequiredIdEmpty(row?.driver_id)) missing.push("Водитель");
     return missing;
+  };
+
+  /** Техоперация, прицеп и водитель выбраны в форме, совпадают с последним сохранением в БД. */
+  const isDialogRequiredFieldsReadyForSubmit = (row, savedIds) => {
+    if (!row || !savedIds) return false;
+    if (getMissingRequiredFields(row).length) return false;
+    if (getMissingRequiredFields(savedIds).length) return false;
+    if (monitoringSavedIdsDirty(row, savedIds)) return false;
+    return true;
   };
 
   const openStatusConfirmIfValid = (activeKey, nextStatus, successMessage, canRunCheck) => {
@@ -243,7 +289,9 @@ const MonitoringPages = ({ year: yearProp }) => {
       await postMonitoringStatus(rowId, nextStatus);
       enqueueSnackbar(successMessage, { variant: "success", autoHideDuration: 3000 });
       const res = await getMonitoringById(rowId);
-      setDialogData(res?.data ?? null);
+      const data = res?.data ?? null;
+      setDialogData(data);
+      setDialogSavedFieldIds(pickMonitoringDialogSavedIds(data?.row));
       await fetchMonitoringData({ targetPage: page, targetPageSize: pageSize });
     } catch (err) {
       console.error(err);
@@ -275,9 +323,26 @@ const MonitoringPages = ({ year: yearProp }) => {
       if (row?.status !== MONITORING_STATUS_RAW) {
         return { ok: false, message: "Подтверждение доступно только для сырой строки" };
       }
-      const missing = getMissingRequiredFields(row);
-      if (missing.length) {
-        return { ok: false, message: `Заполните обязательные поля: ${missing.join(", ")}` };
+      const savedIds = dialogSavedFieldIds;
+      if (!savedIds) {
+        return { ok: false, message: "Данные строки ещё загружаются" };
+      }
+      const missingInForm = getMissingRequiredFields(row);
+      if (missingInForm.length) {
+        return {
+          ok: false,
+          message: `Заполните обязательные поля: ${missingInForm.join(", ")}`,
+        };
+      }
+      if (monitoringSavedIdsDirty(row, savedIds)) {
+        return {
+          ok: false,
+          message: "Сохраните изменения (кнопка «Сохранить») перед переводом в подтверждённый статус",
+        };
+      }
+      const missingSaved = getMissingRequiredFields(savedIds);
+      if (missingSaved.length) {
+        return { ok: false, message: `Сохраните в базе обязательные поля: ${missingSaved.join(", ")}` };
       }
       return { ok: true };
     });
@@ -286,6 +351,27 @@ const MonitoringPages = ({ year: yearProp }) => {
     openStatusConfirmIfValid("publish_1c", MONITORING_STATUS_READY_FOR_1C, "Статус изменён", (row) => {
       if (row?.status !== MONITORING_STATUS_CONFIRMED) {
         return { ok: false, message: "Публикация в 1С доступна только для подтверждённой строки" };
+      }
+      const savedIds = dialogSavedFieldIds;
+      if (!savedIds) {
+        return { ok: false, message: "Данные строки ещё загружаются" };
+      }
+      const missingInForm = getMissingRequiredFields(row);
+      if (missingInForm.length) {
+        return {
+          ok: false,
+          message: `Заполните обязательные поля: ${missingInForm.join(", ")}`,
+        };
+      }
+      if (monitoringSavedIdsDirty(row, savedIds)) {
+        return {
+          ok: false,
+          message: "Сохраните изменения (кнопка «Сохранить») перед публикацией в 1С",
+        };
+      }
+      const missingSaved = getMissingRequiredFields(savedIds);
+      if (missingSaved.length) {
+        return { ok: false, message: `Сохраните в базе обязательные поля: ${missingSaved.join(", ")}` };
       }
       return { ok: true };
     });
@@ -312,7 +398,9 @@ const MonitoringPages = ({ year: yearProp }) => {
       await patchMonitoringRow(row.id, payload);
       enqueueSnackbar("Изменения сохранены", { variant: "success", autoHideDuration: 3000 });
       const res = await getMonitoringById(row.id);
-      setDialogData(res?.data ?? null);
+      const data = res?.data ?? null;
+      setDialogData(data);
+      setDialogSavedFieldIds(pickMonitoringDialogSavedIds(data?.row));
       await fetchMonitoringData({ targetPage: page, targetPageSize: pageSize });
     } catch (err) {
       console.error(err);
@@ -564,17 +652,26 @@ const MonitoringPages = ({ year: yearProp }) => {
       />
       <MonitoringRowDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={() => {
+          setDialogOpen(false);
+          setDialogSavedFieldIds(null);
+        }}
         loading={dialogLoading}
         data={dialogData}
         year={year}
         actionLoading={dialogActionLoading}
         activeAction={dialogActiveAction}
         canEditStatus={!isSentOrReadyStatus(dialogData?.row)}
-        canConfirm={dialogData?.row?.status === MONITORING_STATUS_RAW}
+        canConfirm={
+          dialogData?.row?.status === MONITORING_STATUS_RAW &&
+          isDialogRequiredFieldsReadyForSubmit(dialogData?.row, dialogSavedFieldIds)
+        }
         canReject={[MONITORING_STATUS_RAW, MONITORING_STATUS_CONFIRMED].includes(dialogData?.row?.status)}
         canReturn={[MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_CANCELED].includes(dialogData?.row?.status)}
-        canPublish1C={dialogData?.row?.status === MONITORING_STATUS_CONFIRMED}
+        canPublish1C={
+          dialogData?.row?.status === MONITORING_STATUS_CONFIRMED &&
+          isDialogRequiredFieldsReadyForSubmit(dialogData?.row, dialogSavedFieldIds)
+        }
         onRowChange={handleDialogRowChange}
         onSave={handleDialogSave}
         saveLoading={dialogSaveLoading}
