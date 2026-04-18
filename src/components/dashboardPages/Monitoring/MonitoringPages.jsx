@@ -63,6 +63,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   /** { activeKey, nextStatus, successMessage } | null — ожидание подтверждения смены статуса */
   const [statusConfirm, setStatusConfirm] = useState(null);
   const [headerPublishConfirmOpen, setHeaderPublishConfirmOpen] = useState(false);
+  const [mergeConfirmOpen, setMergeConfirmOpen] = useState(false);
 
   const fetchMonitoringData = useCallback(
     async ({ targetPage = 1, targetPageSize = pageSize, from = appliedIntervalFrom, to = appliedIntervalTo } = {}) => {
@@ -324,7 +325,7 @@ const MonitoringPages = ({ year: yearProp }) => {
     }
   };
 
-  const onMerge = async () => {
+  const executeMerge = async () => {
     if (!canMerge) {
       enqueueSnackbar("Для объединения выберите более 1 подтвержденной строки", {
         variant: "warning",
@@ -348,6 +349,18 @@ const MonitoringPages = ({ year: yearProp }) => {
     } finally {
       setMergeLoading(false);
     }
+  };
+
+  const onMerge = () => {
+    if (mergeLoading) return;
+    if (!canMerge) {
+      enqueueSnackbar("Для объединения выберите более 1 подтвержденной строки", {
+        variant: "warning",
+        autoHideDuration: 2500,
+      });
+      return;
+    }
+    setMergeConfirmOpen(true);
   };
 
   const selectedRows = rows.filter((row) => isRowSelected(row.id));
@@ -591,6 +604,22 @@ const MonitoringPages = ({ year: yearProp }) => {
           if (!mergeLoading) setHeaderPublishConfirmOpen(false);
         }}
       />
+      <MonitoringStatusConfirmDialog
+        open={mergeConfirmOpen}
+        title="Подтверждение объединения"
+        loading={mergeLoading}
+        onConfirm={() => {
+          setMergeConfirmOpen(false);
+          executeMerge();
+        }}
+        onCancel={() => {
+          if (!mergeLoading) setMergeConfirmOpen(false);
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          Объединить выбранные подтверждённые строки ({selectedRowIds.length}) в одну запись?
+        </Typography>
+      </MonitoringStatusConfirmDialog>
     </Box>
   );
 };
