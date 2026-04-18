@@ -140,7 +140,7 @@ const MonitoringFieldTrackMap = ({
               d={trackPathD}
               fill="none"
               stroke={trackStroke}
-              strokeWidth="1.8"
+              strokeWidth="0.9"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
