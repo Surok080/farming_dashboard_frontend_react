@@ -3,7 +3,7 @@ import { Box, Button, TextField } from "@mui/material";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 
-const datetimeLocalInputSx = {
+const dateInputSx = {
   "& .MuiOutlinedInput-input": { cursor: "text" },
 };
 
@@ -47,23 +47,23 @@ const MonitoringIntervalBar = ({
         <Box sx={{ display: "flex", alignItems: "flex-end", gap: 2, flexWrap: "wrap", flex: "1 1 auto", minWidth: 0 }}>
           <TextField
             size="small"
-            type="datetime-local"
-            label="Дата и время начала"
+            type="date"
+            label="Дата начала"
             value={intervalFrom}
             onChange={handleFromChange}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
-            InputProps={{ sx: datetimeLocalInputSx }}
+            InputProps={{ sx: dateInputSx }}
           />
           <TextField
             size="small"
-            type="datetime-local"
-            label="Дата и время окончания"
+            type="date"
+            label="Дата окончания"
             value={intervalTo}
             onChange={handleToChange}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
-            InputProps={{ sx: datetimeLocalInputSx }}
+            InputProps={{ sx: dateInputSx }}
           />
 
           <Button

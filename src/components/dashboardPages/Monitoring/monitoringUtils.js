@@ -1,37 +1,45 @@
-/** Значение для input type="datetime-local": YYYY-MM-DDTHH:mm */
-export const toDatetimeLocalValue = (value) => {
+/** Значение для input type="date": YYYY-MM-DD */
+export const toDateInputValue = (value) => {
   if (!value) return "";
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) return "";
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const min = String(d.getMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  return `${yyyy}-${mm}-${dd}`;
 };
 
-/** Вчера 00:00 — сегодня 23:59 (локальное время). */
+/** Вчера — сегодня (только дата, локальная зона). */
 export const getDefaultMonitoringInterval = () => {
   const now = new Date();
-  const yesterdayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0, 0);
-  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 0, 0);
+  const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0, 0);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   return {
-    from: toDatetimeLocalValue(yesterdayStart),
-    to: toDatetimeLocalValue(todayEnd),
+    from: toDateInputValue(yesterday),
+    to: toDateInputValue(today),
   };
 };
 
 export const parseDatetimeLocal = (value) => {
   if (!value) return null;
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (dateOnlyMatch) {
+    const [, yyyy, mm, dd] = dateOnlyMatch;
+    const localDate = new Date(Number(yyyy), Number(mm) - 1, Number(dd), 0, 0, 0, 0);
+    return Number.isNaN(localDate.getTime()) ? null : localDate;
+  }
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
 };
 
 /** Для query: DD-MM-YYYY HH:MM:SS */
-export const toApiDateTimeString = (datetimeLocalValue) => {
+export const toApiDateTimeString = (datetimeLocalValue, options = {}) => {
+  const { endOfDay = false } = options;
   const d = parseDatetimeLocal(datetimeLocalValue);
   if (!d) return "";
+  if (endOfDay && /^\d{4}-\d{2}-\d{2}$/.test(datetimeLocalValue)) {
+    d.setHours(23, 59, 59, 0);
+  }
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const yyyy = d.getFullYear();

@@ -96,7 +96,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const fetchMonitoringData = useCallback(
     async ({ targetPage = 1, targetPageSize = pageSize, from = appliedIntervalFrom, to = appliedIntervalTo } = {}) => {
       const start = toApiDateTimeString(from);
-      const stop = toApiDateTimeString(to);
+      const stop = toApiDateTimeString(to, { endOfDay: true });
       if (!start || !stop) return;
 
       setLoading(true);
@@ -152,7 +152,7 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const onRun = () => {
     const start = toApiDateTimeString(intervalFrom);
-    const stop = toApiDateTimeString(intervalTo);
+    const stop = toApiDateTimeString(intervalTo, { endOfDay: true });
     if (!start || !stop || !parseDatetimeLocal(intervalFrom) || !parseDatetimeLocal(intervalTo)) {
       enqueueSnackbar("Укажите корректный интервал дат", { variant: "warning" });
       return;
