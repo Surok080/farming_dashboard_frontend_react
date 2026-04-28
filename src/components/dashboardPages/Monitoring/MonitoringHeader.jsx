@@ -36,7 +36,7 @@ const MonitoringHeader = ({
           alignSelf: "center",
         }}
       >
-        Спутниковый мониторинг сельскохозяйственной техники (источники данных Фот Монитор)
+        Спутниковый мониторинг сельскохозяйственной техники (источники данных Форт Монитор)
       </Typography>
     </Box>
     <Box sx={{ display: "flex", gap: 1, alignSelf: "flex-start", flexWrap: "wrap" }}>
