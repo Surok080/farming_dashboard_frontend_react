@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import { sanitizeDateInputYear } from "./monitoringUtils";
 
 const dateInputSx = {
   "& .MuiOutlinedInput-input": { cursor: "text" },
@@ -17,7 +18,7 @@ const MonitoringIntervalBar = ({
 }) => {
   const handleFromChange = useCallback(
     (e) => {
-      const next = e.target.value;
+      const next = sanitizeDateInputYear(e.target.value);
       setIntervalFrom(next);
     },
     [setIntervalFrom]
@@ -25,7 +26,7 @@ const MonitoringIntervalBar = ({
 
   const handleToChange = useCallback(
     (e) => {
-      const next = e.target.value;
+      const next = sanitizeDateInputYear(e.target.value);
       setIntervalTo(next);
     },
     [setIntervalTo]
@@ -51,6 +52,7 @@ const MonitoringIntervalBar = ({
             label="Дата начала"
             value={intervalFrom}
             onChange={handleFromChange}
+            inputProps={{ maxLength: 10, min: "1000-01-01", max: "9999-12-31" }}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
             InputProps={{ sx: dateInputSx }}
@@ -61,6 +63,7 @@ const MonitoringIntervalBar = ({
             label="Дата окончания"
             value={intervalTo}
             onChange={handleToChange}
+            inputProps={{ maxLength: 10, min: "1000-01-01", max: "9999-12-31" }}
             InputLabelProps={{ shrink: true }}
             sx={{ minWidth: 240 }}
             InputProps={{ sx: dateInputSx }}

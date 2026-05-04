@@ -1,3 +1,16 @@
+/**
+ * Нормализует значение input type="date" (YYYY-MM-DD): год не больше 4 цифр.
+ * В некоторых браузерах в сегменте года можно ввести лишние символы.
+ */
+export const sanitizeDateInputYear = (value) => {
+  if (!value || typeof value !== "string") return "";
+  const m = /^(\d+)(-\d{2}-\d{2})$/.exec(value.trim());
+  if (!m) return value;
+  const [, y, rest] = m;
+  if (y.length <= 4) return value;
+  return `${y.slice(0, 4)}${rest}`;
+};
+
 /** Значение для input type="date": YYYY-MM-DD */
 export const toDateInputValue = (value) => {
   if (!value) return "";

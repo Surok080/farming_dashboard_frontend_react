@@ -45,6 +45,7 @@ export const MONITORING_SORT_BY_OPTIONS = [
   { value: "field_name", label: "Поле" },
   { value: "trailer_name", label: "Прицепное" },
   { value: "tech_operation_name", label: "Тех.операция" },
+  { value: "area_worked", label: "Выработке, Га" },
   { value: "driver_name", label: "Водитель" },
 ];
 
