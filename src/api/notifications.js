@@ -15,4 +15,11 @@ export function generateMaxConnectionCode() {
   return httpService.post("/notifications/channels/max/generate-code");
 }
 
+/**
+ * DELETE /notifications/channels/{channelId}
+ */
+export function deleteNotificationChannel(channelId) {
+  return httpService.delete(`/notifications/channels/${channelId}`);
+}
+
 export { getApiErrorMessage };

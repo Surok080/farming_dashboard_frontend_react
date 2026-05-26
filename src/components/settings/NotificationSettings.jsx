@@ -5,6 +5,11 @@ import {
   Button,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Link,
   Paper,
@@ -14,10 +19,12 @@ import {
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LaunchIcon from "@mui/icons-material/Launch";
+import LinkOffIcon from "@mui/icons-material/LinkOff";
 import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useSnackbar } from "notistack";
 import {
+  deleteNotificationChannel,
   generateMaxConnectionCode,
   getApiErrorMessage,
   getNotificationChannels,
@@ -62,6 +69,77 @@ const isMaxChannel = (channel) => {
   return provider === MAX_PROVIDER || providerLabel.toUpperCase().includes(MAX_PROVIDER);
 };
 
+const boolChipProps = (value) =>
+  value
+    ? { label: "Да", color: "success", variant: "filled" }
+    : { label: "Нет", color: "default", variant: "outlined" };
+
+const ChannelInfoRow = ({ label, children }) => (
+  <Box
+    display="flex"
+    justifyContent="space-between"
+    alignItems="center"
+    gap={2}
+    flexWrap="wrap"
+  >
+    <Typography variant="body2" color="text.secondary">
+      {label}
+    </Typography>
+    {children}
+  </Box>
+);
+
+const ChannelDetailsPanel = ({ channel }) => {
+  if (!channel) {
+    return (
+      <Box
+        sx={{
+          p: 2,
+          borderRadius: 2,
+          border: "1px dashed",
+          borderColor: "divider",
+          backgroundColor: "#FAFAFA",
+          textAlign: "left",
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          Канал MAX ещё не создан. После успешной привязки здесь появятся данные канала.
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: "divider",
+        backgroundColor: "#FAFAFA",
+        textAlign: "left",
+      }}
+    >
+      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+        Данные канала
+      </Typography>
+      <Stack spacing={1.25}>
+        <ChannelInfoRow label="Название бота">
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            {channel.provider_label || "—"}
+          </Typography>
+        </ChannelInfoRow>
+        <ChannelInfoRow label="Канал активен">
+          <Chip size="small" {...boolChipProps(channel.is_active)} />
+        </ChannelInfoRow>
+        <ChannelInfoRow label="Группа привязана">
+          <Chip size="small" {...boolChipProps(channel.is_connected)} />
+        </ChannelInfoRow>
+      </Stack>
+    </Box>
+  );
+};
+
 const copyToClipboard = async (text) => {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
@@ -87,9 +165,12 @@ const NotificationSettings = () => {
   const [checkingChannels, setCheckingChannels] = useState(false);
   const [generatingCode, setGeneratingCode] = useState(false);
   const [codeData, setCodeData] = useState(null);
+  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const maxChannel = useMemo(() => channels.find(isMaxChannel), [channels]);
   const isMaxConnected = Boolean(maxChannel?.is_connected && maxChannel?.is_active);
+  const canDisconnectMax = Boolean(maxChannel?.id);
   const command = codeData?.code ? `/start ${codeData.code}` : "";
   const expiresAt = codeData?.createdAt && codeData?.expires_in_minutes
     ? new Date(codeData.createdAt + codeData.expires_in_minutes * 60 * 1000)
@@ -161,6 +242,25 @@ const NotificationSettings = () => {
     }
   };
 
+  const handleDisconnectMax = async () => {
+    if (!maxChannel?.id) return;
+
+    setDeleting(true);
+    try {
+      await deleteNotificationChannel(maxChannel.id);
+      enqueueSnackbar("Подключение MAX отключено", { variant: "success" });
+      setDisconnectDialogOpen(false);
+      setCodeData(null);
+      await loadChannels();
+    } catch (error) {
+      enqueueSnackbar(getApiErrorMessage(error, "Не удалось отключить MAX"), {
+        variant: "error",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loadingChannels) {
     return (
       <Box display="flex" justifyContent="center" py={6}>
@@ -206,12 +306,44 @@ const NotificationSettings = () => {
             />
           </Box>
 
+          <ChannelDetailsPanel channel={maxChannel} />
+
           {isMaxConnected ? (
-            <Alert severity="success" sx={{ textAlign: "left" }}>
-              Группа MAX подключена. Уведомления будут приходить в привязанный групповой чат.
-            </Alert>
+            <Stack spacing={2} sx={{ textAlign: "left" }}>
+              <Alert severity="success">
+                Группа MAX подключена. Уведомления будут приходить в привязанный групповой чат.
+              </Alert>
+              {canDisconnectMax && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<LinkOffIcon />}
+                  onClick={() => setDisconnectDialogOpen(true)}
+                  sx={{ textTransform: "none", alignSelf: "flex-start" }}
+                >
+                  Отключить MAX
+                </Button>
+              )}
+            </Stack>
           ) : (
             <>
+              {canDisconnectMax && (
+                <Stack spacing={1.5} sx={{ textAlign: "left" }}>
+                  <Alert severity="warning">
+                    Найдена незавершённая привязка MAX. Можно удалить канал и подключить группу заново.
+                  </Alert>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    startIcon={<LinkOffIcon />}
+                    onClick={() => setDisconnectDialogOpen(true)}
+                    sx={{ textTransform: "none", alignSelf: "flex-start" }}
+                  >
+                    Удалить канал
+                  </Button>
+                </Stack>
+              )}
               <Alert severity="info" sx={{ textAlign: "left" }}>
                 Сначала сгенерируйте одноразовый код в приложении. Затем добавьте бота в группу MAX
                 и отправьте в этой группе команду с полученным кодом.
@@ -361,6 +493,37 @@ const NotificationSettings = () => {
           )}
         </Stack>
       </Paper>
+
+      <Dialog
+        open={disconnectDialogOpen}
+        onClose={() => !deleting && setDisconnectDialogOpen(false)}
+      >
+        <DialogTitle>Отключить MAX?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Канал уведомлений будет удалён. Чтобы снова получать сообщения в группе, нужно будет
+            заново пройти подключение.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDisconnectDialogOpen(false)}
+            disabled={deleting}
+            sx={{ textTransform: "none" }}
+          >
+            Отмена
+          </Button>
+          <Button
+            onClick={handleDisconnectMax}
+            color="error"
+            variant="contained"
+            disabled={deleting}
+            sx={{ textTransform: "none" }}
+          >
+            {deleting ? "Отключение…" : "Отключить"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
