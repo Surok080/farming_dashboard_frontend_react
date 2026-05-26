@@ -283,7 +283,7 @@ const NotificationSettings = () => {
             <Box display="flex" gap={1.5} alignItems="center">
               <NotificationsActiveOutlinedIcon sx={{ color: "#62A65D" }} />
               <Box>
-                <Typography variant="h6" sx={{ fontSize: "1.1rem" }}>
+                <Typography textAlign={'left'} variant="h6" sx={{ fontSize: "1.1rem" }}>
                   Бот MAX
                 </Typography>
                 <Link
