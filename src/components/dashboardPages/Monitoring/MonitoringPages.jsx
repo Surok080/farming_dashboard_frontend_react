@@ -7,6 +7,7 @@ import {
   getMonitoringById,
   patchMonitoringRow,
   postMonitoringMerge,
+  postMonitoringSendToChat,
   postMonitoringStatus,
 } from "../../../api/monitoring";
 import MonitoringHeader from "./MonitoringHeader";
@@ -85,10 +86,12 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [dialogActiveAction, setDialogActiveAction] = useState(null);
   const [dialogSaveLoading, setDialogSaveLoading] = useState(false);
   const [mergeLoading, setMergeLoading] = useState(false);
+  const [sendMaxLoading, setSendMaxLoading] = useState(false);
   const hasExecutedSearchRef = useRef(false);
   /** { activeKey, nextStatus, successMessage } | null — ожидание подтверждения смены статуса */
   const [statusConfirm, setStatusConfirm] = useState(null);
   const [headerPublishConfirmOpen, setHeaderPublishConfirmOpen] = useState(false);
+  const [sendMaxConfirmOpen, setSendMaxConfirmOpen] = useState(false);
   const [mergeConfirmOpen, setMergeConfirmOpen] = useState(false);
   /** Последние сохранённые на сервере id обязательных полей модалки (для блокировки подтверждения при несохранённых правках). */
   const [dialogSavedFieldIds, setDialogSavedFieldIds] = useState(null);
@@ -440,7 +443,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   };
 
   const onMerge = () => {
-    if (mergeLoading) return;
+    if (mergeLoading || sendMaxLoading) return;
     if (!canMerge) {
       enqueueSnackbar("Для объединения выберите более 1 подтвержденной строки", {
         variant: "warning",
@@ -453,8 +456,12 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const selectedRows = rows.filter((row) => isRowSelected(row.id));
   const selectedConfirmedRows = selectedRows.filter((row) => row.status === MONITORING_STATUS_CONFIRMED);
+  const selectedMaxSendRows = selectedRows.filter((row) =>
+    [MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_READY_FOR_1C].includes(row.status)
+  );
   const canMerge = selectedRowIds.length > 1 && selectedRows.length === selectedConfirmedRows.length;
   const canPublish1C = selectedRowIds.length >= 1 && selectedRows.length === selectedConfirmedRows.length;
+  const canSendMax = selectedRowIds.length >= 1 && selectedRows.length === selectedMaxSendRows.length;
 
   const executePublish1C = async () => {
     if (!canPublish1C) {
@@ -512,7 +519,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   };
 
   const onPublish1C = () => {
-    if (mergeLoading) return;
+    if (mergeLoading || sendMaxLoading) return;
     if (!canPublish1C) {
       enqueueSnackbar("Для публикации выберите минимум 1 подтвержденную строку", {
         variant: "warning",
@@ -529,6 +536,55 @@ const MonitoringPages = ({ year: yearProp }) => {
       return;
     }
     setHeaderPublishConfirmOpen(true);
+  };
+
+  const executeSendMax = async () => {
+    if (!canSendMax) {
+      enqueueSnackbar("Для отправки в MAX выберите подтвержденные или опубликованные в 1С строки", {
+        variant: "warning",
+        autoHideDuration: 3000,
+      });
+      return;
+    }
+
+    const rowIds = selectedRowIds.map((id) => Number(id)).filter((n) => Number.isFinite(n));
+    if (!rowIds.length) {
+      enqueueSnackbar("Не выбраны строки для отправки", {
+        variant: "warning",
+        autoHideDuration: 2500,
+      });
+      return;
+    }
+
+    setSendMaxLoading(true);
+    try {
+      await postMonitoringSendToChat(rowIds, ["MAX"]);
+      enqueueSnackbar("Строки отправлены в MAX", {
+        variant: "success",
+        autoHideDuration: 3000,
+      });
+      setSelectedRowIds([]);
+    } catch (err) {
+      console.error(err);
+      enqueueSnackbar(getErrorMessage(err, "Не удалось отправить строки в MAX"), {
+        variant: "error",
+        autoHideDuration: 4500,
+      });
+    } finally {
+      setSendMaxLoading(false);
+    }
+  };
+
+  const onSendMax = () => {
+    if (mergeLoading || sendMaxLoading) return;
+    if (!canSendMax) {
+      enqueueSnackbar("Для отправки в MAX выберите подтвержденные или опубликованные в 1С строки", {
+        variant: "warning",
+        autoHideDuration: 3000,
+      });
+      return;
+    }
+    setSendMaxConfirmOpen(true);
   };
 
   const handleApplySettings = () => {
@@ -586,9 +642,12 @@ const MonitoringPages = ({ year: yearProp }) => {
               <MonitoringHeader
                 year={year}
                 onPublish1C={onPublish1C}
-                publishDisabled={!canPublish1C}
+                publishDisabled={!canPublish1C || sendMaxLoading}
+                onSendMax={onSendMax}
+                sendMaxDisabled={!canSendMax || mergeLoading}
+                sendMaxLoading={sendMaxLoading}
                 onMerge={onMerge}
-                mergeDisabled={!canMerge}
+                mergeDisabled={!canMerge || sendMaxLoading}
                 mergeLoading={mergeLoading}
               />
             </Box>
@@ -701,6 +760,22 @@ const MonitoringPages = ({ year: yearProp }) => {
           if (!mergeLoading) setHeaderPublishConfirmOpen(false);
         }}
       />
+      <MonitoringStatusConfirmDialog
+        open={sendMaxConfirmOpen}
+        title="Отправка в MAX"
+        loading={sendMaxLoading}
+        onConfirm={() => {
+          setSendMaxConfirmOpen(false);
+          executeSendMax();
+        }}
+        onCancel={() => {
+          if (!sendMaxLoading) setSendMaxConfirmOpen(false);
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          Отправить выбранные строки ({selectedRowIds.length}) в подключённую группу MAX?
+        </Typography>
+      </MonitoringStatusConfirmDialog>
       <MonitoringStatusConfirmDialog
         open={mergeConfirmOpen}
         title="Подтверждение объединения"

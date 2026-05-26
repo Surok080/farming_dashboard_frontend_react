@@ -1,12 +1,16 @@
 import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import PublishedWithChangesOutlinedIcon from "@mui/icons-material/PublishedWithChangesOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 const MonitoringHeader = ({
   year,
   onPublish1C,
   publishDisabled = false,
+  onSendMax,
+  sendMaxDisabled = false,
+  sendMaxLoading = false,
   onMerge,
   mergeDisabled = false,
   mergeLoading = false,
@@ -69,6 +73,21 @@ const MonitoringHeader = ({
         startIcon={<PublishedWithChangesOutlinedIcon />}
       >
         ОПУБЛИКОВАТЬ 1С
+      </Button>
+      <Button
+        onClick={onSendMax}
+        disabled={sendMaxDisabled || sendMaxLoading}
+        variant="contained"
+        sx={{
+          backgroundColor: "#62A65D",
+          color: "#fff",
+          boxShadow: "none",
+          "&:hover": { backgroundColor: "#4f8f4b", boxShadow: "none" },
+          textTransform: "none",
+        }}
+        startIcon={sendMaxLoading ? <CircularProgress size={16} color="inherit" /> : <SendOutlinedIcon />}
+      >
+        {sendMaxLoading ? "ОТПРАВКА..." : "ОТПРАВИТЬ В MAX"}
       </Button>
     </Box>
   </Box>

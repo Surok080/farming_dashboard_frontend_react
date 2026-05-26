@@ -6,6 +6,7 @@ import {useSelector} from "react-redux";
 import UserInfo from "../settings/UserInfo";
 import MapSettings from "../settings/MapSettings";
 import ExternalServicesSettings from "../settings/ExternalServicesSettings";
+import NotificationSettings from "../settings/NotificationSettings";
 
 const SettingsPage = () => {
     const user = useSelector((state) => state.user);
@@ -27,6 +28,7 @@ const SettingsPage = () => {
                         {hasExternalIntegrations && (
                             <Tab sx={{color: 'black !important'}} label="Внешние сервисы" value="3"/>
                         )}
+                        <Tab sx={{color: 'black !important'}} label="Уведомления" value="4"/>
                     </TabList>
                 </Box>
                 <Paper sx={{padding: '26px', height: '100%'}}>
@@ -41,6 +43,9 @@ const SettingsPage = () => {
                             <ExternalServicesSettings/>
                         </TabPanel>
                     )}
+                    <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="4">
+                        <NotificationSettings/>
+                    </TabPanel>
                 </Paper>
             </TabContext>
 

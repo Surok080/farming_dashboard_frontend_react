@@ -40,3 +40,15 @@ export function postMonitoringStatus(rowId, status) {
 export function postMonitoringMerge(rowIds) {
   return httpService.post("/monitoring/merge", { row_ids: rowIds });
 }
+
+/**
+ * POST /monitoring/send-to-chat
+ * @param {Array<number|string>} rowIds
+ * @param {Array<string>|null} providers — например ["MAX"]
+ */
+export function postMonitoringSendToChat(rowIds, providers = null) {
+  return httpService.post("/monitoring/send-to-chat", {
+    row_ids: rowIds,
+    providers,
+  });
+}
