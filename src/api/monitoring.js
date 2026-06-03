@@ -1,4 +1,5 @@
 import { httpService } from "./setup";
+import { getApiErrorMessage } from "./externalIntegrations";
 
 /**
  * GET /monitoring
@@ -17,8 +18,6 @@ export function getMonitoringById(rowId) {
 
 /**
  * PATCH /monitoring/{row_id}
- * @param {number|string} rowId
- * @param {{driver_id:number|null, tech_operation_id:number|null, trailer_id:number|null}} payload
  */
 export function patchMonitoringRow(rowId, payload) {
   return httpService.patch(`/monitoring/${rowId}`, payload);
@@ -26,8 +25,6 @@ export function patchMonitoringRow(rowId, payload) {
 
 /**
  * POST /monitoring/{row_id}/status
- * @param {number|string} rowId
- * @param {string} status
  */
 export function postMonitoringStatus(rowId, status) {
   return httpService.post(`/monitoring/${rowId}/status`, { status });
@@ -35,7 +32,6 @@ export function postMonitoringStatus(rowId, status) {
 
 /**
  * POST /monitoring/merge
- * @param {Array<number|string>} rowIds
  */
 export function postMonitoringMerge(rowIds) {
   return httpService.post("/monitoring/merge", { row_ids: rowIds });
@@ -43,8 +39,6 @@ export function postMonitoringMerge(rowIds) {
 
 /**
  * POST /monitoring/send-to-chat
- * @param {Array<number|string>} rowIds
- * @param {Array<string>|null} providers — например ["MAX"]
  */
 export function postMonitoringSendToChat(rowIds, providers = null) {
   return httpService.post("/monitoring/send-to-chat", {
@@ -52,3 +46,26 @@ export function postMonitoringSendToChat(rowIds, providers = null) {
     providers,
   });
 }
+
+/**
+ * POST /monitoring/download — скачать данные за вчера (фоновая задача)
+ */
+export function postMonitoringDownloadYesterday() {
+  return httpService.post("/monitoring/download");
+}
+
+/**
+ * GET /monitoring/download/auto — статус автоскачивания
+ */
+export function getMonitoringAutoDownloadStatus() {
+  return httpService.get("/monitoring/download/auto");
+}
+
+/**
+ * POST /monitoring/download/auto — включить / выключить автоскачивание
+ */
+export function toggleMonitoringAutoDownload() {
+  return httpService.post("/monitoring/download/auto");
+}
+
+export { getApiErrorMessage };

@@ -344,10 +344,6 @@ const NotificationSettings = () => {
                   </Button>
                 </Stack>
               )}
-              <Alert severity="info" sx={{ textAlign: "left" }}>
-                Сначала сгенерируйте одноразовый код в приложении. Затем добавьте бота в группу MAX
-                и отправьте в этой группе команду с полученным кодом.
-              </Alert>
 
               <Box display="grid" gridTemplateColumns={{ xs: "1fr", md: "minmax(0, 1fr) 220px" }} gap={3}>
                 <Stack spacing={2.2} sx={{ textAlign: "left" }}>
@@ -480,6 +476,21 @@ const NotificationSettings = () => {
                   <Typography variant="body2" color="text.secondary">
                     Наведите камеру на QR-код, чтобы открыть бота MAX.
                   </Typography>
+                  <Link
+                    href={MAX_BOT_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    underline="hover"
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Открыть бота
+                    <LaunchIcon sx={{ fontSize: 16 }} />
+                  </Link>
                 </Box>
               </Box>
 

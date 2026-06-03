@@ -587,11 +587,6 @@ const MonitoringPages = ({ year: yearProp }) => {
     setSendMaxConfirmOpen(true);
   };
 
-  const handleApplySettings = () => {
-    setFilterOpen(false);
-    enqueueSnackbar("Настройки применены (макет)", { variant: "success", autoHideDuration: 2500 });
-  };
-
   const handleTabChange = (_event, newValue) => {
     setTabValue(newValue);
   };
@@ -706,8 +701,6 @@ const MonitoringPages = ({ year: yearProp }) => {
       <MonitoringSettingsDialog
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
-        status={status}
-        onApply={handleApplySettings}
       />
       <MonitoringRowDialog
         open={dialogOpen}

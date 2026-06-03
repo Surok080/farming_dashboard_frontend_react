@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Tab} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {TabContext, TabList, TabPanel} from "@mui/lab";
@@ -11,8 +11,15 @@ import NotificationSettings from "../settings/NotificationSettings";
 const SettingsPage = () => {
     const user = useSelector((state) => state.user);
     const hasExternalIntegrations = user?.userInfo?.module?.includes("external_integrations");
+    const hasMonitoring = user?.userInfo?.module?.includes("monitoring");
 
     const [value, setValue] = useState('1');
+
+    useEffect(() => {
+        if (value === '4' && !hasMonitoring) {
+            setValue('1');
+        }
+    }, [value, hasMonitoring]);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -28,7 +35,9 @@ const SettingsPage = () => {
                         {hasExternalIntegrations && (
                             <Tab sx={{color: 'black !important'}} label="Внешние сервисы" value="3"/>
                         )}
-                        <Tab sx={{color: 'black !important'}} label="Уведомления" value="4"/>
+                        {hasMonitoring && (
+                            <Tab sx={{color: 'black !important'}} label="Уведомления" value="4"/>
+                        )}
                     </TabList>
                 </Box>
                 <Paper sx={{padding: '26px', height: '100%'}}>
@@ -43,9 +52,11 @@ const SettingsPage = () => {
                             <ExternalServicesSettings/>
                         </TabPanel>
                     )}
-                    <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="4">
-                        <NotificationSettings/>
-                    </TabPanel>
+                    {hasMonitoring && (
+                        <TabPanel sx={{padding: '0 0 50px 0', height: '100%'}} value="4">
+                            <NotificationSettings/>
+                        </TabPanel>
+                    )}
                 </Paper>
             </TabContext>
 
