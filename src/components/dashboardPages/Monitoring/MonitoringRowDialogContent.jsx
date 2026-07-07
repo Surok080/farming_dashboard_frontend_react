@@ -116,6 +116,11 @@ const MonitoringRowDialogContent = ({
                         }}
                     >
                         <Box sx={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+                            {row.equipment_name ? (
+                                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                    {row.equipment_name}
+                                </Typography>
+                            ) : null}
                             <Typography variant="h6" sx={{fontWeight: 700}}>
                                 Работа в агрозоне
                             </Typography>

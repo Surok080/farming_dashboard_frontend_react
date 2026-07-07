@@ -127,6 +127,9 @@ const MonitoringTable = ({
                   {displayNum(row.area)}
                 </TableCell>
                 <TableCell sx={{ fontSize: 12 }} align="left">
+                  {displayText(row.equipment_name)}
+                </TableCell>
+                <TableCell sx={{ fontSize: 12 }} align="left">
                   {displayText(row.trailer_name)}
                 </TableCell>
                 <TableCell sx={{ fontSize: 12 }} align="right">

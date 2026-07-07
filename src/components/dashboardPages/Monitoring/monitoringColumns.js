@@ -3,6 +3,7 @@ export const MONITORING_TABLE_COLUMNS = [
   { key: "period", label: "Период", align: "left" },
   { key: "geozone", label: "Геозона, поле", align: "left" },
   { key: "areaHa", label: "Площадь га", align: "right" },
+  { key: "equipment", label: "Сельхоз машина", align: "left" },
   { key: "device", label: "Сельхоз устройство", align: "left" },
   { key: "widthM", label: "Ширина, м", align: "right" },
   { key: "operation", label: "Тех.операция", align: "left" },
