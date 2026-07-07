@@ -161,3 +161,23 @@ export const formatNumberForDisplay = (value, precision = 3) => {
   };
 };
 
+/** Секунды → строка HH:mm:ss для поля интервала посещений. */
+export const formatSecondsAsTime = (totalSeconds) => {
+  const sec = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+};
+
+/** Строка HH:mm:ss → секунды. При ошибке парсинга возвращает null. */
+export const parseTimeToSeconds = (value) => {
+  const match = /^(\d{1,2}):(\d{2}):(\d{2})$/.exec(String(value).trim());
+  if (!match) return null;
+  const h = Number(match[1]);
+  const m = Number(match[2]);
+  const s = Number(match[3]);
+  if (!Number.isFinite(h) || !Number.isFinite(m) || !Number.isFinite(s) || m > 59 || s > 59) return null;
+  return h * 3600 + m * 60 + s;
+};
+

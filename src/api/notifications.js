@@ -22,4 +22,18 @@ export function deleteNotificationChannel(channelId) {
   return httpService.delete(`/notifications/channels/${channelId}`);
 }
 
+/**
+ * GET /notifications/auto-report/settings
+ */
+export function getAutoReportSettings() {
+  return httpService.get("/notifications/auto-report/settings");
+}
+
+/**
+ * POST /notifications/auto-report/settings
+ */
+export function postAutoReportSettings(payload) {
+  return httpService.post("/notifications/auto-report/settings", payload);
+}
+
 export { getApiErrorMessage };
