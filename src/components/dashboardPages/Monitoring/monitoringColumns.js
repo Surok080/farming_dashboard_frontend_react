@@ -9,4 +9,5 @@ export const MONITORING_TABLE_COLUMNS = [
   { key: "operation", label: "Тех.операция", align: "left" },
   { key: "driver", label: "Водитель", align: "left" },
   { key: "productionHa", label: "Выработка, га", align: "right" },
+  { key: "mileage", label: "Пробег, км", align: "right" },
 ];

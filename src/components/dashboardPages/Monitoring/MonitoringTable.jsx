@@ -144,6 +144,9 @@ const MonitoringTable = ({
                 <TableCell sx={{ fontSize: 12 }} align="right">
                   {displayNum(row.area_worked)}
                 </TableCell>
+                <TableCell sx={{ fontSize: 12 }} align="right">
+                  {displayNum(row.mileage)}
+                </TableCell>
               </TableRow>
             ))
           )}

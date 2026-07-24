@@ -23,7 +23,12 @@ import {
   getAutoReportSettings,
   postAutoReportSettings,
 } from "../../../api/notifications";
-import { getApiErrorMessage as getMonitoringApiErrorMessage, postMonitoringDownloadYesterday } from "../../../api/monitoring";
+import {
+  getApiErrorMessage as getMonitoringApiErrorMessage,
+  getMonitoringAutoDownloadStatus,
+  postMonitoringDownloadYesterday,
+  toggleMonitoringAutoDownload,
+} from "../../../api/monitoring";
 import { formatSecondsAsTime, parseTimeToSeconds } from "./monitoringUtils";
 
 const yesterdayLabel = () => dayjs().subtract(1, "day").format("DD.MM.YYYY");
@@ -44,11 +49,29 @@ const toNonNegativeInt = (value) => {
 const MonitoringSettingsDialog = ({ open, onClose }) => {
   const { enqueueSnackbar } = useSnackbar();
 
+  const [autoEnabled, setAutoEnabled] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [toggleLoading, setToggleLoading] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
+
   const [autoReportLoading, setAutoReportLoading] = useState(false);
   const [autoReportSaving, setAutoReportSaving] = useState(false);
   const [autoReportSettings, setAutoReportSettings] = useState(DEFAULT_AUTO_REPORT_SETTINGS);
   const [visitIntervalInput, setVisitIntervalInput] = useState("00:00:00");
+
+  const loadAutoStatus = useCallback(async () => {
+    setStatusLoading(true);
+    try {
+      const { data } = await getMonitoringAutoDownloadStatus();
+      setAutoEnabled(Boolean(data?.enabled));
+    } catch (error) {
+      enqueueSnackbar(getMonitoringApiErrorMessage(error, "Не удалось загрузить статус автоскачивания"), {
+        variant: "error",
+      });
+    } finally {
+      setStatusLoading(false);
+    }
+  }, [enqueueSnackbar]);
 
   const loadAutoReportSettings = useCallback(async () => {
     setAutoReportLoading(true);
@@ -74,9 +97,10 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
 
   useEffect(() => {
     if (open) {
+      loadAutoStatus();
       loadAutoReportSettings();
     }
-  }, [open, loadAutoReportSettings]);
+  }, [open, loadAutoStatus, loadAutoReportSettings]);
 
   const saveAutoReportSettings = useCallback(
     async (nextSettings, { successMessage = "Настройки сохранены" } = {}) => {
@@ -119,6 +143,24 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
       });
     } finally {
       setDownloadLoading(false);
+    }
+  };
+
+  const handleToggleAuto = async () => {
+    setToggleLoading(true);
+    try {
+      const { data } = await toggleMonitoringAutoDownload();
+      setAutoEnabled(Boolean(data?.enabled));
+      enqueueSnackbar(
+        data?.message || (data?.enabled ? "Автоскачивание включено" : "Автоскачивание выключено"),
+        { variant: "success" },
+      );
+    } catch (error) {
+      enqueueSnackbar(getMonitoringApiErrorMessage(error, "Не удалось изменить автоскачивание"), {
+        variant: "error",
+      });
+    } finally {
+      setToggleLoading(false);
     }
   };
 
@@ -166,7 +208,7 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
     }
   };
 
-  const busy = downloadLoading || autoReportLoading || autoReportSaving;
+  const busy = statusLoading || toggleLoading || downloadLoading || autoReportLoading || autoReportSaving;
   const settingsDisabled = busy || !autoReportSettings.enabled;
 
   return (
@@ -201,6 +243,52 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
           >
             {downloadLoading ? "Запуск…" : `Скачать за ${yesterdayLabel()}`}
           </Button>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+            Автоскачивание
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+            Каждое утро (04:00–06:59 по Москве) автоматически скачиваются данные за предыдущий день.
+          </Typography>
+
+          {statusLoading ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <CircularProgress size={20} sx={{ color: "#62A65D" }} />
+              <Typography variant="body2" color="text.secondary">
+                Загрузка статуса…
+              </Typography>
+            </Box>
+          ) : (
+            <FormControlLabel
+              sx={{ ml: 0, alignItems: "flex-start" }}
+              control={
+                <Switch
+                  checked={autoEnabled}
+                  onChange={handleToggleAuto}
+                  disabled={toggleLoading || downloadLoading || autoReportSaving}
+                  color="success"
+                />
+              }
+              label={
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {autoEnabled ? "Включено" : "Выключено"}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Переключатель создаёт задачу при первом включении
+                  </Typography>
+                </Box>
+              }
+            />
+          )}
+
+          <Alert severity="info" sx={{ mt: 2, textAlign: "left" }}>
+            Для скачивания нужна настроенная интеграция SMSR в разделе «Внешние сервисы».
+          </Alert>
         </Box>
 
         <Divider sx={{ my: 2 }} />

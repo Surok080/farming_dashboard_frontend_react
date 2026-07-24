@@ -95,7 +95,7 @@ const ExternalServiceConnectDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} autoComplete="off">
         <DialogTitle sx={{ pb: 1 }}>
           {isConnected ? "Изменить подключение" : "Подключить"} — {service?.name}
         </DialogTitle>
@@ -112,22 +112,44 @@ const ExternalServiceConnectDialog = ({
             </Typography>
           )}
 
+          <Box aria-hidden="true" sx={{ position: "absolute", left: -10000, top: "auto", width: 1, height: 1, overflow: "hidden" }}>
+            <input type="text" name="username" autoComplete="username" tabIndex={-1} />
+            <input type="password" name="password" autoComplete="current-password" tabIndex={-1} />
+          </Box>
+
           <TextField
             label="Логин"
+            name="smsr-login"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
             fullWidth
-            autoComplete="username"
+            autoComplete="off"
             disabled={submitting}
+            inputProps={{
+              autoComplete: "off",
+              autoCorrect: "off",
+              autoCapitalize: "off",
+              spellCheck: "false",
+              "data-1p-ignore": "true",
+              "data-lpignore": "true",
+              "data-form-type": "other",
+            }}
           />
           <TextField
             label="Пароль"
+            name="smsr-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
-            autoComplete="current-password"
+            autoComplete="new-password"
             disabled={submitting}
+            inputProps={{
+              autoComplete: "new-password",
+              "data-1p-ignore": "true",
+              "data-lpignore": "true",
+              "data-form-type": "other",
+            }}
           />
 
           {needsCompanySelection && companies.length > 0 && (
@@ -138,7 +160,7 @@ const ExternalServiceConnectDialog = ({
                 label="Компания"
                 value={companyId}
                 onChange={(e) => setCompanyId(e.target.value)}
-              >
+               variant={'filled'}>
                 {companies.map((company) => (
                   <MenuItem key={company.id} value={String(company.id)}>
                     {company.name}

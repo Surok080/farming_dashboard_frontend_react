@@ -44,6 +44,7 @@ const MonitoringRowDialogContent = ({
     const fuelFmt = row ? formatNumberForDisplay(row.fuel, 3) : null;
     const durationFmt = row ? formatNumberForDisplay(row.duration_hours, 3) : null;
     const areaWorkedFmt = row ? formatNumberForDisplay(row.area_worked, 3) : null;
+    const mileageFmt = row ? formatNumberForDisplay(row.mileage, 3) : null;
     const periodRangeDisplay = row ? formatPeriodRangeDisplay(row.period_start, row.period_stop) : "";
 
     return (
@@ -102,6 +103,14 @@ const MonitoringRowDialogContent = ({
                             InputLabelProps={{shrink: true}}
                             inputProps={{title: areaWorkedFmt?.hasTooltip ? areaWorkedFmt.full : undefined}}
                             sx={{"& .MuiOutlinedInput-notchedOutline": {borderWidth: 1}}}
+                        />
+                        <TextField
+                            disabled
+                            size="small"
+                            label="Пробег, км"
+                            value={mileageFmt?.display === "—" ? "" : mileageFmt?.display ?? ""}
+                            InputLabelProps={{shrink: true}}
+                            inputProps={{title: mileageFmt?.hasTooltip ? mileageFmt.full : undefined}}
                         />
                     </Box>
 
