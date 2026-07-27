@@ -172,7 +172,11 @@ const Map = memo(({ year, setAllArea }) => {
         />
         
         <MapContainer
-          center={[56.66163543086128, 54.6566711425781]}
+          center={
+            Array.isArray(layer?.center) && layer.center.length >= 2
+              ? [layer.center[1], layer.center[0]]
+              : [56.66163543086128, 54.6566711425781]
+          }
           zoom={12}
           zoomControl={false}
           scrollWheelZoom={true}
@@ -191,6 +195,8 @@ const Map = memo(({ year, setAllArea }) => {
               isModalOpen={modals.fieldInfo.open}
               hoveredFieldId={hoveredFieldId}
               hideLayerControl={tabValue === "2"}
+              hideMenu={hideMenu}
+              isSmallScreen={isSmallScreen}
             />
           )}
         </MapContainer>

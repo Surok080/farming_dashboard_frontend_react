@@ -131,8 +131,8 @@ const ExternalServicesSettings = () => {
     <Box display="flex" flexDirection="column" gap={3} alignItems="flex-start">
       <Box textAlign="left">
         <Typography variant="body2" color="textSecondary">
-          Подключите учётные записи внешних систем мониторинга. Данные используются в мониторинге,
-          техкарте и синхронизации с 1С.
+          Подключение внешних систем к спутниковому мониторингу (ГЛОНАСС/GPS). Сервер спутникового мониторинга передает в учетную запись
+          обработанные данные (пробег, расход, координаты и другие параматеры) по запросу (REST API) или по расписанию
         </Typography>
       </Box>
 

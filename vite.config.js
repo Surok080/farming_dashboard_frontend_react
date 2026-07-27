@@ -5,6 +5,7 @@ export default defineConfig({
     // depending on your application, base can also be "/"
     base: '',
     plugins: [react()],
+    assetsInclude: ['**/*.kml'],
     build: {
       outDir: 'build',
     },

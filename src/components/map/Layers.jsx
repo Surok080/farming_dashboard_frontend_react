@@ -1,10 +1,67 @@
-import React, {memo, useEffect, useState} from "react";
+import React, {memo, useEffect, useRef, useState} from "react";
 import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMap} from "react-leaflet";
 import {Typography} from "@mui/material";
+import L from "leaflet";
 
-const Layers = memo(({ layer, activeArea, setActiveArea, year, onFieldClick, isModalOpen, hoveredFieldId, hideLayerControl = false }) => {
+const SIDEBAR_WIDTH_DESKTOP = 400;
+const SIDEBAR_WIDTH_MOBILE = 300;
+
+const getSidebarWidth = (hideMenu, isSmallScreen) => {
+  if (hideMenu) return 0;
+  return isSmallScreen ? SIDEBAR_WIDTH_MOBILE : SIDEBAR_WIDTH_DESKTOP;
+};
+
+const LEGEND_WIDTH = 200;
+
+const getFitBoundsPadding = (map, hideMenu, isSmallScreen) => {
+  const sidebarWidth = getSidebarWidth(hideMenu, isSmallScreen);
+  const mapWidth = map.getSize()?.x || 0;
+  // Не больше ~40% ширины карты — иначе Leaflet сильно уменьшает зум
+  const leftPad = sidebarWidth > 0
+    ? Math.min(sidebarWidth + 24, Math.max(48, mapWidth * 0.4))
+    : 48;
+  const rightPad = Math.min(LEGEND_WIDTH + 24, Math.max(48, mapWidth * 0.25));
+  return {
+    paddingTopLeft: [leftPad, 48],
+    paddingBottomRight: [rightPad, 48],
+  };
+};
+
+const collectFeatureBounds = (features) => {
+  const bounds = L.latLngBounds([]);
+  let hasPoints = false;
+
+  features.forEach((feature) => {
+    if (!feature?.geometry) return;
+    try {
+      const featureBounds = L.geoJSON(feature).getBounds();
+      if (featureBounds.isValid()) {
+        bounds.extend(featureBounds);
+        hasPoints = true;
+      }
+    } catch {
+      // пропускаем битую геометрию
+    }
+  });
+
+  return hasPoints && bounds.isValid() ? bounds : null;
+};
+
+const Layers = memo(({
+  layer,
+  activeArea,
+  setActiveArea,
+  year,
+  onFieldClick,
+  isModalOpen,
+  hoveredFieldId,
+  hideLayerControl = false,
+  hideMenu = false,
+  isSmallScreen = false,
+}) => {
   const [tooltipKey, setTooltipKey] = useState(0);
   const map = useMap();
+  const fittedKeyRef = useRef(null);
 
   // Управление тултипами при открытии/закрытии модального окна
   useEffect(() => {
@@ -28,12 +85,48 @@ const Layers = memo(({ layer, activeArea, setActiveArea, year, onFieldClick, isM
     }
   }, [isModalOpen, map]);
 
-
+  // При загрузке нового набора полей — один раз вмещаем их в видимую зону (справа от панели)
   useEffect(() => {
-    if (layer && layer?.features?.length) {
-      map.setView([layer.center[1], layer.center[0]], map.getZoom());
-    }
-  }, [layer, map]);
+    if (!layer?.features?.length) return;
+
+    // Ключ по данным слоя: при смене года со старым layer не фитим, ждём новый layer
+    const fitKey = [
+      layer.features.length,
+      layer.center?.[0],
+      layer.center?.[1],
+      layer.total_area,
+      layer.features[0]?.properties?.id,
+    ].join(":");
+    if (fittedKeyRef.current === fitKey) return;
+
+    const bounds = collectFeatureBounds(layer.features);
+    const centerLatLng = bounds
+      ? bounds.getCenter()
+      : Array.isArray(layer.center) && layer.center.length >= 2
+        ? L.latLng(layer.center[1], layer.center[0])
+        : null;
+
+    const fitAllFields = () => {
+      map.invalidateSize();
+
+      if (!bounds) {
+        if (!centerLatLng) return;
+        fittedKeyRef.current = fitKey;
+        map.setView(centerLatLng, 12, { animate: false });
+        return;
+      }
+
+      fittedKeyRef.current = fitKey;
+      map.fitBounds(bounds, {
+        ...getFitBoundsPadding(map, hideMenu, isSmallScreen),
+        maxZoom: 15,
+        animate: false,
+      });
+    };
+
+    const timeoutId = window.setTimeout(fitAllFields, 50);
+    return () => window.clearTimeout(timeoutId);
+  }, [layer, map, hideMenu, isSmallScreen]);
 
   useEffect(() => {
     if (activeArea) {

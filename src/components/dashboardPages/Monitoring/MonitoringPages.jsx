@@ -17,6 +17,7 @@ import MonitoringTable from "./MonitoringTable";
 import MonitoringSettingsDialog from "./MonitoringSettingsDialog";
 import MonitoringRowDialog from "./MonitoringRowDialog";
 import MonitoringStatusConfirmDialog from "./MonitoringStatusConfirmDialog";
+import MonitoringPublish1CUnavailableDialog from "./MonitoringPublish1CUnavailableDialog";
 import {
   MONITORING_DEFAULT_PAGE_SIZE,
   MONITORING_MAX_PAGE_SIZE,
@@ -91,6 +92,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   /** { activeKey, nextStatus, successMessage } | null — ожидание подтверждения смены статуса */
   const [statusConfirm, setStatusConfirm] = useState(null);
   const [headerPublishConfirmOpen, setHeaderPublishConfirmOpen] = useState(false);
+  const [publish1CUnavailableOpen, setPublish1CUnavailableOpen] = useState(false);
   const [sendMaxConfirmOpen, setSendMaxConfirmOpen] = useState(false);
   const [mergeConfirmOpen, setMergeConfirmOpen] = useState(false);
   /** Последние сохранённые на сервере id обязательных полей модалки (для блокировки подтверждения при несохранённых правках). */
@@ -350,35 +352,9 @@ const MonitoringPages = ({ year: yearProp }) => {
       return { ok: true };
     });
 
-  const handleDialogPublish1C = () =>
-    openStatusConfirmIfValid("publish_1c", MONITORING_STATUS_READY_FOR_1C, "Статус изменён", (row) => {
-      if (row?.status !== MONITORING_STATUS_CONFIRMED) {
-        return { ok: false, message: "Публикация в 1С доступна только для подтверждённой строки" };
-      }
-      const savedIds = dialogSavedFieldIds;
-      if (!savedIds) {
-        return { ok: false, message: "Данные строки ещё загружаются" };
-      }
-      const missingInForm = getMissingRequiredFields(row);
-      if (missingInForm.length) {
-        return {
-          ok: false,
-          message: `Заполните обязательные поля: ${missingInForm.join(", ")}`,
-        };
-      }
-      if (monitoringSavedIdsDirty(row, savedIds)) {
-        return {
-          ok: false,
-          message: "Сохраните изменения (кнопка «Сохранить») перед публикацией в 1С",
-        };
-      }
-      const missingSaved = getMissingRequiredFields(savedIds);
-      if (missingSaved.length) {
-        return { ok: false, message: `Сохраните в базе обязательные поля: ${missingSaved.join(", ")}` };
-      }
-      return { ok: true };
-    });
-
+  const handleDialogPublish1C = () => {
+    setPublish1CUnavailableOpen(true);
+  };
   const handleDialogSave = async () => {
     const row = dialogData?.row;
     if (!row?.id) return;
@@ -520,22 +496,7 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const onPublish1C = () => {
     if (mergeLoading || sendMaxLoading) return;
-    if (!canPublish1C) {
-      enqueueSnackbar("Для публикации выберите минимум 1 подтвержденную строку", {
-        variant: "warning",
-        autoHideDuration: 2500,
-      });
-      return;
-    }
-    const rowIds = selectedRowIds.map((id) => Number(id)).filter((n) => Number.isFinite(n));
-    if (!rowIds.length) {
-      enqueueSnackbar("Не выбраны строки для публикации", {
-        variant: "warning",
-        autoHideDuration: 2500,
-      });
-      return;
-    }
-    setHeaderPublishConfirmOpen(true);
+    setPublish1CUnavailableOpen(true);
   };
 
   const executeSendMax = async () => {
@@ -637,7 +598,7 @@ const MonitoringPages = ({ year: yearProp }) => {
               <MonitoringHeader
                 year={year}
                 onPublish1C={onPublish1C}
-                publishDisabled={!canPublish1C || sendMaxLoading}
+                publishDisabled={sendMaxLoading || mergeLoading}
                 onSendMax={onSendMax}
                 sendMaxDisabled={!canSendMax || mergeLoading}
                 sendMaxLoading={sendMaxLoading}
@@ -720,10 +681,7 @@ const MonitoringPages = ({ year: yearProp }) => {
         }
         canReject={[MONITORING_STATUS_RAW, MONITORING_STATUS_CONFIRMED].includes(dialogData?.row?.status)}
         canReturn={[MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_CANCELED].includes(dialogData?.row?.status)}
-        canPublish1C={
-          dialogData?.row?.status === MONITORING_STATUS_CONFIRMED &&
-          isDialogRequiredFieldsReadyForSubmit(dialogData?.row, dialogSavedFieldIds)
-        }
+        canPublish1C={true}
         onRowChange={handleDialogRowChange}
         onSave={handleDialogSave}
         saveLoading={dialogSaveLoading}
@@ -731,6 +689,10 @@ const MonitoringPages = ({ year: yearProp }) => {
         onReject={handleDialogReject}
         onConfirm={handleDialogConfirm}
         onPublish1C={handleDialogPublish1C}
+      />
+      <MonitoringPublish1CUnavailableDialog
+        open={publish1CUnavailableOpen}
+        onClose={() => setPublish1CUnavailableOpen(false)}
       />
       <MonitoringStatusConfirmDialog
         open={Boolean(statusConfirm)}

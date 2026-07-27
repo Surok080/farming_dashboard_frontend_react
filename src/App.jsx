@@ -4,7 +4,7 @@ import Dashboard from "./components/dashboard/Dashboard";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 import SignIn from "./components/SingIn";
-
+import { useCompactViewportZoom } from "./hooks/useCompactViewportZoom";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +24,7 @@ const router = createBrowserRouter([
 
 
 function App() {
+  useCompactViewportZoom();
 
   return (
     <div className="App">

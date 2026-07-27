@@ -1,8 +1,9 @@
 import React from 'react';
-import {Box, Typography, useMediaQuery, useTheme} from "@mui/material";
+import {Box, Link, Typography, useMediaQuery, useTheme} from "@mui/material";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import UploadFiles from "./UploadFiles";
 import {useSelector} from "react-redux";
-
+import testKmlUrl from "../../docs/test.kml?url";
 
 const MapSettings = () => {
     const user = useSelector((state) => state.user)
@@ -56,6 +57,47 @@ const MapSettings = () => {
                         :
                         null
                 }
+            </Box>
+
+            <Box textAlign="left" sx={{ mt: 1 }}>
+                <Typography variant="body2" color="text.primary" sx={{ mb: 1.5 }}>
+                    Используйте ссылку ниже, чтобы скачать пример KML-файла
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                *.kml-формат файл для импорта полей в систему Агро-Коннет, в раздел “Поля”
+                Поддерживаемый формат - Google KML (.kml файл).
+                </Typography>
+
+                <Box display="flex" alignItems="center" gap={1.25}>
+                    <Box
+                        sx={{
+                            width: 40,
+                            height: 48,
+                            borderRadius: 1,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            backgroundColor: "#fafafa",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <DescriptionOutlinedIcon sx={{ fontSize: 22, color: "text.secondary" }} />
+                        <Typography variant="caption" sx={{ fontSize: 9, fontWeight: 700, lineHeight: 1, mt: 0.25 }}>
+                            KML
+                        </Typography>
+                    </Box>
+                    <Link
+                        href={testKmlUrl}
+                        download="test.kml"
+                        underline="hover"
+                        sx={{ fontSize: 14 }}
+                    >
+                        Скачать test.kml
+                    </Link>
+                </Box>
             </Box>
 
         </Box>
