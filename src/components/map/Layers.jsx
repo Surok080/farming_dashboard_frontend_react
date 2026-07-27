@@ -12,18 +12,19 @@ const getSidebarWidth = (hideMenu, isSmallScreen) => {
 };
 
 const LEGEND_WIDTH = 200;
+/** Увеличивать при смене логики fit — иначе HMR/повторный рендер не пересчитает зум. */
+const FIT_VERSION = 4;
 
 const getFitBoundsPadding = (map, hideMenu, isSmallScreen) => {
   const sidebarWidth = getSidebarWidth(hideMenu, isSmallScreen);
   const mapWidth = map.getSize()?.x || 0;
-  // Не больше ~40% ширины карты — иначе Leaflet сильно уменьшает зум
   const leftPad = sidebarWidth > 0
-    ? Math.min(sidebarWidth + 24, Math.max(48, mapWidth * 0.4))
-    : 48;
-  const rightPad = Math.min(LEGEND_WIDTH + 24, Math.max(48, mapWidth * 0.25));
+    ? Math.min(sidebarWidth + 16, Math.max(40, mapWidth * 0.4))
+    : 40;
+  const rightPad = Math.min(LEGEND_WIDTH + 16, Math.max(40, mapWidth * 0.22));
   return {
-    paddingTopLeft: [leftPad, 48],
-    paddingBottomRight: [rightPad, 48],
+    paddingTopLeft: [leftPad, 32],
+    paddingBottomRight: [rightPad, 32],
   };
 };
 
@@ -89,8 +90,9 @@ const Layers = memo(({
   useEffect(() => {
     if (!layer?.features?.length) return;
 
-    // Ключ по данным слоя: при смене года со старым layer не фитим, ждём новый layer
+    // Ключ по данным слоя + версия fit: при смене года со старым layer не фитим, ждём новый layer
     const fitKey = [
+      FIT_VERSION,
       layer.features.length,
       layer.center?.[0],
       layer.center?.[1],
@@ -117,9 +119,10 @@ const Layers = memo(({
       }
 
       fittedKeyRef.current = fitKey;
+
       map.fitBounds(bounds, {
         ...getFitBoundsPadding(map, hideMenu, isSmallScreen),
-        maxZoom: 15,
+        maxZoom: 16,
         animate: false,
       });
     };

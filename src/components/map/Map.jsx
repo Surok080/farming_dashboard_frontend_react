@@ -178,6 +178,8 @@ const Map = memo(({ year, setAllArea }) => {
               : [56.66163543086128, 54.6566711425781]
           }
           zoom={12}
+          zoomSnap={0.25}
+          zoomDelta={0.5}
           zoomControl={false}
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%", position: "relative" }}
