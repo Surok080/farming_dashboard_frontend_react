@@ -21,6 +21,7 @@ import WarehouseAccountingToolbar from "./WarehouseAccountingToolbar";
 import WarehouseAccountingSectionCards from "./WarehouseAccountingSectionCards";
 import WarehouseAccountingTable from "./WarehouseAccountingTable";
 import WarehouseAccountingChart from "./WarehouseAccountingChart";
+import WarehouseAccountingDocumentsDialog from "./WarehouseAccountingDocumentsDialog";
 
 const WarehouseAccountingPage = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -141,6 +142,13 @@ const WarehouseAccountingPage = () => {
         />
         <WarehouseAccountingChart stock={chartStock} />
       </Box>
+      <WarehouseAccountingDocumentsDialog
+        open={Boolean(documentsQuery)}
+        query={documentsQuery}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onClose={() => setDocumentsQuery(null)}
+      />
     </Box>
   );
 };
