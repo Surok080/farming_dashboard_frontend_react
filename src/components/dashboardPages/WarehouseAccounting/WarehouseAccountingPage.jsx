@@ -9,6 +9,7 @@ import {
   getWarehouseStockByStorages,
 } from "../../../api/warehouseAccounting";
 import {
+  aggregateStockFromMovement,
   filterMovementRows,
   getDefaultWarehouseInterval,
   hasClientFilters,
@@ -19,6 +20,7 @@ import WarehouseAccountingHeader from "./WarehouseAccountingHeader";
 import WarehouseAccountingToolbar from "./WarehouseAccountingToolbar";
 import WarehouseAccountingSectionCards from "./WarehouseAccountingSectionCards";
 import WarehouseAccountingTable from "./WarehouseAccountingTable";
+import WarehouseAccountingChart from "./WarehouseAccountingChart";
 
 const WarehouseAccountingPage = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -98,6 +100,10 @@ const WarehouseAccountingPage = () => {
     [movement.rows, storageIds, sectionIds, productIds]
   );
   const filtersActive = hasClientFilters({ storageIds, sectionIds, productIds });
+  const chartStock = useMemo(() => {
+    if (!filtersActive) return stockByStorages;
+    return aggregateStockFromMovement(filteredRows);
+  }, [filtersActive, stockByStorages, filteredRows]);
 
   return (
     <Box sx={{ p: 2, height: "100%", overflow: "auto" }}>
@@ -133,6 +139,7 @@ const WarehouseAccountingPage = () => {
           filtersActive={filtersActive}
           onOpenDocuments={setDocumentsQuery}
         />
+        <WarehouseAccountingChart stock={chartStock} />
       </Box>
     </Box>
   );
