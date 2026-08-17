@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, LinearProgress } from "@mui/material";
 import { useSnackbar } from "notistack";
 import {
@@ -8,10 +8,17 @@ import {
   getWarehouseSectionsSummary,
   getWarehouseStockByStorages,
 } from "../../../api/warehouseAccounting";
-import { getDefaultWarehouseInterval, toApiDate, toggleId } from "./warehouseAccountingUtils";
+import {
+  filterMovementRows,
+  getDefaultWarehouseInterval,
+  hasClientFilters,
+  toApiDate,
+  toggleId,
+} from "./warehouseAccountingUtils";
 import WarehouseAccountingHeader from "./WarehouseAccountingHeader";
 import WarehouseAccountingToolbar from "./WarehouseAccountingToolbar";
 import WarehouseAccountingSectionCards from "./WarehouseAccountingSectionCards";
+import WarehouseAccountingTable from "./WarehouseAccountingTable";
 
 const WarehouseAccountingPage = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -26,6 +33,7 @@ const WarehouseAccountingPage = () => {
   const [sectionsSummary, setSectionsSummary] = useState([]);
   const [stockByStorages, setStockByStorages] = useState({ storages: [], total_amount: 0, date: null });
   const [loading, setLoading] = useState(false);
+  const [documentsQuery, setDocumentsQuery] = useState(null);
 
   const loadPeriod = useCallback(
     async (from, to) => {
@@ -85,6 +93,12 @@ const WarehouseAccountingPage = () => {
     loadPeriod(dateFrom, dateTo);
   }, [dateFrom, dateTo, loadPeriod]);
 
+  const filteredRows = useMemo(
+    () => filterMovementRows(movement.rows, { storageIds, sectionIds, productIds }),
+    [movement.rows, storageIds, sectionIds, productIds]
+  );
+  const filtersActive = hasClientFilters({ storageIds, sectionIds, productIds });
+
   return (
     <Box sx={{ p: 2, height: "100%", overflow: "auto" }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 2, flexWrap: "wrap" }}>
@@ -108,6 +122,18 @@ const WarehouseAccountingPage = () => {
         selectedIds={sectionIds}
         onToggle={(id) => setSectionIds((prev) => toggleId(prev, id))}
       />
+      <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start", mt: 1, flexWrap: { xs: "wrap", lg: "nowrap" } }}>
+        <WarehouseAccountingTable
+          rows={filteredRows}
+          products={dictionaries.products}
+          productIds={productIds}
+          onProductIdsChange={setProductIds}
+          lastOperationDate={movement.last_operation_date}
+          loading={loading}
+          filtersActive={filtersActive}
+          onOpenDocuments={setDocumentsQuery}
+        />
+      </Box>
     </Box>
   );
 };
