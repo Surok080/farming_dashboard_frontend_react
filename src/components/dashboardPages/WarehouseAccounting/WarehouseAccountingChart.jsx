@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, CircularProgress, Paper, Typography } from "@mui/material";
 import { Chart } from "react-google-charts";
 import { CHART_COLORS } from "./warehouseAccountingConstants";
 import { formatMoney, formatQuantities } from "./warehouseAccountingUtils";
 
-const WarehouseAccountingChart = ({ stock }) => {
+const WarehouseAccountingChart = ({ stock, loading }) => {
   const storages = stock?.storages ?? [];
   const chartData = useMemo(() => {
     if (!storages.length) return null;
@@ -29,7 +29,12 @@ const WarehouseAccountingChart = ({ stock }) => {
       <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1 }}>
         Учёт запасов по складам (местам хранения)
       </Typography>
-      {!storages.length || !chartData ? (
+      {loading ? (
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, py: 4 }}>
+          <CircularProgress size={22} />
+          <Typography sx={{ fontSize: 13, color: "#666" }}>Загрузка…</Typography>
+        </Box>
+      ) : !storages.length || !chartData ? (
         <Typography sx={{ fontSize: 13, color: "#666" }}>Нет данных по складам</Typography>
       ) : (
         <>

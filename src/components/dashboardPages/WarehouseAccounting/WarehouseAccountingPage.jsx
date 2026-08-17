@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, LinearProgress } from "@mui/material";
 import { useSnackbar } from "notistack";
 import {
@@ -38,63 +38,68 @@ const WarehouseAccountingPage = () => {
   const [loading, setLoading] = useState(false);
   const [documentsQuery, setDocumentsQuery] = useState(null);
 
-  const loadPeriod = useCallback(
-    async (from, to) => {
-      const date_from = toApiDate(from);
-      const date_to = toApiDate(to);
-      if (!date_from || !date_to) return;
-      setLoading(true);
-      const results = await Promise.allSettled([
-        getWarehouseDictionaries(),
-        getWarehouseMovement({ date_from, date_to }),
-        getWarehouseSectionsSummary({ date_from, date_to }),
-        getWarehouseStockByStorages({ date_to }),
-      ]);
-      const labels = [
-        "Не удалось загрузить справочники",
-        "Не удалось загрузить движение ТМЦ",
-        "Не удалось загрузить сводку по разделам",
-        "Не удалось загрузить остатки по складам",
-      ];
-      results.forEach((result, index) => {
-        if (result.status === "rejected") {
-          enqueueSnackbar(getApiErrorMessage(result.reason, labels[index]), { variant: "error" });
-        }
-      });
-      if (results[0].status === "fulfilled") {
-        const data = results[0].value?.data ?? {};
-        setDictionaries({
-          products: data.products ?? [],
-          storages: data.storages ?? [],
-          sections: data.sections ?? [],
-        });
-      }
-      if (results[1].status === "fulfilled") {
-        const data = results[1].value?.data ?? {};
-        setMovement({
-          rows: data.rows ?? [],
-          last_operation_date: data.last_operation_date ?? null,
-        });
-      }
-      if (results[2].status === "fulfilled") {
-        setSectionsSummary(results[2].value?.data ?? []);
-      }
-      if (results[3].status === "fulfilled") {
-        const data = results[3].value?.data ?? {};
-        setStockByStorages({
-          storages: data.storages ?? [],
-          total_amount: data.total_amount ?? 0,
-          date: data.date ?? null,
-        });
-      }
-      setLoading(false);
-    },
-    [enqueueSnackbar]
-  );
-
   useEffect(() => {
-    loadPeriod(dateFrom, dateTo);
-  }, [dateFrom, dateTo, loadPeriod]);
+    const date_from = toApiDate(dateFrom);
+    const date_to = toApiDate(dateTo);
+    if (!date_from || !date_to) return undefined;
+
+    let cancelled = false;
+    const loadPeriod = async () => {
+      setLoading(true);
+      try {
+        const results = await Promise.allSettled([
+          getWarehouseDictionaries(),
+          getWarehouseMovement({ date_from, date_to }),
+          getWarehouseSectionsSummary({ date_from, date_to }),
+          getWarehouseStockByStorages({ date_to }),
+        ]);
+        if (cancelled) return;
+        const labels = [
+          "Не удалось загрузить справочники",
+          "Не удалось загрузить движение ТМЦ",
+          "Не удалось загрузить сводку по разделам",
+          "Не удалось загрузить остатки по складам",
+        ];
+        results.forEach((result, index) => {
+          if (result.status === "rejected") {
+            enqueueSnackbar(getApiErrorMessage(result.reason, labels[index]), { variant: "error" });
+          }
+        });
+        if (results[0].status === "fulfilled") {
+          const data = results[0].value?.data ?? {};
+          setDictionaries({
+            products: data.products ?? [],
+            storages: data.storages ?? [],
+            sections: data.sections ?? [],
+          });
+        }
+        if (results[1].status === "fulfilled") {
+          const data = results[1].value?.data ?? {};
+          setMovement({
+            rows: data.rows ?? [],
+            last_operation_date: data.last_operation_date ?? null,
+          });
+        }
+        if (results[2].status === "fulfilled") {
+          setSectionsSummary(results[2].value?.data ?? []);
+        }
+        if (results[3].status === "fulfilled") {
+          const data = results[3].value?.data ?? {};
+          setStockByStorages({
+            storages: data.storages ?? [],
+            total_amount: data.total_amount ?? 0,
+            date: data.date ?? null,
+          });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    loadPeriod();
+    return () => {
+      cancelled = true;
+    };
+  }, [dateFrom, dateTo, enqueueSnackbar]);
 
   const filteredRows = useMemo(
     () => filterMovementRows(movement.rows, { storageIds, sectionIds, productIds }),
@@ -140,7 +145,7 @@ const WarehouseAccountingPage = () => {
           filtersActive={filtersActive}
           onOpenDocuments={setDocumentsQuery}
         />
-        <WarehouseAccountingChart stock={chartStock} />
+        <WarehouseAccountingChart stock={chartStock} loading={loading} />
       </Box>
       <WarehouseAccountingDocumentsDialog
         open={Boolean(documentsQuery)}
