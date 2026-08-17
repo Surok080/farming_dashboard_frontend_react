@@ -19,6 +19,7 @@ import MonitoringPages from "../dashboardPages/Monitoring/MonitoringPages";
 import CartogramsPage from "../dashboardPages/CartogramsPage";
 import TechcartPage from "../dashboardPages/TechcartPage";
 import SettingsPage from "../dashboardPages/SettingsPage";
+import WarehouseAccountingPage from "../dashboardPages/WarehouseAccounting/WarehouseAccountingPage";
 import {useEffect} from "react";
 import {useMediaQuery, useTheme} from "@mui/material";
 import {httpService} from "../../api/setup";
@@ -120,6 +121,8 @@ export default function Dashboard() {
                 return <MonitoringPages setAllArea={setAllArea} year={year}/>;
             case "cartogram":
                 return <CartogramsPage setAllArea={setAllArea} year={year}/>;
+            case "warehouse_accounting":
+                return <WarehouseAccountingPage/>;
             case "menu_settings":
                 return <SettingsPage setAllArea={setAllArea} year={year}/>;
 

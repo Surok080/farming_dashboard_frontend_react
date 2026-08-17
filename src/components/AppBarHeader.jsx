@@ -76,6 +76,8 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                 return "Картограммы";
             case "menu_settings":
                 return "Настройки";
+            case "warehouse_accounting":
+                return "Склад-учёт";
             default:
                 break;
         }

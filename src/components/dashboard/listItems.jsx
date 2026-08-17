@@ -11,6 +11,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import NavigationOutlinedIcon from '@mui/icons-material/NavigationOutlined';
+import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined';
 import {useSelector} from "react-redux";
 import {appBarName, sortTabsByFixedOrder} from "../../utils/appBar";
 import {defaultTheme} from "./Dashboard";
@@ -40,6 +41,7 @@ const ListItems = memo(() => {
             // 3. monitoring (Мониторинг)
             // 4. cartogram (Картограммы)
             // 5. state_monitoring (Госмониторинг)
+            // 6. warehouse_accounting (Склад-учёт)
             tabNames = sortTabsByFixedOrder(tabNames);
             
             setMenu(tabNames);
@@ -69,6 +71,9 @@ const ListItems = memo(() => {
             case 'tech_map':
                 return <DescriptionOutlinedIcon
                     sx={{color: valueTabs === "tech_map" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
+            case 'warehouse_accounting':
+                return <WarehouseOutlinedIcon
+                    sx={{color: valueTabs === "warehouse_accounting" ? "#82F865" : "", transition: 'all .2s ease-in-out'}}/>
             default:
                 return null;
         }

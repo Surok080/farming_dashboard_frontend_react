@@ -11,6 +11,8 @@ export const appBarName = (menu) => {
           return "Госмониторинг"
       case 'tech_map':
           return "ТехКарта"
+      case 'warehouse_accounting':
+          return "Склад-учёт"
       default:
           return menu
   }
@@ -63,6 +65,7 @@ export function moveStringToFirstPositionImmutable(array, targetString) {
  * 3. monitoring (Мониторинг)
  * 4. cartogram (Картограммы)
  * 5. state_monitoring (Госмониторинг)
+ * 6. warehouse_accounting (Склад-учёт)
  * Остальные вкладки добавляются в конец
  */
 export function sortTabsByFixedOrder(tabs) {
@@ -83,7 +86,7 @@ export function sortTabsByFixedOrder(tabs) {
  */
 function sortTabsByOrder(tabs) {
     // Определяем порядок вкладок
-    const order = ['tech_map', 'fields', 'fields_v2', 'monitoring', 'cartogram', 'state_monitoring'];
+    const order = ['tech_map', 'fields', 'fields_v2', 'monitoring', 'cartogram', 'state_monitoring', 'warehouse_accounting'];
     
     // Создаём Map для быстрого поиска индекса
     const orderMap = new Map();
