@@ -8,9 +8,10 @@ import {
   getWarehouseSectionsSummary,
   getWarehouseStockByStorages,
 } from "../../../api/warehouseAccounting";
-import { getDefaultWarehouseInterval, toApiDate } from "./warehouseAccountingUtils";
+import { getDefaultWarehouseInterval, toApiDate, toggleId } from "./warehouseAccountingUtils";
 import WarehouseAccountingHeader from "./WarehouseAccountingHeader";
 import WarehouseAccountingToolbar from "./WarehouseAccountingToolbar";
+import WarehouseAccountingSectionCards from "./WarehouseAccountingSectionCards";
 
 const WarehouseAccountingPage = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -102,6 +103,11 @@ const WarehouseAccountingPage = () => {
         onSectionIdsChange={setSectionIds}
       />
       {loading ? <LinearProgress sx={{ mt: 2 }} /> : null}
+      <WarehouseAccountingSectionCards
+        items={sectionsSummary}
+        selectedIds={sectionIds}
+        onToggle={(id) => setSectionIds((prev) => toggleId(prev, id))}
+      />
     </Box>
   );
 };
