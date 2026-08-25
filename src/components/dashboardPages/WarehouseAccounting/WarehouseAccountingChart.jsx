@@ -5,72 +5,86 @@ import { CHART_COLORS } from "./warehouseAccountingConstants";
 import { formatMoney, formatQuantities } from "./warehouseAccountingUtils";
 
 const WarehouseAccountingChart = ({ stock, loading }) => {
-  const storages = stock?.storages ?? [];
+  const storages = Array.isArray(stock?.storages) ? stock.storages : [];
+  const chartStorages = useMemo(
+    () => storages.filter((item) => Number(item.amount) > 0),
+    [storages]
+  );
   const chartData = useMemo(() => {
-    if (!storages.length) return null;
+    if (!chartStorages.length) return null;
     const data = [["Склад", "Сумма"]];
-    storages.forEach((item) => data.push([item.storage_name, Number(item.amount) || 0]));
+    chartStorages.forEach((item) => data.push([item.storage_name, Number(item.amount) || 0]));
     return data;
-  }, [storages]);
-  const maxAmount = storages.reduce((max, item) => Math.max(max, Number(item.amount) || 0), 0);
+  }, [chartStorages]);
 
   return (
     <Paper
       variant="outlined"
       sx={{
-        mt: 2,
         p: 2,
-        width: { xs: "100%", lg: 360 },
-        flexShrink: 0,
-        borderColor: "#e0e0e0",
+        width: "100%",
+        height: "100%",
+        minHeight: 0,
+        boxSizing: "border-box",
+        borderColor: "#e6ecf2",
+        borderRadius: "10px",
         boxShadow: "none",
+        overflow: "auto",
       }}
     >
-      <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1 }}>
-        Учёт запасов по складам (местам хранения)
+      <Typography sx={{ fontWeight: 600, fontSize: 14, mb: 0.25, color: "#2f3743", textAlign: "center" }}>
+        Учёт запасов
+      </Typography>
+      <Typography sx={{ fontSize: 13, mb: 1.25, color: "#2f3743", textAlign: "center", lineHeight: 1.35 }}>
+        По складам (местам хранения)
       </Typography>
       {loading ? (
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, py: 4 }}>
           <CircularProgress size={22} />
           <Typography sx={{ fontSize: 13, color: "#666" }}>Загрузка…</Typography>
         </Box>
-      ) : !storages.length || !chartData ? (
+      ) : !chartStorages.length || !chartData ? (
         <Typography sx={{ fontSize: 13, color: "#666" }}>Нет данных по складам</Typography>
       ) : (
         <>
           <Chart
             chartType="PieChart"
             data={chartData}
+            loader={<CircularProgress size={22} />}
             options={{
-              pieHole: 0.45,
+              pieHole: 0.72,
               legend: "none",
               colors: CHART_COLORS,
-              chartArea: { width: "90%", height: "90%" },
+              chartArea: { width: "88%", height: "88%" },
               pieSliceText: "none",
+              tooltip: { text: "both" },
+              pieStartAngle: 270,
+              backgroundColor: "transparent",
             }}
             width="100%"
-            height="220px"
+            height="210px"
           />
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, mt: 1 }}>
-            {storages.map((item, index) => {
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 1, mt: 1, alignItems: "start" }}>
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#7f8997" }}>Склад</Typography>
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#7f8997", textAlign: "right" }}>
+              Количество
+            </Typography>
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#7f8997", textAlign: "right" }}>Сумма</Typography>
+            {chartStorages.map((item, index) => {
               const color = CHART_COLORS[index % CHART_COLORS.length];
-              const ratio = maxAmount ? (Number(item.amount) || 0) / maxAmount : 0;
               return (
-                <Box key={item.storage_id}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-                    <Box sx={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: color, flexShrink: 0 }} />
-                    <Typography sx={{ fontSize: 13, fontWeight: 600, flex: 1 }}>{item.storage_name}</Typography>
+                <React.Fragment key={item.storage_id}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+                    <Box sx={{ width: 9, height: 9, borderRadius: "50%", backgroundColor: color, flexShrink: 0 }} />
+                    <Typography sx={{ fontSize: 12, color: "#3b4350", minWidth: 0 }}>{item.storage_name}</Typography>
                   </Box>
-                  <Typography sx={{ fontSize: 12, color: "#555", ml: 2.5 }}>
-                    {formatQuantities(item.quantities)}
+                  <Typography sx={{ fontSize: 12, color: "#3b4350", textAlign: "right", whiteSpace: "nowrap" }}>
+                    {formatQuantities(item.quantities) || "—"}
                   </Typography>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, ml: 2.5, mb: 0.5 }}>
+                  <Typography sx={{ fontSize: 12, color: "#3b4350", textAlign: "right", whiteSpace: "nowrap" }}>
                     {formatMoney(item.amount)}
                   </Typography>
-                  <Box sx={{ ml: 2.5, height: 8, backgroundColor: "#eee", borderRadius: 1, overflow: "hidden" }}>
-                    <Box sx={{ width: `${Math.round(ratio * 100)}%`, height: "100%", backgroundColor: color }} />
-                  </Box>
-                </Box>
+                </React.Fragment>
               );
             })}
           </Box>

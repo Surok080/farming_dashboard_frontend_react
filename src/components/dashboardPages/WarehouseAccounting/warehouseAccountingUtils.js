@@ -55,10 +55,26 @@ export const formatMoney = (value) => {
   return `${ruNumber(value, 2, 2)} ₽`;
 };
 
+/** Сумма без символа валюты (заголовок уже говорит «руб»). */
+export const formatAmount = (value) => {
+  if (value === null || value === undefined || value === "") return "—";
+  return ruNumber(value, 0, 2);
+};
+
 export const formatQuantity = (value, unit) => {
   if (value === null || value === undefined || value === "") return "—";
   const qty = ruNumber(value, 0, 3);
   return unit ? `${qty} ${unit}` : qty;
+};
+
+/** Приход/расход: +80 т / -35 л */
+export const formatSignedQuantity = (value, unit, sign) => {
+  if (value === null || value === undefined || value === "") return "—";
+  const num = Number(value);
+  if (!Number.isFinite(num) || num === 0) return "—";
+  const qty = ruNumber(Math.abs(num), 0, 3);
+  const withUnit = unit ? `${qty} ${unit}` : qty;
+  return `${sign}${withUnit}`;
 };
 
 export const formatQuantities = (list) => {

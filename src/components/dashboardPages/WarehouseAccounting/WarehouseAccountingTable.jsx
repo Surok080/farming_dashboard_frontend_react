@@ -1,14 +1,8 @@
 import React from "react";
 import {
   Box,
-  Checkbox,
-  FormControl,
   IconButton,
-  InputLabel,
-  ListItemText,
-  MenuItem,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -20,107 +14,150 @@ import {
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { EMPTY_FILTERS_MESSAGE, EMPTY_PERIOD_MESSAGE } from "./warehouseAccountingConstants";
 import {
-  formatApiDateDisplay,
-  formatMoney,
+  formatAmount,
   formatQuantity,
+  formatSignedQuantity,
   hasMovement,
 } from "./warehouseAccountingUtils";
 
-const headCell = { fontWeight: 700, fontSize: 12, whiteSpace: "nowrap", borderBottom: "1px solid #e0e0e0" };
+const headCell = {
+  fontWeight: 600,
+  fontSize: 11,
+  color: "#8a93a0",
+  whiteSpace: "nowrap",
+  borderBottom: "1px solid #e7edf3",
+  backgroundColor: "#fff",
+  padding: "10px 12px",
+  verticalAlign: "middle",
+  top: 0,
+  zIndex: 3,
+};
+
+const bodyCellBase = {
+  fontSize: 13,
+  color: "#3b4350",
+  borderBottom: "1px solid #eef2f6",
+  padding: "10px 12px",
+  verticalAlign: "middle",
+};
+
+const openingHeadSx = {
+  ...headCell,
+  backgroundColor: "#f3f5f8",
+  borderBottom: "1px solid #dfe4ea",
+};
+
+const openingBodySx = {
+  ...bodyCellBase,
+  backgroundColor: "#f3f5f8",
+};
+
+const closingHeadSx = {
+  ...headCell,
+  backgroundColor: "#edf8e8",
+  borderBottom: "1px solid #d7ebd0",
+};
+
+const closingBodySx = {
+  ...bodyCellBase,
+  backgroundColor: "#edf8e8",
+};
+
+const balanceHeadLabel = (text) => (
+  <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#8a93a0", lineHeight: 1.25 }}>{text}</Typography>
+);
+
+const MovementCell = ({ value, unit, sign, color, showInfo, onInfoClick }) => (
+  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, justifyContent: "flex-start" }}>
+    <Typography sx={{ fontSize: 13, fontWeight: 600, color, whiteSpace: "nowrap" }}>
+      {formatSignedQuantity(value, unit, sign)}
+    </Typography>
+    {showInfo ? (
+      <IconButton size="small" onClick={onInfoClick} sx={{ color: "#9aa3af", p: 0.25 }}>
+        <InfoOutlinedIcon sx={{ fontSize: 16 }} />
+      </IconButton>
+    ) : null}
+  </Box>
+);
 
 const WarehouseAccountingTable = ({
   rows = [],
-  products = [],
-  productIds,
-  onProductIdsChange,
-  lastOperationDate,
   loading,
   filtersActive,
   onOpenDocuments,
 }) => {
   const emptyMessage = filtersActive ? EMPTY_FILTERS_MESSAGE : EMPTY_PERIOD_MESSAGE;
+  const colCount = 9;
+
   return (
-    <Box sx={{ mt: 2, flex: 1, minWidth: 0 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2, mb: 1, flexWrap: "wrap" }}>
-        <Typography sx={{ fontWeight: 700, fontSize: 15 }}>
-          Движение ТМЦ: приход, расход и остаток ТМЦ на складе
-        </Typography>
-        {lastOperationDate ? (
-          <Typography sx={{ fontSize: 13, color: "#555" }}>
-            Последняя операция — {formatApiDateDisplay(lastOperationDate)}
-          </Typography>
-        ) : null}
-      </Box>
-      <FormControl size="small" sx={{ minWidth: 260, mb: 1 }}>
-        <InputLabel id="warehouse-products-label">Все наименования</InputLabel>
-        <Select
-          labelId="warehouse-products-label"
-          multiple
-          value={productIds}
-          label="Все наименования"
-          onChange={(e) => onProductIdsChange(e.target.value)}
-          renderValue={(selected) => {
-            if (!selected.length) return "Все наименования";
-            return selected
-              .map((id) => products.find((item) => item.id === id)?.name)
-              .filter(Boolean)
-              .join(", ") || "Все наименования";
-          }}
-        >
-          {products.map((item) => (
-            <MenuItem key={item.id} value={item.id}>
-              <Checkbox checked={productIds.includes(item.id)} />
-              <ListItemText primary={item.name} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <TableContainer component={Paper} variant="outlined" sx={{ borderColor: "#e0e0e0", overflowX: "auto" }}>
-        <Table size="small">
+    <Box
+      sx={{
+        mt: 1.5,
+        flex: 1,
+        minWidth: 0,
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <TableContainer
+        component={Paper}
+        variant="outlined"
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          maxHeight: "100%",
+          borderColor: "#e6ecf2",
+          borderRadius: "10px",
+          overflow: "auto",
+          boxShadow: "none",
+        }}
+      >
+        <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell sx={headCell} rowSpan={2}>Наименование</TableCell>
-              <TableCell sx={headCell} rowSpan={2}>Склад</TableCell>
-              <TableCell sx={headCell} align="center" colSpan={2}>Нач. остаток</TableCell>
-              <TableCell sx={headCell} align="center" colSpan={3}>Приход</TableCell>
-              <TableCell sx={headCell} rowSpan={2} align="right">Средняя цена</TableCell>
-              <TableCell sx={headCell} align="center" colSpan={3}>Расход</TableCell>
-              <TableCell sx={headCell} align="center" colSpan={2}>Кон. остаток</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={headCell} align="right">Кол-во</TableCell>
-              <TableCell sx={headCell} align="right">Сумма</TableCell>
-              <TableCell sx={headCell} align="right">Кол-во</TableCell>
-              <TableCell sx={headCell} align="right">Сумма</TableCell>
-              <TableCell sx={headCell} />
-              <TableCell sx={headCell} align="right">Кол-во</TableCell>
-              <TableCell sx={headCell} align="right">Сумма</TableCell>
-              <TableCell sx={headCell} />
-              <TableCell sx={headCell} align="right">Кол-во</TableCell>
-              <TableCell sx={headCell} align="right">Сумма</TableCell>
+              <TableCell sx={headCell}>Наименование</TableCell>
+              <TableCell sx={headCell}>Склад</TableCell>
+              <TableCell sx={openingHeadSx}>{balanceHeadLabel("Остаток на начало")}</TableCell>
+              <TableCell sx={{ ...openingHeadSx, borderLeft: "1px solid #dfe4ea" }}>
+                {balanceHeadLabel("Сумма, руб")}
+              </TableCell>
+              <TableCell sx={headCell}>Приход</TableCell>
+              <TableCell sx={headCell}>Средняя цена</TableCell>
+              <TableCell sx={headCell}>Расход</TableCell>
+              <TableCell sx={closingHeadSx}>{balanceHeadLabel("Остаток на конец")}</TableCell>
+              <TableCell sx={{ ...closingHeadSx, borderLeft: "1px solid #d7ebd0" }}>
+                {balanceHeadLabel("Сумма, руб")}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {!loading && rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={13} sx={{ fontSize: 13, color: "#666" }}>
+                <TableCell colSpan={colCount} sx={{ ...bodyCellBase, color: "#666" }}>
                   {emptyMessage}
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row) => (
-                <TableRow key={`${row.product_id}-${row.storage_id}-${row.section_id}`}>
-                  <TableCell sx={{ fontSize: 13 }}>{row.product_name}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }}>{row.storage_name}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatQuantity(row.opening_quantity, row.unit)}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatMoney(row.opening_amount)}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatQuantity(row.income_quantity, row.unit)}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatMoney(row.income_amount)}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="center">
-                    {hasMovement(row.income_quantity, row.income_amount) ? (
-                      <IconButton
-                        size="small"
-                        onClick={() =>
+              rows.map((row) => {
+                const hasIncome = hasMovement(row.income_quantity, row.income_amount);
+                const hasExpense = hasMovement(row.expense_quantity, row.expense_amount);
+                return (
+                  <TableRow key={`${row.product_id}-${row.storage_id}-${row.section_id}`}>
+                    <TableCell sx={{ ...bodyCellBase, minWidth: 135 }}>{row.product_name}</TableCell>
+                    <TableCell sx={{ ...bodyCellBase, minWidth: 110 }}>{row.storage_name}</TableCell>
+                    <TableCell sx={openingBodySx}>{formatQuantity(row.opening_quantity, row.unit)}</TableCell>
+                    <TableCell sx={{ ...openingBodySx, borderLeft: "1px solid #e4e8ee" }}>
+                      {formatAmount(row.opening_amount)}
+                    </TableCell>
+                    <TableCell sx={bodyCellBase}>
+                      <MovementCell
+                        value={row.income_quantity}
+                        unit={row.unit}
+                        sign="+"
+                        color="#5cb85c"
+                        showInfo={hasIncome}
+                        onInfoClick={() =>
                           onOpenDocuments({
                             storage_id: row.storage_id,
                             product_id: row.product_id,
@@ -129,21 +166,19 @@ const WarehouseAccountingTable = ({
                             income: true,
                           })
                         }
-                      >
-                        <InfoOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    ) : null}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">
-                    {row.avg_price === null || row.avg_price === undefined ? "—" : formatMoney(row.avg_price)}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatQuantity(row.expense_quantity, row.unit)}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatMoney(row.expense_amount)}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="center">
-                    {hasMovement(row.expense_quantity, row.expense_amount) ? (
-                      <IconButton
-                        size="small"
-                        onClick={() =>
+                      />
+                    </TableCell>
+                    <TableCell sx={bodyCellBase}>
+                      {row.avg_price === null || row.avg_price === undefined ? "—" : formatAmount(row.avg_price)}
+                    </TableCell>
+                    <TableCell sx={bodyCellBase}>
+                      <MovementCell
+                        value={row.expense_quantity}
+                        unit={row.unit}
+                        sign="-"
+                        color="#e57373"
+                        showInfo={hasExpense}
+                        onInfoClick={() =>
                           onOpenDocuments({
                             storage_id: row.storage_id,
                             product_id: row.product_id,
@@ -152,15 +187,15 @@ const WarehouseAccountingTable = ({
                             income: false,
                           })
                         }
-                      >
-                        <InfoOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    ) : null}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatQuantity(row.closing_quantity, row.unit)}</TableCell>
-                  <TableCell sx={{ fontSize: 13 }} align="right">{formatMoney(row.closing_amount)}</TableCell>
-                </TableRow>
-              ))
+                      />
+                    </TableCell>
+                    <TableCell sx={closingBodySx}>{formatQuantity(row.closing_quantity, row.unit)}</TableCell>
+                    <TableCell sx={{ ...closingBodySx, borderLeft: "1px solid #dcefd6", fontWeight: 600 }}>
+                      {formatAmount(row.closing_amount)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
