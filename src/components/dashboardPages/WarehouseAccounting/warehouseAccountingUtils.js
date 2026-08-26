@@ -42,8 +42,13 @@ export const formatApiDateDisplay = (apiDate) => {
 };
 
 const ruNumber = (value, minFrac, maxFrac) => {
-  const num = Number(value);
+  let num = Number(value);
   if (!Number.isFinite(num)) return "—";
+  if (maxFrac >= 0) {
+    const factor = 10 ** maxFrac;
+    num = Math.round(num * factor) / factor;
+  }
+  if (Object.is(num, -0) || num === 0) num = 0;
   return num.toLocaleString("ru-RU", {
     minimumFractionDigits: minFrac,
     maximumFractionDigits: maxFrac,

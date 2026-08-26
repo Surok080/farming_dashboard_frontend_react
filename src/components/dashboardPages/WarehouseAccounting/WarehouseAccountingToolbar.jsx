@@ -13,7 +13,6 @@ import {
   Typography,
 } from "@mui/material";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { formatApiDateDisplay, sanitizeDateInputYear } from "./warehouseAccountingUtils";
 
@@ -168,6 +167,48 @@ export const WarehouseAccountingRunBar = ({
       Движение ТМЦ: приход, расход и остаток ТМЦ на складе
     </Typography>
     <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1, flexWrap: "wrap" }}>
+      <FormControl size="small" sx={{ width: PRODUCT_SELECT_WIDTH, flexShrink: 0 }}>
+        <InputLabel id="warehouse-products-label">Все наименования</InputLabel>
+        <Select
+          labelId="warehouse-products-label"
+          multiple
+          value={productIds}
+          label="Все наименования"
+          onChange={(e) => onProductIdsChange(e.target.value)}
+          renderValue={(selected) => renderCompactSelectValue(selected, products, "Все наименования")}
+          endAdornment={
+            <SelectClearButton
+              visible={productIds.length > 0}
+              ariaLabel="Очистить наименования"
+              onClear={() => onProductIdsChange([])}
+            />
+          }
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                maxHeight: 280,
+              },
+            },
+          }}
+          sx={{
+            width: PRODUCT_SELECT_WIDTH,
+            backgroundColor: "#fff",
+            "& .MuiSelect-select": {
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              pr: productIds.length ? "52px !important" : "32px !important",
+            },
+          }}
+        >
+          {products.map((item) => (
+            <MenuItem key={item.id} value={item.id}>
+              <Checkbox checked={productIds.includes(item.id)} />
+              <ListItemText primary={item.name} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <TextField
         size="small"
         type="date"
@@ -212,41 +253,6 @@ export const WarehouseAccountingRunBar = ({
       >
         <PlayArrowOutlinedIcon />
       </Button>
-      <FormControl size="small" sx={{ width: PRODUCT_SELECT_WIDTH, flexShrink: 0 }}>
-        <InputLabel id="warehouse-products-label">Все наименования</InputLabel>
-        <Select
-          labelId="warehouse-products-label"
-          multiple
-          value={productIds}
-          label="Все наименования"
-          onChange={(e) => onProductIdsChange(e.target.value)}
-          renderValue={(selected) => renderCompactSelectValue(selected, products, "Все наименования")}
-          endAdornment={
-            <SelectClearButton
-              visible={productIds.length > 0}
-              ariaLabel="Очистить наименования"
-              onClear={() => onProductIdsChange([])}
-            />
-          }
-          sx={{
-            width: PRODUCT_SELECT_WIDTH,
-            backgroundColor: "#fff",
-            "& .MuiSelect-select": {
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              pr: productIds.length ? "52px !important" : "32px !important",
-            },
-          }}
-        >
-          {products.map((item) => (
-            <MenuItem key={item.id} value={item.id}>
-              <Checkbox checked={productIds.includes(item.id)} />
-              <ListItemText primary={item.name} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
       {lastOperationDate ? (
         <Typography
           sx={{
@@ -262,24 +268,6 @@ export const WarehouseAccountingRunBar = ({
       ) : (
         <Box sx={{ flex: 1, minWidth: 8 }} />
       )}
-      <Button
-        disabled
-        variant="outlined"
-        sx={{
-          minWidth: 120,
-          height: 40,
-          borderColor: "#dbe2ea",
-          color: "#a5afb9",
-          textTransform: "none",
-          fontWeight: 500,
-          backgroundColor: "#fafbfd",
-          boxShadow: "none",
-          ml: lastOperationDate ? 1 : 0,
-        }}
-        startIcon={<SettingsOutlinedIcon />}
-      >
-        Настройки
-      </Button>
     </Box>
   </Box>
 );

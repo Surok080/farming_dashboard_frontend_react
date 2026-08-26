@@ -21,4 +21,9 @@ export function getWarehouseStockByStorages(params) {
   return httpService.get("/warehouse_accounting/stock_by_storages", { params });
 }
 
+/** POST /s3_storage/check → { ok: boolean, detail: string } */
+export function checkS3Storage() {
+  return httpService.post("/s3_storage/check");
+}
+
 export { getApiErrorMessage };

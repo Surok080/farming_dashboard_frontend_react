@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Box, LinearProgress } from "@mui/material";
+import { Alert, Box, LinearProgress, Typography } from "@mui/material";
 import { useSnackbar } from "notistack";
 import {
+  checkS3Storage,
   getApiErrorMessage,
   getWarehouseDictionaries,
   getWarehouseMovement,
@@ -25,6 +26,9 @@ import WarehouseAccountingDocumentsDialog from "./WarehouseAccountingDocumentsDi
 
 const asArray = (value) => (Array.isArray(value) ? value : []);
 
+const SERVICE_UNAVAILABLE_MESSAGE =
+  "Проблемы с подключением к сервису. Необходимо обратиться к администратору.";
+
 const WarehouseAccountingPage = () => {
   const { enqueueSnackbar } = useSnackbar();
   const enqueueSnackbarRef = useRef(enqueueSnackbar);
@@ -44,6 +48,7 @@ const WarehouseAccountingPage = () => {
   const [sectionsSummary, setSectionsSummary] = useState([]);
   const [stockByStorages, setStockByStorages] = useState({ storages: [], total_amount: 0, date: null });
   const [loading, setLoading] = useState(true);
+  const [serviceReady, setServiceReady] = useState(null);
   const [documentsQuery, setDocumentsQuery] = useState(null);
 
   const loadPeriod = useCallback(async (fromValue, toValue) => {
@@ -110,8 +115,31 @@ const WarehouseAccountingPage = () => {
   }, []);
 
   useEffect(() => {
-    loadPeriod(defaults.from, defaults.to);
-    // initial load only
+    let cancelled = false;
+    const bootstrap = async () => {
+      setLoading(true);
+      setServiceReady(null);
+      try {
+        const res = await checkS3Storage();
+        if (cancelled) return;
+        if (res?.data?.ok === true) {
+          setServiceReady(true);
+          await loadPeriod(defaults.from, defaults.to);
+          return;
+        }
+        setServiceReady(false);
+      } catch {
+        if (cancelled) return;
+        setServiceReady(false);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    bootstrap();
+    return () => {
+      cancelled = true;
+    };
+    // initial check + load only
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -124,6 +152,41 @@ const WarehouseAccountingPage = () => {
     if (!filtersActive) return stockByStorages;
     return aggregateStockFromMovement(filteredRows);
   }, [filtersActive, stockByStorages, filteredRows]);
+
+  if (serviceReady === false) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          background: "#f7f9fc",
+          p: 1.5,
+          boxSizing: "border-box",
+        }}
+      >
+        <Box
+          sx={{
+            flex: 1,
+            backgroundColor: "#fff",
+            border: "1px solid #e6ecf2",
+            borderRadius: "10px",
+            p: 1.5,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <WarehouseAccountingHeader />
+          <Alert severity="warning" sx={{ mt: 2, maxWidth: 640 }}>
+            <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 0.5 }}>Сервис недоступен</Typography>
+            <Typography sx={{ fontSize: 14 }}>{SERVICE_UNAVAILABLE_MESSAGE}</Typography>
+          </Alert>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -166,60 +229,68 @@ const WarehouseAccountingPage = () => {
         >
           <Box sx={{ flexShrink: 0 }}>
             <WarehouseAccountingHeader />
-            <WarehouseAccountingToolbar
-              storages={dictionaries.storages}
-              sections={dictionaries.sections}
-              storageIds={storageIds}
-              sectionIds={sectionIds}
-              onStorageIdsChange={setStorageIds}
-              onSectionIdsChange={setSectionIds}
-              clearDisabled={!filtersActive}
-              onClearSelection={() => {
-                setStorageIds([]);
-                setSectionIds([]);
-                setProductIds([]);
-              }}
-            />
-            {loading ? <LinearProgress sx={{ mt: 1.5 }} /> : null}
-            <WarehouseAccountingSectionCards
-              items={sectionsSummary}
-              selectedIds={sectionIds}
-              onToggle={(id) => setSectionIds((prev) => toggleId(prev, id))}
-            />
-            <WarehouseAccountingRunBar
-              dateFrom={dateFrom}
-              dateTo={dateTo}
-              onDateFromChange={setDateFrom}
-              onDateToChange={setDateTo}
-              products={dictionaries.products}
-              productIds={productIds}
-              onProductIdsChange={setProductIds}
-              lastOperationDate={movement.last_operation_date}
-              runLoading={loading}
-              onRun={() => loadPeriod(dateFrom, dateTo)}
-            />
+            {serviceReady === null || loading ? <LinearProgress sx={{ mt: 1.5 }} /> : null}
+            {serviceReady === true ? (
+              <>
+                <WarehouseAccountingToolbar
+                  storages={dictionaries.storages}
+                  sections={dictionaries.sections}
+                  storageIds={storageIds}
+                  sectionIds={sectionIds}
+                  onStorageIdsChange={setStorageIds}
+                  onSectionIdsChange={setSectionIds}
+                  clearDisabled={!filtersActive}
+                  onClearSelection={() => {
+                    setStorageIds([]);
+                    setSectionIds([]);
+                    setProductIds([]);
+                  }}
+                />
+                <WarehouseAccountingSectionCards
+                  items={sectionsSummary}
+                  selectedIds={sectionIds}
+                  onToggle={(id) => setSectionIds((prev) => toggleId(prev, id))}
+                />
+                <WarehouseAccountingRunBar
+                  dateFrom={dateFrom}
+                  dateTo={dateTo}
+                  onDateFromChange={setDateFrom}
+                  onDateToChange={setDateTo}
+                  products={dictionaries.products}
+                  productIds={productIds}
+                  onProductIdsChange={setProductIds}
+                  lastOperationDate={movement.last_operation_date}
+                  runLoading={loading}
+                  onRun={() => loadPeriod(dateFrom, dateTo)}
+                />
+              </>
+            ) : null}
           </Box>
-          <WarehouseAccountingTable
-            rows={filteredRows}
-            loading={loading}
-            filtersActive={filtersActive}
-            onOpenDocuments={setDocumentsQuery}
-          />
+          {serviceReady === true ? (
+            <WarehouseAccountingTable
+              rows={filteredRows}
+              loading={loading}
+              filtersActive={filtersActive}
+              onOpenDocuments={setDocumentsQuery}
+            />
+          ) : null}
         </Box>
-        <Box
-          sx={{
-            width: { xs: "100%", lg: 320 },
-            minWidth: 0,
-            minHeight: { xs: "auto", lg: 0 },
-            height: { xs: "auto", lg: "100%" },
-            display: "flex",
-            flexDirection: "column",
-            alignSelf: "stretch",
-            overflow: "hidden",
-          }}
-        >
-          <WarehouseAccountingChart stock={chartStock} loading={loading} />
-        </Box>
+        {serviceReady === true ? (
+          <Box
+            sx={{
+              width: { xs: "100%", lg: 320 },
+              minWidth: 0,
+              minHeight: { xs: "auto", lg: 0 },
+              height: { xs: "auto", lg: "100%" },
+              display: "flex",
+              flexDirection: "column",
+              alignSelf: "stretch",
+              overflow: "hidden",
+            }}
+          >
+            <WarehouseAccountingChart stock={chartStock} loading={loading} />
+          </Box>
+        ) : null}
       </Box>
       <WarehouseAccountingDocumentsDialog
         open={Boolean(documentsQuery)}
