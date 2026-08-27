@@ -92,7 +92,9 @@ const WarehouseAccountingDocumentsDialog = ({ open, query, dateFrom, dateTo, onC
                     <TableCell>{formatApiDateDisplay(row.date)}</TableCell>
                     <TableCell>{row.document_name}</TableCell>
                     <TableCell align="right">{formatQuantity(row.quantity)}</TableCell>
-                    <TableCell align="right">{formatMoney(row.amount)}</TableCell>
+                    <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                      {formatMoney(row.amount)}
+                    </TableCell>
                   </TableRow>
                 ))
               )}

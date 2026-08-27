@@ -57,7 +57,7 @@ const ruNumber = (value, minFrac, maxFrac) => {
 
 export const formatMoney = (value) => {
   if (value === null || value === undefined || value === "") return "—";
-  return `${ruNumber(value, 2, 2)} ₽`;
+  return `${ruNumber(value, 2, 2)}\u00A0₽`;
 };
 
 /** Сумма без символа валюты (заголовок уже говорит «руб»). */
