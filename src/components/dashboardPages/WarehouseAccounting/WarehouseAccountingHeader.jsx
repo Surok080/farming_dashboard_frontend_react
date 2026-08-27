@@ -30,7 +30,7 @@ const WarehouseAccountingHeader = () => (
           whiteSpace: "nowrap",
         }}
       >
-        Мониторинг-2026
+        Склад-Учет-2026
       </Typography>
       <Typography sx={{ color: "#525c69", fontSize: 13, lineHeight: 1.4 }}>
         Учёт товарно-материальных ценностей (источник данных 1С)
