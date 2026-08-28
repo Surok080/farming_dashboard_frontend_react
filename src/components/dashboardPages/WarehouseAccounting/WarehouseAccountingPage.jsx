@@ -51,6 +51,13 @@ const WarehouseAccountingPage = () => {
   const [serviceReady, setServiceReady] = useState(null);
   const [documentsQuery, setDocumentsQuery] = useState(null);
 
+  const resetDates = useCallback(() => {
+    setDateFrom(defaults.from);
+    setDateTo(defaults.to);
+    setAppliedDateFrom(defaults.from);
+    setAppliedDateTo(defaults.to);
+  }, [defaults]);
+
   const loadPeriod = useCallback(async (fromValue, toValue) => {
     const date_from = toApiDate(fromValue);
     const date_to = toApiDate(toValue);
@@ -262,6 +269,7 @@ const WarehouseAccountingPage = () => {
                   lastOperationDate={movement.last_operation_date}
                   runLoading={loading}
                   onRun={() => loadPeriod(dateFrom, dateTo)}
+                  dateReset={resetDates}
                 />
               </>
             ) : null}

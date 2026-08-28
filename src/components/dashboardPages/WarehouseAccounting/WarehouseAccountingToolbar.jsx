@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import { formatApiDateDisplay, sanitizeDateInputYear } from "./warehouseAccountingUtils";
 
 const dateInputSx = {
@@ -59,6 +60,26 @@ const SelectClearButton = ({ visible, onClear, ariaLabel }) =>
       <CloseOutlinedIcon sx={{ fontSize: 16 }} />
     </IconButton>
   ) : null;
+
+const periodActionButtonSx = {
+  width: 44,
+  height: 40,
+  minWidth: 44,
+  minHeight: 40,
+  boxShadow: "none",
+  borderRadius: "4px",
+  flexShrink: 0,
+  backgroundColor: "#67b55b",
+  color: "#fff",
+  "&:hover": {
+    backgroundColor: "#5aa34f",
+    boxShadow: "none",
+  },
+  "&.Mui-disabled": {
+    backgroundColor: "#a8d4a1",
+    color: "#fff",
+  },
+};
 
 export const WarehouseAccountingFiltersBar = ({
   storages = [],
@@ -161,6 +182,7 @@ export const WarehouseAccountingRunBar = ({
   lastOperationDate,
   onRun,
   runLoading = false,
+  dateReset,
 }) => (
   <Box sx={{ mt: 1.5 }}>
     <Typography sx={{ fontWeight: 600, fontSize: 14, color: "#2f3743", mb: 1 }}>
@@ -231,28 +253,22 @@ export const WarehouseAccountingRunBar = ({
         sx={{ minWidth: 140 }}
         InputProps={{ sx: dateInputSx }}
       />
-      <Button
-        variant="contained"
+      <IconButton
+        aria-label="Выполнить запрос"
         disabled={runLoading}
         onClick={onRun}
-        sx={{
-          minWidth: 44,
-          width: 44,
-          height: 40,
-          backgroundColor: "#67b55b",
-          color: "#fff",
-          boxShadow: "none",
-          px: 0,
-          minHeight: 40,
-          "&:hover": { backgroundColor: "#5aa34f" },
-          "&.Mui-disabled": {
-            backgroundColor: "#a8d4a1",
-            color: "#fff",
-          },
-        }}
+        sx={periodActionButtonSx}
       >
         <PlayArrowOutlinedIcon />
-      </Button>
+      </IconButton>
+      <IconButton
+        aria-label="Сбросить период"
+        onClick={dateReset}
+        disabled={runLoading}
+        sx={periodActionButtonSx}
+      >
+        <RefreshOutlinedIcon />
+      </IconButton>
       {lastOperationDate ? (
         <Typography
           sx={{

@@ -13,9 +13,7 @@ const WarehouseAccountingHeader = () => (
       borderBottom: "1px solid #ebeff5",
     }}
   >
-    <Typography sx={{ color: "#333", fontSize: 12, fontWeight: 700, letterSpacing: 0.3 }}>
-      ПРИХОД-РАСХОД
-    </Typography>
+
     <Box display="flex" gap={1.5} flexWrap="wrap" alignItems="center">
       <Typography
         sx={{
