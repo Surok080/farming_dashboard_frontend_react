@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Box, LinearProgress, Typography } from "@mui/material";
+import { Alert, Box, Collapse, LinearProgress, Typography } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useSnackbar } from "notistack";
 import {
   checkS3Storage,
@@ -50,6 +52,7 @@ const WarehouseAccountingPage = () => {
   const [loading, setLoading] = useState(true);
   const [serviceReady, setServiceReady] = useState(null);
   const [documentsQuery, setDocumentsQuery] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const resetDates = useCallback(() => {
     setDateFrom(defaults.from);
@@ -286,17 +289,48 @@ const WarehouseAccountingPage = () => {
         {serviceReady === true ? (
           <Box
             sx={{
-              width: { xs: "100%", lg: 320 },
-              minWidth: 0,
-              minHeight: { xs: "auto", lg: 0 },
-              height: { xs: "auto", lg: "100%" },
               display: "flex",
-              flexDirection: "column",
-              alignSelf: "stretch",
-              overflow: "hidden",
+              flexDirection: "row",
+              alignItems: "stretch",
             }}
           >
-            <WarehouseAccountingChart stock={chartStock} loading={loading} />
+            <Collapse in={sidebarOpen} orientation="horizontal" sx={{ minWidth: 0 }}>
+              <Box
+                sx={{
+                  width: 320,
+                  minWidth: 0,
+                  minHeight: { xs: "auto", lg: 0 },
+                  height: { xs: "auto", lg: "100%" },
+                  display: "flex",
+                  flexDirection: "column",
+                  alignSelf: "stretch",
+                  overflow: "hidden",
+                }}
+              >
+                <WarehouseAccountingChart stock={chartStock} loading={loading} />
+              </Box>
+            </Collapse>
+            <Box
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              sx={{
+                width: 15,
+                flexShrink: 0,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.08)",
+                },
+              }}
+            >
+              {sidebarOpen ? (
+                <ChevronRightIcon sx={{ fontSize: 16, color: "#666" }} />
+              ) : (
+                <ChevronLeftIcon sx={{ fontSize: 16, color: "#666" }} />
+              )}
+            </Box>
           </Box>
         ) : null}
       </Box>
