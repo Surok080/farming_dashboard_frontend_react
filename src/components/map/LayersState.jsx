@@ -58,7 +58,7 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
   return (
     <>
       <LayersControl position="topright">
-        <LayersControl.BaseLayer checked name="Basic Map">
+        <LayersControl.BaseLayer  name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
@@ -71,7 +71,7 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
             url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
           />
         </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="WorldImagery">
+        <LayersControl.BaseLayer checked name="WorldImagery">
           <TileLayer
             attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
