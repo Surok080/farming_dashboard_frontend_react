@@ -29,6 +29,7 @@ import {
 } from "./monitoringConstants";
 import { getDefaultMonitoringInterval, parseDatetimeLocal, toApiDateTimeString } from "./monitoringUtils";
 import { useMonitoringRowSelection } from "./useMonitoringRowSelection";
+import CampaignsTab from "./Campaigns/CampaignsTab";
 
 /** Обязательные поля строки в том виде, как они сохранены на сервере (последний GET/PATCH). */
 const pickMonitoringDialogSavedIds = (row) =>
@@ -580,6 +581,7 @@ const MonitoringPages = ({ year: yearProp }) => {
             <TabList onChange={handleTabChange} aria-label="Вкладки мониторинга">
               <Tab sx={{ color: "black !important" }} label="Обработки" value="1" />
               <Tab sx={{ color: "black !important" }} label="Сводка" value="2" disabled />
+              <Tab sx={{ color: "black !important" }} label="Ход выполнения" value="3" />
             </TabList>
           </Box>
 
@@ -591,6 +593,7 @@ const MonitoringPages = ({ year: yearProp }) => {
               flexDirection: "column",
               overflow: "hidden",
               padding: "8px 0 0 0",
+              "&[hidden]": { display: "none" },
             }}
             value="1"
           >
@@ -651,10 +654,25 @@ const MonitoringPages = ({ year: yearProp }) => {
             </Box>
           </TabPanel>
 
-          <TabPanel sx={{ padding: 2, flex: 1, minHeight: 0, overflow: "auto" }} value="2">
+          <TabPanel sx={{ padding: 2, flex: 1, minHeight: 0, overflow: "auto", "&[hidden]": { display: "none" } }} value="2">
             <Typography variant="body2" color="text.secondary">
               Раздел «Сводка» будет доступен позже.
             </Typography>
+          </TabPanel>
+
+          <TabPanel
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              padding: "8px 0 0 0",
+              "&[hidden]": { display: "none" },
+            }}
+            value="3"
+          >
+            <CampaignsTab active={tabValue === "3"} year={year} />
           </TabPanel>
         </Box>
       </TabContext>
