@@ -11,9 +11,9 @@ import {
 } from '@mui/material';
 import {
     TabContext,
-    TabList,
     TabPanel,
 } from '@mui/lab';
+import ZoomAwareTabList from '../ZoomAwareTabList';
 import IconButton from '@mui/material/IconButton';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ListArea from './ListArea';
@@ -178,7 +178,7 @@ const MapSidebar = ({
                     </Box>
                 ) : (
                     <TabContext value={tabValue}>
-                        <TabList
+                        <ZoomAwareTabList
                             textColor="primary"
                             onChange={onTabChange}
                             aria-label="lab API tabs example"
@@ -199,7 +199,7 @@ const MapSidebar = ({
                         >
                             <Tab label="Поля" value="1"/>
                             <Tab label="Структура" value="2"/>
-                        </TabList>
+                        </ZoomAwareTabList>
 
                         <TabPanel
                             sx={{

@@ -119,7 +119,15 @@ const CampaignsTab = ({ active, year }) => {
         </Typography>
       </Box>
 
-      <Alert severity="info" sx={{ mb: 1.5 }}>
+      <Alert
+        severity="info"
+        sx={{
+          mb: 1.5,
+          alignItems: "flex-start",
+          textAlign: "left",
+          "& .MuiAlert-message": { textAlign: "left", width: "100%" },
+        }}
+      >
         На этой вкладке Вы можете планировать предстоящие работы, объединяя их в кампании, и контролировать соблюдение плана.
         Кампании создаются в случае, если одна и та же операция должна выполняться на нескольких полях в течение нескольких дней.
       </Alert>
@@ -129,7 +137,7 @@ const CampaignsTab = ({ active, year }) => {
           <Button
             variant="contained"
             onClick={() => setCreateOpen(true)}
-            sx={{ backgroundColor: "#62A65D", textTransform: "none", "&:hover": { backgroundColor: "#4f8f4b" } }}
+            sx={{ backgroundColor: "#62A65D", color: "#fff", textTransform: "none", "&:hover": { backgroundColor: "#4f8f4b" } }}
           >
             Создать
           </Button>

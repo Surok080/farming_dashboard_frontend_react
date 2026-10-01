@@ -14,8 +14,21 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { CAMPAIGN_STATUS_LABEL, formatCampaignDate, formatCampaignNumber } from "./campaignUtils";
 
-const headCellSx = { fontWeight: 700, fontSize: 12, whiteSpace: "nowrap", borderBottom: "1px solid #e0e0e0" };
+const headCellSx = {
+  fontWeight: 400,
+  fontSize: 12,
+  color: "#9C9B9B",
+  whiteSpace: "nowrap",
+  borderBottom: "1px solid #e0e0e0",
+};
 const cellSx = { fontSize: 13, verticalAlign: "top" };
+const campaignCellSx = { ...cellSx, fontWeight: 700 };
+
+const formatDoneValue = (value) => {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "—";
+  return num.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
 
 const unitLines = (row) => {
   const trailers = Array.isArray(row.trailers) ? row.trailers : [];
@@ -48,7 +61,7 @@ const CampaignsTable = ({ campaigns, expandedIds, onToggle, onDelete }) => {
           <TableCell sx={headCellSx}>Кол-во полей</TableCell>
           <TableCell sx={headCellSx}>Площадь выработки</TableCell>
           <TableCell sx={headCellSx}>Выполнено, га (%)</TableCell>
-          <TableCell sx={{ ...headCellSx, width: 48 }} />
+          <TableCell sx={{ ...headCellSx, minWidth: 200 }} />
         </TableRow>
       </TableHead>
       <TableBody>
@@ -58,25 +71,25 @@ const CampaignsTable = ({ campaigns, expandedIds, onToggle, onDelete }) => {
           return (
             <React.Fragment key={campaign.id}>
               <TableRow hover>
-                <TableCell sx={cellSx}>
+                <TableCell sx={campaignCellSx}>
                   <IconButton size="small" onClick={() => onToggle(campaign.id)} aria-label="Показать строки">
                     {expanded ? <KeyboardArrowDownIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
                   </IconButton>
                 </TableCell>
-                <TableCell sx={cellSx}>
+                <TableCell sx={campaignCellSx}>
                   <Box>{campaign.name}</Box>
-                  <Typography sx={{ fontSize: 12, color: "#888" }}>
+                  <Typography sx={{ fontSize: 12, color: "#888", fontWeight: 400 }}>
                     {CAMPAIGN_STATUS_LABEL[campaign.status] || campaign.status}
                   </Typography>
                 </TableCell>
-                <TableCell sx={cellSx}>{campaign.tech_operation_name || "—"}</TableCell>
-                <TableCell sx={{ ...cellSx, whiteSpace: "nowrap" }}>
+                <TableCell sx={campaignCellSx}>{campaign.tech_operation_name || "—"}</TableCell>
+                <TableCell sx={{ ...campaignCellSx, whiteSpace: "nowrap" }}>
                   {formatCampaignDate(campaign.date_start)} - {formatCampaignDate(campaign.date_stop)}
                 </TableCell>
-                <TableCell sx={cellSx}>{campaign.fields_count ?? "—"}</TableCell>
-                <TableCell sx={cellSx}>{formatCampaignNumber(campaign.plan_area, 1)} га</TableCell>
-                <TableCell sx={{ ...cellSx, whiteSpace: "nowrap" }}>
-                  {formatCampaignNumber(campaign.fact_area, 2)} га ({formatCampaignNumber(campaign.fact_percent, 2)}%)
+                <TableCell sx={campaignCellSx}>{campaign.fields_count ?? "—"}</TableCell>
+                <TableCell sx={campaignCellSx}>{formatCampaignNumber(campaign.plan_area, 1)} га</TableCell>
+                <TableCell sx={{ ...campaignCellSx, whiteSpace: "nowrap" }}>
+                  {formatDoneValue(campaign.fact_area)} га ({formatDoneValue(campaign.fact_percent)}%)
                 </TableCell>
                 <TableCell sx={cellSx}>
                   <IconButton size="small" color="error" onClick={() => onDelete(campaign)} aria-label="Удалить кампанию">
@@ -113,7 +126,7 @@ const CampaignsTable = ({ campaigns, expandedIds, onToggle, onDelete }) => {
                           <Box key={`driver-${unitIndex}`}>{unit.driver}</Box>
                         ))}
                       </TableCell>
-                      <TableCell sx={cellSx}>
+                      <TableCell sx={{ ...cellSx, whiteSpace: "nowrap" }}>
                         {formatCampaignNumber(row.area_worked, 2)} / {formatCampaignNumber(row.cumulative_area, 2)} (
                         {formatCampaignNumber(row.cumulative_percent, 2)}%)
                       </TableCell>

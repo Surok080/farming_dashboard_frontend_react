@@ -15,7 +15,8 @@ import {
 } from "@mui/material";
 import {Chart} from "react-google-charts";
 import {useSnackbar} from "notistack";
-import {TabContext, TabList, TabPanel} from "@mui/lab";
+import {TabContext, TabPanel} from "@mui/lab";
+import ZoomAwareTabList from "../ZoomAwareTabList";
 import ListArea from "./ListArea";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import {getAreaLayers, getColorLayers, getOptionChart,} from "../../utils/mapUtils";
@@ -203,7 +204,7 @@ const MapState = memo(() => {
                     >
                         <TabContext value={value}>
                             {/* <Box sx={{ borderBottom: 1, borderColor: 'red' }}> */}
-                            <TabList
+                            <ZoomAwareTabList
                                 centered
                                 textColor="primary"
                                 onChange={handleChange}
@@ -212,7 +213,7 @@ const MapState = memo(() => {
                                 <Tab label="Участки" value="1"/>
                                 <Tab label="Структура" value="2"/>
                                 <Tab label="Отчет" value="3"/>
-                            </TabList>
+                            </ZoomAwareTabList>
                             {/* </Box> */}
                             <TabPanel
                                 sx={{

@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   IconButton,
   InputAdornment,
   List,
@@ -10,11 +11,14 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
   MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
@@ -43,6 +47,7 @@ const CampaignTransferList = ({
 }) => {
   const [query, setQuery] = useState("");
   const [culture, setCulture] = useState("");
+  const [cultureMenuAnchor, setCultureMenuAnchor] = useState(null);
   const [leftChecked, setLeftChecked] = useState([]);
   const [rightChecked, setRightChecked] = useState([]);
 
@@ -63,7 +68,7 @@ const CampaignTransferList = ({
   );
 
   const leftItems = filtered.filter((item) => !selectedSet.has(item.id));
-  const rightItems = items.filter((item) => selectedSet.has(item.id) && matchesQuery(item, query));
+  const rightItems = items.filter((item) => selectedSet.has(item.id));
 
   const areaSum = (list) => list.reduce((sum, item) => sum + (Number(item.area) || 0), 0);
 
@@ -84,10 +89,10 @@ const CampaignTransferList = ({
     setRightChecked([]);
   };
 
-  const renderList = (list, checked, setChecked) => (
+  const renderList = (list, checked, setChecked, emptyText) => (
     <List dense disablePadding>
       {list.length === 0 ? (
-        <Typography sx={{ px: 1.5, py: 1, fontSize: 13, color: "#888" }}>Ничего не найдено</Typography>
+        <Typography sx={{ px: 1.5, py: 1, fontSize: 13, color: "#888", textAlign: "left" }}>{emptyText}</Typography>
       ) : (
         list.map((item) => (
           <ListItem key={item.id} disablePadding>
@@ -115,69 +120,119 @@ const CampaignTransferList = ({
 
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1, flexWrap: "wrap" }}>
-        <Typography sx={{ fontSize: 13, color: "#666" }}>
-          {availableLabel}: {items.length - selectedIds.length}
-          {availableArea != null ? ` (${availableArea.toLocaleString("ru-RU", { maximumFractionDigits: 1 })} га)` : ""}
-        </Typography>
-        <Typography sx={{ fontSize: 13, color: "#666" }}>
-          {selectedLabel}: {selectedIds.length}
-          {selectedArea != null ? ` (${selectedArea.toLocaleString("ru-RU", { maximumFractionDigits: 1 })} га)` : ""}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
-        <TextField
-          size="small"
-          placeholder="Поиск"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          sx={{ flex: 1, minWidth: 160 }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        {enableCultureFilter ? (
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 1, mb: 1, flexWrap: "wrap" }}>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center", minWidth: 0 }}>
+          <Typography sx={{ fontSize: 13, color: "#666", textAlign: "left" }}>
+            {availableLabel}: {items.length - selectedIds.length}
+            {availableArea != null ? ` (${availableArea.toLocaleString("ru-RU", { maximumFractionDigits: 1 })} га)` : ""}
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: "#666", textAlign: "left" }}>
+            {selectedLabel}: {selectedIds.length}
+            {selectedArea != null ? ` (${selectedArea.toLocaleString("ru-RU", { maximumFractionDigits: 1 })} га)` : ""}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center", ml: "auto" }}>
           <TextField
-            select
             size="small"
-            label="Культура"
-            value={culture}
-            onChange={(event) => setCulture(event.target.value)}
-            sx={{ minWidth: 180 }}
-            InputLabelProps={{ shrink: true }}
+            placeholder="Поиск"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            sx={{ width: 180 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  {query ? (
+                    <IconButton aria-label="Очистить поиск" size="small" onClick={() => setQuery("")} edge="end">
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  ) : (
+                    <SearchIcon fontSize="small" />
+                  )}
+                </InputAdornment>
+              ),
+            }}
+          />
+          {enableCultureFilter ? (
+            <>
+              <IconButton
+                aria-label="Фильтр по культуре"
+                onClick={(event) => setCultureMenuAnchor(event.currentTarget)}
+                sx={{ color: culture ? "#62A65D" : "#757575", border: "1px solid", borderColor: culture ? "#62A65D" : "#e0e0e0", borderRadius: 1 }}
+              >
+                <FilterAltOutlinedIcon fontSize="small" />
+              </IconButton>
+              {culture ? (
+                <Chip
+                  size="small"
+                  label={culture}
+                  onDelete={() => setCulture("")}
+                  sx={{ maxWidth: 200 }}
+                />
+              ) : null}
+            </>
+          ) : null}
+          <Menu
+            anchorEl={cultureMenuAnchor}
+            open={Boolean(cultureMenuAnchor)}
+            onClose={() => setCultureMenuAnchor(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
           >
-            <MenuItem value="">Все</MenuItem>
+            <MenuItem
+              selected={culture === ""}
+              onClick={() => {
+                setCulture("");
+                setCultureMenuAnchor(null);
+              }}
+            >
+              Все культуры
+            </MenuItem>
             {cultures.map((name) => (
-              <MenuItem key={name} value={name}>
+              <MenuItem
+                key={name}
+                selected={culture === name}
+                onClick={() => {
+                  setCulture(name);
+                  setCultureMenuAnchor(null);
+                }}
+              >
                 {name}
               </MenuItem>
             ))}
-          </TextField>
-        ) : null}
+          </Menu>
+        </Box>
       </Box>
       <Box sx={{ display: "flex", gap: 1, alignItems: "stretch" }}>
-        <Box sx={listBoxSx}>{renderList(leftItems, leftChecked, setLeftChecked)}</Box>
+        <Box sx={{ ...listBoxSx, display: "flex", flexDirection: "column" }}>
+          <Typography sx={{ px: 1.5, py: 0.75, fontSize: 12, fontWeight: 700, color: "#333", textAlign: "left", borderBottom: "1px solid #eee" }}>
+            Выбрано
+          </Typography>
+          {renderList(rightItems, rightChecked, setRightChecked, "Переместите выбранное сюда")}
+        </Box>
         <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 1 }}>
           <IconButton
+            aria-label="Переместить в выбранное"
             onClick={moveRight}
             disabled={leftChecked.length === 0}
             sx={{ backgroundColor: "#62A65D", color: "#fff", borderRadius: 1, "&:hover": { backgroundColor: "#4f8f4b" }, "&.Mui-disabled": { backgroundColor: "#e0e0e0" } }}
           >
-            <ChevronRightIcon />
+            <ChevronLeftIcon />
           </IconButton>
           <IconButton
+            aria-label="Вернуть в справочник"
             onClick={moveLeft}
             disabled={rightChecked.length === 0}
             sx={{ backgroundColor: "#9e9e9e", color: "#fff", borderRadius: 1, "&:hover": { backgroundColor: "#757575" }, "&.Mui-disabled": { backgroundColor: "#e0e0e0" } }}
           >
-            <ChevronLeftIcon />
+            <ChevronRightIcon />
           </IconButton>
         </Box>
-        <Box sx={listBoxSx}>{renderList(rightItems, rightChecked, setRightChecked)}</Box>
+        <Box sx={{ ...listBoxSx, display: "flex", flexDirection: "column" }}>
+          <Typography sx={{ px: 1.5, py: 0.75, fontSize: 12, fontWeight: 700, color: "#333", textAlign: "left", borderBottom: "1px solid #eee" }}>
+            Справочник
+          </Typography>
+          {renderList(leftItems, leftChecked, setLeftChecked, "В справочнике ничего не найдено")}
+        </Box>
       </Box>
       {enableCultureFilter ? (
         <Button

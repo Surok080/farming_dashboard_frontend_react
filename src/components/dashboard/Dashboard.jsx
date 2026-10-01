@@ -28,6 +28,7 @@ export const defaultTheme = createTheme({
     palette: {
         primary: {
             main: "#62A65D",
+            contrastText: "#fff",
         },
     },
     breakpoints: {

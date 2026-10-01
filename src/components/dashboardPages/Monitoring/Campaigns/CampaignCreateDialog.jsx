@@ -161,7 +161,7 @@ const CampaignCreateDialog = ({ open, onClose, onCreated }) => {
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 2 }}>
               <Box sx={cardSx}>
                 <Typography sx={{ fontWeight: 700, mb: 1 }}>Наименование</Typography>
-                <Typography sx={{ fontSize: 13, color: "#666", mb: 1 }}>1. Укажите имя наименование кампании:</Typography>
+                <Typography sx={{ fontSize: 13, color: "#666", mb: 1 }}>1. Укажите наименование кампании:</Typography>
                 <TextField
                   fullWidth
                   size="small"
@@ -217,7 +217,7 @@ const CampaignCreateDialog = ({ open, onClose, onCreated }) => {
                 </Box>
               </Box>
             </Box>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Box sx={cardSx}>
                 <Typography sx={{ fontWeight: 700, mb: 0.5 }}>4. Укажите, какие объекты должны использоваться</Typography>
                 <Typography sx={{ fontSize: 13, color: "#666", mb: 1 }}>для выполнения кампании</Typography>
@@ -252,7 +252,7 @@ const CampaignCreateDialog = ({ open, onClose, onCreated }) => {
           variant="contained"
           disabled={saving || loadingDicts}
           onClick={handleSave}
-          sx={{ backgroundColor: "#62A65D", textTransform: "none", "&:hover": { backgroundColor: "#4f8f4b" } }}
+          sx={{ backgroundColor: "#62A65D", color: "#fff", textTransform: "none", "&:hover": { backgroundColor: "#4f8f4b" } }}
         >
           {saving ? "Сохранение..." : "Сохранить"}
         </Button>

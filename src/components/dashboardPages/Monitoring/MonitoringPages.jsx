@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, LinearProgress, Tab, Typography } from "@mui/material";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { TabContext, TabPanel } from "@mui/lab";
+import ZoomAwareTabList from "../../ZoomAwareTabList";
 import { useSnackbar } from "notistack";
 import {
   getMonitoring,
@@ -578,11 +579,10 @@ const MonitoringPages = ({ year: yearProp }) => {
           }}
         >
           <Box sx={{ borderBottom: 1, borderColor: "divider", flexShrink: 0 }}>
-            <TabList onChange={handleTabChange} aria-label="Вкладки мониторинга">
+            <ZoomAwareTabList onChange={handleTabChange} aria-label="Вкладки мониторинга">
               <Tab sx={{ color: "black !important" }} label="Обработки" value="1" />
-              <Tab sx={{ color: "black !important" }} label="Сводка" value="2" disabled />
               <Tab sx={{ color: "black !important" }} label="Ход выполнения" value="3" />
-            </TabList>
+            </ZoomAwareTabList>
           </Box>
 
           <TabPanel
@@ -652,12 +652,6 @@ const MonitoringPages = ({ year: yearProp }) => {
                 onRowClick={handleRowClick}
               />
             </Box>
-          </TabPanel>
-
-          <TabPanel sx={{ padding: 2, flex: 1, minHeight: 0, overflow: "auto", "&[hidden]": { display: "none" } }} value="2">
-            <Typography variant="body2" color="text.secondary">
-              Раздел «Сводка» будет доступен позже.
-            </Typography>
           </TabPanel>
 
           <TabPanel

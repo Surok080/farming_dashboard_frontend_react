@@ -13,7 +13,8 @@ import {
     Typography, useMediaQuery, useTheme,
 } from "@mui/material";
 import {useSnackbar} from "notistack";
-import {TabContext, TabList, TabPanel} from "@mui/lab";
+import {TabContext, TabPanel} from "@mui/lab";
+import ZoomAwareTabList from "../ZoomAwareTabList";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import {getAreaLayersCartogram, getColorLayersCartogram,} from "../../utils/mapUtils";
 import LayersCartogram from "./LayersCartogram";
@@ -191,7 +192,7 @@ const MapCartogram = memo(() => {
                     >
                         <TabContext value={value}>
                             {/* <Box sx={{ borderBottom: 1, borderColor: 'red' }}> */}
-                            <TabList
+                            <ZoomAwareTabList
                                 centered
                                 textColor="primary"
                                 onChange={handleChange}
@@ -199,7 +200,7 @@ const MapCartogram = memo(() => {
                             >
                                 <Tab label="Слои" value="1"/>
                                 <Tab label="Свойства" value="2"/>
-                            </TabList>
+                            </ZoomAwareTabList>
                             {/* </Box> */}
                             <TabPanel
                                 sx={{
