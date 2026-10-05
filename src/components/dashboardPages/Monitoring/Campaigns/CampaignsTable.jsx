@@ -60,8 +60,8 @@ const CampaignsTable = ({ campaigns, expandedIds, onToggle, onDelete }) => {
           <TableCell sx={headCellSx}>Интервал</TableCell>
           <TableCell sx={headCellSx}>Кол-во полей</TableCell>
           <TableCell sx={headCellSx}>Площадь выработки</TableCell>
-          <TableCell sx={headCellSx}>Выполнено, га (%)</TableCell>
-          <TableCell sx={{ ...headCellSx, minWidth: 200 }} />
+          <TableCell sx={headCellSx} />
+          <TableCell sx={{ ...headCellSx, minWidth: 220 }}>Выполнено, га (%)</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -88,13 +88,16 @@ const CampaignsTable = ({ campaigns, expandedIds, onToggle, onDelete }) => {
                 </TableCell>
                 <TableCell sx={campaignCellSx}>{campaign.fields_count ?? "—"}</TableCell>
                 <TableCell sx={campaignCellSx}>{formatCampaignNumber(campaign.plan_area, 1)} га</TableCell>
+                <TableCell sx={campaignCellSx} />
                 <TableCell sx={{ ...campaignCellSx, whiteSpace: "nowrap" }}>
-                  {formatDoneValue(campaign.fact_area)} га ({formatDoneValue(campaign.fact_percent)}%)
-                </TableCell>
-                <TableCell sx={cellSx}>
-                  <IconButton size="small" color="error" onClick={() => onDelete(campaign)} aria-label="Удалить кампанию">
-                    <RemoveCircleOutlineIcon fontSize="small" />
-                  </IconButton>
+                  <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1 }}>
+                    <span>
+                      {formatDoneValue(campaign.fact_area)} га ({formatDoneValue(campaign.fact_percent)}%)
+                    </span>
+                    <IconButton size="small" color="error" onClick={() => onDelete(campaign)} aria-label="Удалить кампанию">
+                      <RemoveCircleOutlineIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                 </TableCell>
               </TableRow>
               {expanded ? (
@@ -105,7 +108,18 @@ const CampaignsTable = ({ campaigns, expandedIds, onToggle, onDelete }) => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  rows.map((row, index) => (
+                  <>
+                  <TableRow>
+                    <TableCell sx={headCellSx} />
+                    <TableCell sx={headCellSx}>Дата</TableCell>
+                    <TableCell sx={headCellSx}>Выбранные поля</TableCell>
+                    <TableCell sx={headCellSx}>Агрегат</TableCell>
+                    <TableCell sx={headCellSx}>Ширина, м</TableCell>
+                    <TableCell sx={headCellSx}>Техоперация</TableCell>
+                    <TableCell sx={headCellSx}>Водитель</TableCell>
+                    <TableCell sx={headCellSx}>Выполнено/Всего, га (%)</TableCell>
+                  </TableRow>
+                  {rows.map((row, index) => (
                     <TableRow key={`${campaign.id}-${row.field_id}-${row.work_date}-${index}`} sx={{ backgroundColor: "#fafafa" }}>
                       <TableCell />
                       <TableCell sx={cellSx}>{formatCampaignDate(row.work_date)}</TableCell>
@@ -131,7 +145,8 @@ const CampaignsTable = ({ campaigns, expandedIds, onToggle, onDelete }) => {
                         {formatCampaignNumber(row.cumulative_percent, 2)}%)
                       </TableCell>
                     </TableRow>
-                  ))
+                  ))}
+                  </>
                 )
               ) : null}
             </React.Fragment>
