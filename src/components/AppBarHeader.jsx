@@ -92,6 +92,7 @@ const AppBarHeader = memo(({valueTabs, year, setYear, allArea, drawerWidth}) => 
                     boxShadow: "none",
                     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
                     background: "#f0f0f0",
+                    color: "rgba(0, 0, 0, 0.87)",
                 }}
             >
 
