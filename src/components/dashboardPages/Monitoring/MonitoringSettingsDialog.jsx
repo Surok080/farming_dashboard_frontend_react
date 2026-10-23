@@ -1,14 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Box,
   Button,
+  Card,
+  CardContent,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   FormControlLabel,
   InputAdornment,
   Switch,
@@ -18,127 +19,191 @@ import {
 import CloudDownloadOutlinedIcon from "@mui/icons-material/CloudDownloadOutlined";
 import dayjs from "dayjs";
 import { useSnackbar } from "notistack";
+import { useSelector } from "react-redux";
 import {
   getApiErrorMessage,
   getAutoReportSettings,
   postAutoReportSettings,
 } from "../../../api/notifications";
 import {
-  getApiErrorMessage as getMonitoringApiErrorMessage,
   getMonitoringAutoDownloadStatus,
+  getMonitoringFilterSettings,
   postMonitoringDownloadYesterday,
+  postMonitoringFilterSettings,
   toggleMonitoringAutoDownload,
 } from "../../../api/monitoring";
+import { DEFAULT_FILTER_SETTINGS, DEFAULT_REPORT_SETTINGS, isSendTimeAllowed } from "./monitoringAutoFilter";
 import { formatSecondsAsTime, parseTimeToSeconds } from "./monitoringUtils";
 
 const yesterdayLabel = () => dayjs().subtract(1, "day").format("DD.MM.YYYY");
 
-const DEFAULT_AUTO_REPORT_SETTINGS = {
-  enabled: false,
-  min_agro_zone_percent: 0,
-  min_visit_interval_seconds: 0,
-  min_speed_kmh: 0,
-  max_speed_kmh: 0,
+const EMPTY_FIELD_ERRORS = {
+  percent: "",
+  interval: "",
+  speed: "",
+  sendTime: "",
 };
 
-const toNonNegativeInt = (value) => {
-  const n = Number.parseInt(String(value), 10);
-  return Number.isFinite(n) && n >= 0 ? n : 0;
+const parseFiniteNumber = (value) => {
+  const raw = String(value ?? "").trim().replace(",", ".");
+  if (raw === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
 };
 
-const MonitoringSettingsDialog = ({ open, onClose }) => {
+const parsePercent = (value) => {
+  const n = parseFiniteNumber(value);
+  if (n == null || n < 0 || n > 100) return null;
+  return n;
+};
+
+const pickNumber = (value, fallback) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+};
+
+const asObject = (data) => (data && typeof data === "object" && !Array.isArray(data) ? data : {});
+
+const filterFieldsFrom = (data, fallback) => {
+  const source = asObject(data);
+  const base = fallback ?? DEFAULT_FILTER_SETTINGS;
+  return {
+    enabled: source.enabled == null ? Boolean(base.enabled) : Boolean(source.enabled),
+    min_agro_zone_percent: pickNumber(source.min_agro_zone_percent, base.min_agro_zone_percent),
+    min_visit_interval_seconds: pickNumber(source.min_visit_interval_seconds, base.min_visit_interval_seconds),
+    min_speed_kmh: pickNumber(source.min_speed_kmh, base.min_speed_kmh),
+    max_speed_kmh: pickNumber(source.max_speed_kmh, base.max_speed_kmh),
+  };
+};
+
+const reportFieldsFrom = (data, fallback) => {
+  const source = asObject(data);
+  const base = fallback ?? DEFAULT_REPORT_SETTINGS;
+  const raw = typeof source.send_time === "string" ? source.send_time.trim() : "";
+  const match = /^(\d{2}:\d{2})/.exec(raw);
+  return {
+    enabled: source.enabled == null ? Boolean(base.enabled) : Boolean(source.enabled),
+    send_time: match ? match[1] : raw || base.send_time,
+  };
+};
+
+const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
   const { enqueueSnackbar } = useSnackbar();
+  const isSuperAdmin = useSelector((state) => state.user?.userInfo?.role) === "super_admin";
 
   const [autoEnabled, setAutoEnabled] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [toggleLoading, setToggleLoading] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
-  const [autoReportLoading, setAutoReportLoading] = useState(false);
-  const [autoReportSaving, setAutoReportSaving] = useState(false);
-  const [autoReportSettings, setAutoReportSettings] = useState(DEFAULT_AUTO_REPORT_SETTINGS);
-  const [visitIntervalInput, setVisitIntervalInput] = useState("00:00:00");
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
 
-  const loadAutoStatus = useCallback(async () => {
-    setStatusLoading(true);
-    try {
-      const { data } = await getMonitoringAutoDownloadStatus();
-      setAutoEnabled(Boolean(data?.enabled));
-    } catch (error) {
-      enqueueSnackbar(getMonitoringApiErrorMessage(error, "Не удалось загрузить статус автоскачивания"), {
-        variant: "error",
-      });
-    } finally {
-      setStatusLoading(false);
-    }
-  }, [enqueueSnackbar]);
+  const [filterEnabled, setFilterEnabled] = useState(DEFAULT_FILTER_SETTINGS.enabled);
+  const [percentInput, setPercentInput] = useState(String(DEFAULT_FILTER_SETTINGS.min_agro_zone_percent));
+  const [visitIntervalInput, setVisitIntervalInput] = useState(
+    formatSecondsAsTime(DEFAULT_FILTER_SETTINGS.min_visit_interval_seconds),
+  );
+  const [minSpeedInput, setMinSpeedInput] = useState(String(DEFAULT_FILTER_SETTINGS.min_speed_kmh));
+  const [maxSpeedInput, setMaxSpeedInput] = useState(String(DEFAULT_FILTER_SETTINGS.max_speed_kmh));
+  const [reportEnabled, setReportEnabled] = useState(DEFAULT_REPORT_SETTINGS.enabled);
+  const [sendTime, setSendTime] = useState(DEFAULT_REPORT_SETTINGS.send_time);
+  const [fieldErrors, setFieldErrors] = useState(EMPTY_FIELD_ERRORS);
 
-  const loadAutoReportSettings = useCallback(async () => {
-    setAutoReportLoading(true);
-    try {
-      const { data } = await getAutoReportSettings();
-      const next = {
-        enabled: Boolean(data?.enabled),
-        min_agro_zone_percent: toNonNegativeInt(data?.min_agro_zone_percent),
-        min_visit_interval_seconds: toNonNegativeInt(data?.min_visit_interval_seconds),
-        min_speed_kmh: toNonNegativeInt(data?.min_speed_kmh),
-        max_speed_kmh: toNonNegativeInt(data?.max_speed_kmh),
-      };
-      setAutoReportSettings(next);
-      setVisitIntervalInput(formatSecondsAsTime(next.min_visit_interval_seconds));
-    } catch (error) {
-      enqueueSnackbar(getApiErrorMessage(error, "Не удалось загрузить настройки автоматизированного отчёта"), {
-        variant: "error",
-      });
-    } finally {
-      setAutoReportLoading(false);
-    }
-  }, [enqueueSnackbar]);
+  const applyFilterFields = useCallback((fields) => {
+    setFilterEnabled(Boolean(fields.enabled));
+    setPercentInput(String(fields.min_agro_zone_percent));
+    setVisitIntervalInput(formatSecondsAsTime(fields.min_visit_interval_seconds));
+    setMinSpeedInput(String(fields.min_speed_kmh));
+    setMaxSpeedInput(String(fields.max_speed_kmh));
+  }, []);
+
+  const applyReportFields = useCallback((fields) => {
+    setReportEnabled(Boolean(fields.enabled));
+    setSendTime(fields.send_time);
+  }, []);
 
   useEffect(() => {
-    if (open) {
-      loadAutoStatus();
-      loadAutoReportSettings();
-    }
-  }, [open, loadAutoStatus, loadAutoReportSettings]);
+    if (!open) return undefined;
+    let cancelled = false;
+    const isCancelled = () => cancelled;
+    setSettingsLoading(true);
+    setLoadFailed(false);
+    setFieldErrors(EMPTY_FIELD_ERRORS);
 
-  const saveAutoReportSettings = useCallback(
-    async (nextSettings, { successMessage = "Настройки сохранены" } = {}) => {
-      setAutoReportSaving(true);
+    const loadAutoStatus = async () => {
+      setStatusLoading(true);
       try {
-        const payload = {
-          enabled: Boolean(nextSettings.enabled),
-          min_agro_zone_percent: toNonNegativeInt(nextSettings.min_agro_zone_percent),
-          min_visit_interval_seconds: toNonNegativeInt(nextSettings.min_visit_interval_seconds),
-          min_speed_kmh: toNonNegativeInt(nextSettings.min_speed_kmh),
-          max_speed_kmh: toNonNegativeInt(nextSettings.max_speed_kmh),
-        };
-        await postAutoReportSettings(payload);
-        setAutoReportSettings(payload);
-        enqueueSnackbar(successMessage, { variant: "success" });
-        return true;
+        const { data } = await getMonitoringAutoDownloadStatus();
+        if (isCancelled()) return;
+        setAutoEnabled(Boolean(data?.enabled));
       } catch (error) {
-        enqueueSnackbar(getApiErrorMessage(error, "Не удалось сохранить настройки"), {
+        if (isCancelled()) return;
+        enqueueSnackbar(getApiErrorMessage(error, "Не удалось загрузить статус автоскачивания"), {
           variant: "error",
         });
-        return false;
       } finally {
-        setAutoReportSaving(false);
+        if (!isCancelled()) setStatusLoading(false);
       }
-    },
-    [enqueueSnackbar],
-  );
+    };
+
+    const loadFilter = async () => {
+      try {
+        const { data } = await getMonitoringFilterSettings();
+        if (isCancelled()) return;
+        applyFilterFields(filterFieldsFrom(data, DEFAULT_FILTER_SETTINGS));
+      } catch (error) {
+        if (isCancelled()) return;
+        if (error?.response?.status === 404) {
+          applyFilterFields(DEFAULT_FILTER_SETTINGS);
+          return;
+        }
+        setLoadFailed(true);
+        enqueueSnackbar(getApiErrorMessage(error, "Не удалось загрузить настройки фильтра"), {
+          variant: "error",
+        });
+      }
+    };
+
+    const loadReport = async () => {
+      try {
+        const { data } = await getAutoReportSettings();
+        if (isCancelled()) return;
+        applyReportFields(reportFieldsFrom(data, DEFAULT_REPORT_SETTINGS));
+      } catch (error) {
+        if (isCancelled()) return;
+        if (error?.response?.status === 404) {
+          applyReportFields(DEFAULT_REPORT_SETTINGS);
+          return;
+        }
+        setLoadFailed(true);
+        enqueueSnackbar(getApiErrorMessage(error, "Не удалось загрузить настройки отчёта"), {
+          variant: "error",
+        });
+      }
+    };
+
+    Promise.all([loadAutoStatus(), loadFilter(), loadReport()]).finally(() => {
+      if (!isCancelled()) setSettingsLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, enqueueSnackbar, applyFilterFields, applyReportFields]);
 
   const handleDownloadYesterday = async () => {
     setDownloadLoading(true);
     try {
       const { data } = await postMonitoringDownloadYesterday();
-      enqueueSnackbar(
-        data?.message || `Скачивание данных за ${yesterdayLabel()} запущено`,
-        { variant: "success", autoHideDuration: 5000 },
-      );
+      enqueueSnackbar(data?.message || `Скачивание данных за ${yesterdayLabel()} запущено`, {
+        variant: "success",
+        autoHideDuration: 5000,
+      });
     } catch (error) {
-      enqueueSnackbar(getMonitoringApiErrorMessage(error, "Не удалось запустить скачивание"), {
+      enqueueSnackbar(getApiErrorMessage(error, "Не удалось запустить скачивание"), {
         variant: "error",
       });
     } finally {
@@ -156,7 +221,7 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
         { variant: "success" },
       );
     } catch (error) {
-      enqueueSnackbar(getMonitoringApiErrorMessage(error, "Не удалось изменить автоскачивание"), {
+      enqueueSnackbar(getApiErrorMessage(error, "Не удалось изменить автоскачивание"), {
         variant: "error",
       });
     } finally {
@@ -164,193 +229,282 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
     }
   };
 
-  const handleToggleAutoReport = async (event) => {
-    const enabled = event.target.checked;
-    const prev = autoReportSettings;
-    const next = { ...prev, enabled };
-    setAutoReportSettings(next);
-    const ok = await saveAutoReportSettings(next, {
-      successMessage: enabled ? "Автоматизированный отчёт включён" : "Автоматизированный отчёт выключен",
-    });
-    if (!ok) {
-      setAutoReportSettings(prev);
-    }
-  };
+  const handleSave = async () => {
+    if (savingRef.current || settingsLoading || loadFailed) return;
 
-  const handleNumericFieldBlur = (field) => async (event) => {
-    const value = toNonNegativeInt(event.target.value);
-    if (value === autoReportSettings[field]) return;
-    const prev = autoReportSettings;
-    const next = { ...prev, [field]: value };
-    setAutoReportSettings(next);
-    const ok = await saveAutoReportSettings(next);
-    if (!ok) {
-      setAutoReportSettings(prev);
+    const nextErrors = { ...EMPTY_FIELD_ERRORS };
+    const percent = parsePercent(percentInput);
+    if (percent == null) {
+      nextErrors.percent = "Укажите процент от 0 до 100";
     }
-  };
-
-  const handleVisitIntervalBlur = async () => {
     const seconds = parseTimeToSeconds(visitIntervalInput);
-    if (seconds === null) {
-      enqueueSnackbar("Укажите время в формате ЧЧ:ММ:СС", { variant: "warning" });
-      setVisitIntervalInput(formatSecondsAsTime(autoReportSettings.min_visit_interval_seconds));
-      return;
+    if (seconds == null) {
+      nextErrors.interval = "Укажите время в формате ЧЧ:ММ:СС";
     }
-    if (seconds === autoReportSettings.min_visit_interval_seconds) return;
-    const prev = autoReportSettings;
-    const next = { ...prev, min_visit_interval_seconds: seconds };
-    setAutoReportSettings(next);
-    setVisitIntervalInput(formatSecondsAsTime(seconds));
-    const ok = await saveAutoReportSettings(next);
-    if (!ok) {
-      setAutoReportSettings(prev);
-      setVisitIntervalInput(formatSecondsAsTime(prev.min_visit_interval_seconds));
+    const minSpeed = parseFiniteNumber(minSpeedInput);
+    const maxSpeed = parseFiniteNumber(maxSpeedInput);
+    if (minSpeed == null || maxSpeed == null) {
+      nextErrors.speed = "Укажите скорость";
+    } else if (minSpeed > maxSpeed) {
+      nextErrors.speed = "Минимальная скорость не может быть больше максимальной";
+    }
+    if (!isSendTimeAllowed(sendTime)) {
+      nextErrors.sendTime = "Время отправки должно быть с 05:00 до 22:00";
+    }
+    setFieldErrors(nextErrors);
+    if (nextErrors.percent || nextErrors.interval || nextErrors.speed || nextErrors.sendTime) return;
+
+    const filterPayload = {
+      enabled: Boolean(filterEnabled),
+      min_agro_zone_percent: percent,
+      min_visit_interval_seconds: seconds,
+      min_speed_kmh: minSpeed,
+      max_speed_kmh: maxSpeed,
+    };
+    const reportPayload = {
+      enabled: filterEnabled ? Boolean(reportEnabled) : false,
+      send_time: sendTime,
+    };
+
+    savingRef.current = true;
+    setSaving(true);
+    try {
+      const filterRes = await postMonitoringFilterSettings(filterPayload);
+      onFilterSaved?.({
+        enabled: filterPayload.enabled,
+        min_agro_zone_percent: filterPayload.min_agro_zone_percent,
+        min_visit_interval_seconds: filterPayload.min_visit_interval_seconds,
+        min_speed_kmh: filterPayload.min_speed_kmh,
+        max_speed_kmh: filterPayload.max_speed_kmh,
+      });
+      try {
+        const reportRes = await postAutoReportSettings(reportPayload);
+        const savedFilter = filterFieldsFrom(filterRes?.data, filterPayload);
+        const savedReport = reportFieldsFrom(reportRes?.data, reportPayload);
+        enqueueSnackbar("Настройки сохранены", { variant: "success" });
+        applyFilterFields(savedFilter);
+        applyReportFields(savedReport);
+      } catch (reportError) {
+        enqueueSnackbar(getApiErrorMessage(reportError, "Не удалось сохранить настройки отчёта"), {
+          variant: "error",
+        });
+      }
+    } catch (error) {
+      enqueueSnackbar(getApiErrorMessage(error, "Не удалось сохранить настройки"), {
+        variant: "error",
+      });
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
     }
   };
 
-  const busy = statusLoading || toggleLoading || downloadLoading || autoReportLoading || autoReportSaving;
-  const settingsDisabled = busy || !autoReportSettings.enabled;
+  const filterFieldsDisabled = !filterEnabled || settingsLoading || saving;
+  const reportToggleDisabled = !filterEnabled || settingsLoading || saving;
+  const reportSwitchChecked = filterEnabled && reportEnabled;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ pb: 0, textAlign: "left" }}>Настройки мониторинга</DialogTitle>
-      <DialogContent sx={{ pt: 2, textAlign: "left" }}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Загрузка данных из SMSR (ФортМонитор) за предыдущий календарный день.
-        </Typography>
+      <DialogTitle sx={{ pb: 1, textAlign: "left" }}>Настройки мониторинга</DialogTitle>
+      <DialogContent sx={{ pt: 1, textAlign: "left" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: 2,
+            alignItems: "start",
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Alert severity="info" sx={{ textAlign: "left" }}>
+              Принимая решения на основе автоматически выдаваемых ответов, вы берёте ответственность за любые
+              последствия на себя. Чтобы минимизировать риски и обезопасить себя, рекомендуется создавать или
+              редактировать полевые обработки вручную.
+            </Alert>
 
-        <Box sx={{ mb: 2.5 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            Ручное скачивание
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-            Запускает импорт за <b>{yesterdayLabel()}</b>. Ответ приходит сразу, загрузка идёт в фоне
-            несколько минут — затем обновите таблицу кнопкой «Выполнить» или обновите страницу.
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={handleDownloadYesterday}
-            disabled={busy}
-            startIcon={
-              downloadLoading ? <CircularProgress size={18} color="inherit" /> : <CloudDownloadOutlinedIcon />
-            }
-            sx={{
-              textTransform: "none",
-              backgroundColor: "#62A65D",
-              boxShadow: "none",
-              "&:hover": { backgroundColor: "#4f8f4b", boxShadow: "none" },
-            }}
-          >
-            {downloadLoading ? "Запуск…" : `Скачать за ${yesterdayLabel()}`}
-          </Button>
-        </Box>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                  Автозагрузка данных
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                  Загрузка данных из SMSR (ФортМонитор) за предыдущий календарный день.
+                </Typography>
 
-        <Divider sx={{ my: 2 }} />
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  Ручное скачивание
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                  Запускает импорт за <b>{yesterdayLabel()}</b>. Ответ приходит сразу, загрузка идёт в фоне
+                  несколько минут — затем обновите таблицу кнопкой «Выполнить» или обновите страницу.
+                </Typography>
+                {isSuperAdmin ? (
+                  <Button
+                    variant="contained"
+                    onClick={handleDownloadYesterday}
+                    disabled={downloadLoading || toggleLoading || statusLoading}
+                    startIcon={
+                      downloadLoading ? (
+                        <CircularProgress size={18} color="inherit" />
+                      ) : (
+                        <CloudDownloadOutlinedIcon />
+                      )
+                    }
+                    sx={{
+                      textTransform: "none",
+                      backgroundColor: "#62A65D",
+                      boxShadow: "none",
+                      "&:hover": { backgroundColor: "#4f8f4b", boxShadow: "none" },
+                    }}
+                  >
+                    {downloadLoading ? "Запуск…" : `Скачать за ${yesterdayLabel()}`}
+                  </Button>
+                ) : null}
 
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            Автоскачивание
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-            Каждое утро (04:00–06:59 по Москве) автоматически скачиваются данные за предыдущий день.
-          </Typography>
+                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                  Автоскачивание
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                  Каждое утро (04:00–06:59 по Москве) автоматически скачиваются данные за предыдущий день.
+                </Typography>
 
-          {statusLoading ? (
-            <Box display="flex" alignItems="center" gap={1}>
-              <CircularProgress size={20} sx={{ color: "#62A65D" }} />
-              <Typography variant="body2" color="text.secondary">
-                Загрузка статуса…
-              </Typography>
-            </Box>
-          ) : (
-            <FormControlLabel
-              sx={{ ml: 0, alignItems: "flex-start" }}
-              control={
-                <Switch
-                  checked={autoEnabled}
-                  onChange={handleToggleAuto}
-                  disabled={toggleLoading || downloadLoading || autoReportSaving}
-                  color="success"
+                {statusLoading ? (
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <CircularProgress size={20} sx={{ color: "#62A65D" }} />
+                    <Typography variant="body2" color="text.secondary">
+                      Загрузка статуса…
+                    </Typography>
+                  </Box>
+                ) : (
+                  <FormControlLabel
+                    sx={{ ml: 0, alignItems: "flex-start" }}
+                    control={
+                      <Switch
+                        checked={autoEnabled}
+                        onChange={handleToggleAuto}
+                        disabled={toggleLoading || downloadLoading}
+                        color="success"
+                        inputProps={{ "aria-label": "Автоскачивание" }}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {autoEnabled ? "Включено" : "Выключено"}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Переключатель создаёт задачу при первом включении
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                )}
+
+                <Alert severity="info" sx={{ mt: 2, textAlign: "left" }}>
+                  Для скачивания нужна настроенная интеграция SMSR в разделе «Внешние сервисы».
+                </Alert>
+              </CardContent>
+            </Card>
+
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                  Автоматизированные уведомления
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                  Ежедневная отправка в MAX строк, которые разметил автофильтр
+                </Typography>
+                <FormControlLabel
+                  sx={{ ml: 0, alignItems: "flex-start", mb: 1 }}
+                  control={
+                    <Switch
+                      checked={reportSwitchChecked}
+                      onChange={(event) => {
+                        if (!filterEnabled) return;
+                        setReportEnabled(event.target.checked);
+                      }}
+                      disabled={reportToggleDisabled}
+                      color="success"
+                      inputProps={{ "aria-label": "Автоматизированные уведомления" }}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {reportSwitchChecked ? "Включено" : "Выключено"}
+                    </Typography>
+                  }
                 />
-              }
-              label={
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {autoEnabled ? "Включено" : "Выключено"}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Переключатель создаёт задачу при первом включении
+                <TextField
+                  size="small"
+                  fullWidth
+                  type="time"
+                  label="Время отправки"
+                  value={sendTime}
+                  onChange={(event) => {
+                    setSendTime(event.target.value);
+                    setFieldErrors((prev) => ({ ...prev, sendTime: "" }));
+                  }}
+                  disabled={settingsLoading || saving}
+                  error={Boolean(fieldErrors.sendTime)}
+                  helperText={fieldErrors.sendTime || " "}
+                  InputLabelProps={{ shrink: true }}
+                  inputProps={{ "aria-label": "Время отправки", step: 60 }}
+                  sx={{ mb: 1.5 }}
+                />
+                <Typography variant="body2" color="text.secondary">
+                  Чтобы отчёт уходил в MAX, подключите бота в Настройки → Уведомления
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
+
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                Автофильтрование строк
+              </Typography>
+              {settingsLoading ? (
+                <Box display="flex" alignItems="center" gap={1} sx={{ mb: 1.5 }}>
+                  <CircularProgress size={20} sx={{ color: "#62A65D" }} />
+                  <Typography variant="body2" color="text.secondary">
+                    Загрузка настроек…
                   </Typography>
                 </Box>
-              }
-            />
-          )}
-
-          <Alert severity="info" sx={{ mt: 2, textAlign: "left" }}>
-            Для скачивания нужна настроенная интеграция SMSR в разделе «Внешние сервисы».
-          </Alert>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            Автоматизированный отчёт
-          </Typography>
-
-          {autoReportLoading ? (
-            <Box display="flex" alignItems="center" gap={1} sx={{ mb: 2 }}>
-              <CircularProgress size={20} sx={{ color: "#62A65D" }} />
-              <Typography variant="body2" color="text.secondary">
-                Загрузка настроек…
-              </Typography>
-            </Box>
-          ) : (
-            <>
+              ) : null}
               <FormControlLabel
                 sx={{ ml: 0, alignItems: "flex-start", mb: 2 }}
                 control={
                   <Switch
-                    checked={autoReportSettings.enabled}
-                    onChange={handleToggleAutoReport}
-                    disabled={busy}
+                    checked={filterEnabled}
+                    onChange={(event) => setFilterEnabled(event.target.checked)}
+                    disabled={settingsLoading || saving}
                     color="success"
+                    inputProps={{ "aria-label": "Автофильтрование строк" }}
                   />
                 }
                 label={
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {autoReportSettings.enabled ? "Включено" : "Выключено"}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Автоматическая генерация обработка данных с использованием алгоритмов и последующим
-                      отправлением в мессенджер
-                    </Typography>
-                  </Box>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {filterEnabled ? "Включено" : "Выключено"}
+                  </Typography>
                 }
               />
 
-              <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-                Задать настройки (ручной режим)
-              </Typography>
-
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 2 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <TextField
                   size="small"
                   fullWidth
                   type="number"
                   label="Не показывать агрозоны, % обработки которых меньше"
-                  value={autoReportSettings.min_agro_zone_percent}
-                  onChange={(e) =>
-                    setAutoReportSettings((prev) => ({
-                      ...prev,
-                      min_agro_zone_percent: e.target.value,
-                    }))
-                  }
-                  onBlur={handleNumericFieldBlur("min_agro_zone_percent")}
-                  disabled={settingsDisabled}
+                  value={percentInput}
+                  onChange={(event) => {
+                    setPercentInput(event.target.value);
+                    setFieldErrors((prev) => ({ ...prev, percent: "" }));
+                  }}
+                  disabled={filterFieldsDisabled}
+                  error={Boolean(fieldErrors.percent)}
+                  helperText={fieldErrors.percent || " "}
                   InputLabelProps={{ shrink: true }}
-                  inputProps={{ min: 0, step: 1 }}
+                  inputProps={{ min: 0, max: 100, step: 1, "aria-label": "Процент обработки агрозоны" }}
                 />
 
                 <TextField
@@ -358,12 +512,19 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
                   fullWidth
                   label="Минимальное время между посещениями геозон"
                   value={visitIntervalInput}
-                  onChange={(e) => setVisitIntervalInput(e.target.value)}
-                  onBlur={handleVisitIntervalBlur}
-                  disabled={settingsDisabled}
+                  onChange={(event) => {
+                    setVisitIntervalInput(event.target.value);
+                    setFieldErrors((prev) => ({ ...prev, interval: "" }));
+                  }}
+                  disabled={filterFieldsDisabled}
+                  error={Boolean(fieldErrors.interval)}
+                  helperText={fieldErrors.interval || " "}
                   InputLabelProps={{ shrink: true }}
                   placeholder="00:00:10"
-                  inputProps={{ pattern: "[0-9]{2}:[0-9]{2}:[0-9]{2}" }}
+                  inputProps={{
+                    pattern: "[0-9]{2}:[0-9]{2}:[0-9]{2}",
+                    "aria-label": "Минимальное время между посещениями геозон",
+                  }}
                 />
 
                 <Box>
@@ -380,15 +541,13 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={autoReportSettings.min_speed_kmh}
-                      onChange={(e) =>
-                        setAutoReportSettings((prev) => ({
-                          ...prev,
-                          min_speed_kmh: e.target.value,
-                        }))
-                      }
-                      onBlur={handleNumericFieldBlur("min_speed_kmh")}
-                      disabled={settingsDisabled}
+                      value={minSpeedInput}
+                      onChange={(event) => {
+                        setMinSpeedInput(event.target.value);
+                        setFieldErrors((prev) => ({ ...prev, speed: "" }));
+                      }}
+                      disabled={filterFieldsDisabled}
+                      error={Boolean(fieldErrors.speed)}
                       InputProps={{
                         startAdornment: <InputAdornment position="start">от</InputAdornment>,
                       }}
@@ -397,35 +556,45 @@ const MonitoringSettingsDialog = ({ open, onClose }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={autoReportSettings.max_speed_kmh}
-                      onChange={(e) =>
-                        setAutoReportSettings((prev) => ({
-                          ...prev,
-                          max_speed_kmh: e.target.value,
-                        }))
-                      }
-                      onBlur={handleNumericFieldBlur("max_speed_kmh")}
-                      disabled={settingsDisabled}
+                      value={maxSpeedInput}
+                      onChange={(event) => {
+                        setMaxSpeedInput(event.target.value);
+                        setFieldErrors((prev) => ({ ...prev, speed: "" }));
+                      }}
+                      disabled={filterFieldsDisabled}
+                      error={Boolean(fieldErrors.speed)}
                       InputProps={{
                         startAdornment: <InputAdornment position="start">до</InputAdornment>,
                       }}
                       inputProps={{ min: 0, step: 1, "aria-label": "Максимальная скорость, км/ч" }}
                     />
                   </Box>
+                  {fieldErrors.speed ? (
+                    <Typography variant="caption" color="error" sx={{ display: "block", mt: 0.5 }}>
+                      {fieldErrors.speed}
+                    </Typography>
+                  ) : null}
                 </Box>
               </Box>
-
-              <Alert severity="info" sx={{ textAlign: "left" }}>
-                Принимая решения на основе автоматически выдаваемых ответов, вы берёте ответственность за любые
-                последствия на себя. Чтобы минимизировать риски и обезопасить себя, рекомендуется создавать или
-                редактировать полевые обработки вручную.
-              </Alert>
-            </>
-          )}
+            </CardContent>
+          </Card>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose} variant="outlined" sx={{ textTransform: "none" }} disabled={busy}>
+      <DialogActions sx={{ p: 2, justifyContent: "flex-end" }}>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          disabled={settingsLoading || saving || loadFailed}
+          sx={{
+            textTransform: "none",
+            backgroundColor: "#62A65D",
+            boxShadow: "none",
+            "&:hover": { backgroundColor: "#4f8f4b", boxShadow: "none" },
+          }}
+        >
+          {saving ? "Сохранение…" : "Сохранить"}
+        </Button>
+        <Button onClick={onClose} variant="outlined" sx={{ textTransform: "none" }}>
           Закрыть
         </Button>
       </DialogActions>

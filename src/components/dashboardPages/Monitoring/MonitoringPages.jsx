@@ -6,7 +6,9 @@ import { useSnackbar } from "notistack";
 import {
   getMonitoring,
   getMonitoringById,
+  getMonitoringFilterSettings,
   patchMonitoringRow,
+  postMonitoringFilterSettings,
   postMonitoringMerge,
   postMonitoringSendToChat,
   postMonitoringStatus,
@@ -15,6 +17,7 @@ import MonitoringHeader from "./MonitoringHeader";
 import MonitoringIntervalBar from "./MonitoringIntervalBar";
 import MonitoringToolbar from "./MonitoringToolbar";
 import MonitoringTable from "./MonitoringTable";
+import MonitoringFilterLegend from "./MonitoringFilterLegend";
 import MonitoringSettingsDialog from "./MonitoringSettingsDialog";
 import MonitoringRowDialog from "./MonitoringRowDialog";
 import MonitoringStatusConfirmDialog from "./MonitoringStatusConfirmDialog";
@@ -25,10 +28,13 @@ import {
   MONITORING_NON_EDITABLE_SENT_STATUSES,
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CONFIRMED,
+  MONITORING_STATUS_PARTIALLY_CONFIRMED,
   MONITORING_STATUS_READY_FOR_1C,
   MONITORING_STATUS_RAW,
 } from "./monitoringConstants";
+import { buildLegend, DEFAULT_FILTER_SETTINGS, monitoringStatusActions } from "./monitoringAutoFilter";
 import { getDefaultMonitoringInterval, parseDatetimeLocal, toApiDateTimeString } from "./monitoringUtils";
+import { monitoringRowIdsEqual } from "./monitoringIdUtils";
 import { useMonitoringRowSelection } from "./useMonitoringRowSelection";
 import CampaignsTab from "./Campaigns/CampaignsTab";
 
@@ -58,6 +64,22 @@ const monitoringSavedIdsDirty = (row, saved) => {
   );
 };
 
+const plainObject = (value) =>
+  value && typeof value === "object" && !Array.isArray(value) ? value : null;
+
+const filterSettingsFromPayload = (data) => {
+  const source = plainObject(data) ?? {};
+  const next = { ...source };
+  delete next.updated_at;
+  return { ...DEFAULT_FILTER_SETTINGS, ...next };
+};
+
+const equipmentGroupName = (groups, id) => {
+  if (id == null) return "";
+  const group = (groups ?? []).find((item) => String(item?.id) === String(id));
+  return typeof group?.name === "string" ? group.name : "";
+};
+
 const MonitoringPages = ({ year: yearProp }) => {
   const { enqueueSnackbar } = useSnackbar();
   const year = Number(yearProp ?? localStorage.getItem("year") ?? new Date().getFullYear());
@@ -70,11 +92,19 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [status, setStatus] = useState("all");
   const [sortBy, setSortBy] = useState("period_start");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [equipmentGroupId, setEquipmentGroupId] = useState(null);
+  const [equipmentGroups, setEquipmentGroups] = useState([]);
+  const [filterSettings, setFilterSettings] = useState(DEFAULT_FILTER_SETTINGS);
+  const [filterToggleLoading, setFilterToggleLoading] = useState(false);
 
   const [filterOpen, setFilterOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const { selectedRowIds, setSelectedRowIds, handleRowCheckedChange, pruneInvalidIds, isRowSelected } =
     useMonitoringRowSelection();
+  const [legendRow, setLegendRow] = useState(null);
+  const selectedRowIdsRef = useRef(selectedRowIds);
+  selectedRowIdsRef.current = selectedRowIds;
+  const legendSelectionId = selectedRowIds.length === 1 ? selectedRowIds[0] : null;
   const [statusCounts, setStatusCounts] = useState({});
   const [tabValue, setTabValue] = useState("1");
 
@@ -91,6 +121,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [mergeLoading, setMergeLoading] = useState(false);
   const [sendMaxLoading, setSendMaxLoading] = useState(false);
   const hasExecutedSearchRef = useRef(false);
+  const filterSettingsTouchedRef = useRef(false);
   /** { activeKey, nextStatus, successMessage } | null — ожидание подтверждения смены статуса */
   const [statusConfirm, setStatusConfirm] = useState(null);
   const [headerPublishConfirmOpen, setHeaderPublishConfirmOpen] = useState(false);
@@ -120,6 +151,9 @@ const MonitoringPages = ({ year: yearProp }) => {
         if (status !== "all") {
           params.status_value = status;
         }
+        if (equipmentGroupId != null) {
+          params.equipment_group_id = equipmentGroupId;
+        }
 
         const res = await getMonitoring(params);
         const data = res?.data ?? res;
@@ -129,6 +163,14 @@ const MonitoringPages = ({ year: yearProp }) => {
         const t = typeof data?.total === "number" ? data.total : items.length;
         setTotal(t);
         setStatusCounts(data?.status_counts && typeof data.status_counts === "object" ? data.status_counts : {});
+        const nextGroups = Array.isArray(data?.equipment_groups) ? data.equipment_groups : [];
+        setEquipmentGroups(nextGroups);
+        if (
+          equipmentGroupId != null &&
+          !nextGroups.some((group) => String(group?.id) === String(equipmentGroupId))
+        ) {
+          setEquipmentGroupId(null);
+        }
         if (typeof data?.page === "number") setPage(data.page);
         else setPage(targetPage);
         if (typeof data?.page_size === "number") {
@@ -149,7 +191,7 @@ const MonitoringPages = ({ year: yearProp }) => {
         setLoading(false);
       }
     },
-    [appliedIntervalFrom, appliedIntervalTo, status, sortBy, sortOrder, pageSize, pruneInvalidIds]
+    [appliedIntervalFrom, appliedIntervalTo, status, sortBy, sortOrder, equipmentGroupId, pageSize, pruneInvalidIds]
   );
 
   const fetchMonitoringDataRef = useRef(fetchMonitoringData);
@@ -175,7 +217,7 @@ const MonitoringPages = ({ year: yearProp }) => {
     if (!hasExecutedSearchRef.current) return;
     setPage(1);
     fetchMonitoringDataRef.current({ targetPage: 1 });
-  }, [status, sortBy, sortOrder]);
+  }, [status, sortBy, sortOrder, equipmentGroupId]);
 
   const handlePageChange = (nextPage) => {
     setPage(nextPage);
@@ -234,6 +276,127 @@ const MonitoringPages = ({ year: yearProp }) => {
     return typeof msg === "string" ? msg : fallback;
   };
 
+  useEffect(() => {
+    const rowId = dialogData?.row?.id;
+    if (!dialogOpen || !dialogData?.row?.is_track_loading || rowId == null || rowId === "") {
+      return undefined;
+    }
+
+    let intervalId = null;
+    let stopped = false;
+    let snackbarShown = false;
+    let inFlight = false;
+
+    const stop = () => {
+      stopped = true;
+      if (intervalId != null) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const pollTrack = async () => {
+      if (stopped || inFlight) return;
+      inFlight = true;
+      try {
+        const res = await getMonitoringById(rowId);
+        if (stopped) return;
+        const incoming = res?.data?.row;
+        if (!incoming) return;
+        setDialogData((prev) => {
+          if (!prev?.row || !monitoringRowIdsEqual(prev.row.id, rowId)) return prev;
+          return {
+            ...prev,
+            row: {
+              ...prev.row,
+              track_points: incoming.track_points,
+              is_track_loading: incoming.is_track_loading,
+              source_changed_at: incoming.source_changed_at,
+            },
+          };
+        });
+        if (!incoming.is_track_loading) stop();
+      } catch (err) {
+        if (stopped) return;
+        console.error(err);
+        stop();
+        if (!snackbarShown) {
+          snackbarShown = true;
+          enqueueSnackbar(getErrorMessage(err, "Не удалось загрузить трек"), {
+            variant: "error",
+            autoHideDuration: 4000,
+          });
+        }
+      } finally {
+        inFlight = false;
+      }
+    };
+
+    intervalId = setInterval(pollTrack, 2000);
+    return () => {
+      stop();
+    };
+  }, [dialogOpen, dialogData?.row?.id, dialogData?.row?.is_track_loading, enqueueSnackbar]);
+
+  useEffect(() => {
+    if (legendSelectionId == null) {
+      setLegendRow(null);
+      return;
+    }
+
+    const rowId = legendSelectionId;
+    setLegendRow(null);
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await getMonitoringById(rowId);
+        const currentIds = selectedRowIdsRef.current;
+        if (cancelled || currentIds.length !== 1 || !monitoringRowIdsEqual(currentIds[0], rowId)) return;
+        setLegendRow(res?.data?.row ?? null);
+      } catch (err) {
+        if (cancelled) return;
+        const currentIds = selectedRowIdsRef.current;
+        if (currentIds.length !== 1 || !monitoringRowIdsEqual(currentIds[0], rowId)) return;
+        setLegendRow(null);
+        enqueueSnackbar(getErrorMessage(err, "Не удалось загрузить строку"), {
+          variant: "error",
+          autoHideDuration: 4000,
+        });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [legendSelectionId, enqueueSnackbar]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getMonitoringFilterSettings();
+        if (cancelled || filterSettingsTouchedRef.current) return;
+        const body = plainObject(res?.data);
+        if (!body) return;
+        setFilterSettings(filterSettingsFromPayload(body));
+      } catch (err) {
+        if (cancelled || filterSettingsTouchedRef.current) return;
+        if (err?.response?.status === 404) {
+          setFilterSettings(DEFAULT_FILTER_SETTINGS);
+          return;
+        }
+        enqueueSnackbar(getErrorMessage(err, "Не удалось загрузить настройки фильтра"), {
+          variant: "error",
+          autoHideDuration: 4000,
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [enqueueSnackbar]);
+
   const isSentOrReadyStatus = (row) =>
     MONITORING_NON_EDITABLE_SENT_STATUSES.includes(row?.status) || Boolean(row?.sent_to_1c);
 
@@ -248,15 +411,6 @@ const MonitoringPages = ({ year: yearProp }) => {
     if (isMonitoringRequiredIdEmpty(row?.trailer_id)) missing.push("Прицепное устройство");
     if (isMonitoringRequiredIdEmpty(row?.driver_id)) missing.push("Водитель");
     return missing;
-  };
-
-  /** Техоперация, прицеп и водитель выбраны в форме, совпадают с последним сохранением в БД. */
-  const isDialogRequiredFieldsReadyForSubmit = (row, savedIds) => {
-    if (!row || !savedIds) return false;
-    if (getMissingRequiredFields(row).length) return false;
-    if (getMissingRequiredFields(savedIds).length) return false;
-    if (monitoringSavedIdsDirty(row, savedIds)) return false;
-    return true;
   };
 
   const openStatusConfirmIfValid = (activeKey, nextStatus, successMessage, canRunCheck) => {
@@ -315,20 +469,25 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const handleDialogReturn = () =>
     openStatusConfirmIfValid("return", MONITORING_STATUS_RAW, "Статус изменён", (row) => {
-      if ([MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_CANCELED].includes(row?.status)) return { ok: true };
-      return { ok: false, message: "Вернуть в сырой статус можно только из подтверждённой или отменённой строки" };
+      if ([MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_CANCELED, MONITORING_STATUS_PARTIALLY_CONFIRMED].includes(row?.status)) {
+        return { ok: true };
+      }
+      return {
+        ok: false,
+        message: "Вернуть в сырой статус можно только из подтверждённой, частично подтверждённой или отменённой строки",
+      };
     });
 
   const handleDialogReject = () =>
     openStatusConfirmIfValid("reject", MONITORING_STATUS_CANCELED, "Статус изменён", (row) => {
-      if ([MONITORING_STATUS_RAW, MONITORING_STATUS_CONFIRMED].includes(row?.status)) return { ok: true };
-      return { ok: false, message: "Отклонение доступно только для сырой или подтверждённой строки" };
+      if ([MONITORING_STATUS_RAW, MONITORING_STATUS_PARTIALLY_CONFIRMED].includes(row?.status)) return { ok: true };
+      return { ok: false, message: "Отклонение доступно только для сырой или частично подтверждённой строки" };
     });
 
   const handleDialogConfirm = () =>
     openStatusConfirmIfValid("confirm", MONITORING_STATUS_CONFIRMED, "Статус изменён", (row) => {
-      if (row?.status !== MONITORING_STATUS_RAW) {
-        return { ok: false, message: "Подтверждение доступно только для сырой строки" };
+      if (![MONITORING_STATUS_RAW, MONITORING_STATUS_PARTIALLY_CONFIRMED].includes(row?.status)) {
+        return { ok: false, message: "Подтверждение доступно только для сырой или частично подтверждённой строки" };
       }
       const savedIds = dialogSavedFieldIds;
       if (!savedIds) {
@@ -435,10 +594,11 @@ const MonitoringPages = ({ year: yearProp }) => {
   const selectedRows = rows.filter((row) => isRowSelected(row.id));
   const selectedConfirmedRows = selectedRows.filter((row) => row.status === MONITORING_STATUS_CONFIRMED);
   const selectedMaxSendRows = selectedRows.filter((row) =>
-    [MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_READY_FOR_1C].includes(row.status)
+    [MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_PARTIALLY_CONFIRMED, MONITORING_STATUS_READY_FOR_1C].includes(row.status)
   );
   const canMerge = selectedRowIds.length > 1 && selectedRows.length === selectedConfirmedRows.length;
   const canPublish1C = selectedRowIds.length >= 1 && selectedRows.length === selectedConfirmedRows.length;
+  const dialogStatusActions = monitoringStatusActions(dialogData?.row?.status);
   const canSendMax = selectedRowIds.length >= 1 && selectedRows.length === selectedMaxSendRows.length;
 
   const executePublish1C = async () => {
@@ -503,7 +663,7 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const executeSendMax = async () => {
     if (!canSendMax) {
-      enqueueSnackbar("Для отправки в MAX выберите подтвержденные или опубликованные в 1С строки", {
+      enqueueSnackbar("Для отправки в MAX выберите подтверждённые, частично подтверждённые или опубликованные в 1С строки", {
         variant: "warning",
         autoHideDuration: 3000,
       });
@@ -541,7 +701,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const onSendMax = () => {
     if (mergeLoading || sendMaxLoading) return;
     if (!canSendMax) {
-      enqueueSnackbar("Для отправки в MAX выберите подтвержденные или опубликованные в 1С строки", {
+      enqueueSnackbar("Для отправки в MAX выберите подтверждённые, частично подтверждённые или опубликованные в 1С строки", {
         variant: "warning",
         autoHideDuration: 3000,
       });
@@ -553,6 +713,57 @@ const MonitoringPages = ({ year: yearProp }) => {
   const handleTabChange = (_event, newValue) => {
     setTabValue(newValue);
   };
+
+  const handleColumnSort = (nextSortBy) => {
+    if (!nextSortBy) return;
+    if (sortBy === nextSortBy) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+      return;
+    }
+    setSortBy(nextSortBy);
+    setSortOrder("asc");
+  };
+
+  const handleEquipmentGroupChange = (nextId) => {
+    if (nextId == null || nextId === "all") {
+      setEquipmentGroupId(null);
+      return;
+    }
+    const match = equipmentGroups.find((group) => String(group?.id) === String(nextId));
+    setEquipmentGroupId(match ? match.id : nextId);
+  };
+
+  const handleFilterEnabledChange = async (next) => {
+    if (filterToggleLoading) return;
+    setFilterToggleLoading(true);
+    try {
+      const payload = { ...filterSettings, enabled: next };
+      delete payload.updated_at;
+      const res = await postMonitoringFilterSettings(payload);
+      filterSettingsTouchedRef.current = true;
+      setFilterSettings(filterSettingsFromPayload(plainObject(res?.data) ?? payload));
+    } catch (err) {
+      console.error(err);
+      enqueueSnackbar(getErrorMessage(err, "Не удалось сохранить автофильтрование"), {
+        variant: "error",
+        autoHideDuration: 4000,
+      });
+    } finally {
+      setFilterToggleLoading(false);
+    }
+  };
+
+  const handleFilterSaved = (payload) => {
+    filterSettingsTouchedRef.current = true;
+    setFilterSettings(filterSettingsFromPayload(payload));
+  };
+
+  if (
+    legendRow != null &&
+    (legendSelectionId == null || !monitoringRowIdsEqual(legendRow.id, legendSelectionId))
+  ) {
+    setLegendRow(null);
+  }
 
   return (
     <Box
@@ -601,7 +812,7 @@ const MonitoringPages = ({ year: yearProp }) => {
               <MonitoringHeader
                 year={year}
                 onPublish1C={onPublish1C}
-                publishDisabled={sendMaxLoading || mergeLoading}
+                publishDisabled={sendMaxLoading || mergeLoading || !canPublish1C}
                 onSendMax={onSendMax}
                 sendMaxDisabled={!canSendMax || mergeLoading}
                 sendMaxLoading={sendMaxLoading}
@@ -628,10 +839,13 @@ const MonitoringPages = ({ year: yearProp }) => {
               <MonitoringToolbar
                 status={status}
                 onStatusChange={setStatus}
-                sortBy={sortBy}
-                onSortByChange={setSortBy}
-                sortOrder={sortOrder}
-                onSortOrderChange={setSortOrder}
+                equipmentGroups={equipmentGroups}
+                equipmentGroupId={equipmentGroupId}
+                onEquipmentGroupChange={handleEquipmentGroupChange}
+                filterEnabled={Boolean(filterSettings.enabled)}
+                filterToggleDisabled={filterToggleLoading || filterOpen}
+                onFilterEnabledChange={handleFilterEnabledChange}
+                onOpenFilterInfo={() => setFilterOpen(true)}
                 statusCounts={statusCounts}
                 total={total}
                 hasSelection={selectedRowIds.length > 0}
@@ -650,7 +864,12 @@ const MonitoringPages = ({ year: yearProp }) => {
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 onRowClick={handleRowClick}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onColumnSort={handleColumnSort}
+                groupTitle={equipmentGroupId != null ? equipmentGroupName(equipmentGroups, equipmentGroupId) : ""}
               />
+              <MonitoringFilterLegend items={buildLegend(selectedRowIds.length === 1 ? legendRow : null)} />
             </Box>
           </TabPanel>
 
@@ -674,6 +893,7 @@ const MonitoringPages = ({ year: yearProp }) => {
       <MonitoringSettingsDialog
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
+        onFilterSaved={handleFilterSaved}
       />
       <MonitoringRowDialog
         open={dialogOpen}
@@ -687,13 +907,11 @@ const MonitoringPages = ({ year: yearProp }) => {
         actionLoading={dialogActionLoading}
         activeAction={dialogActiveAction}
         canEditStatus={!isSentOrReadyStatus(dialogData?.row)}
-        canConfirm={
-          dialogData?.row?.status === MONITORING_STATUS_RAW &&
-          isDialogRequiredFieldsReadyForSubmit(dialogData?.row, dialogSavedFieldIds)
-        }
-        canReject={[MONITORING_STATUS_RAW, MONITORING_STATUS_CONFIRMED].includes(dialogData?.row?.status)}
-        canReturn={[MONITORING_STATUS_CONFIRMED, MONITORING_STATUS_CANCELED].includes(dialogData?.row?.status)}
-        canPublish1C={true}
+        canConfirm={dialogStatusActions.canConfirm}
+        canReject={dialogStatusActions.canReject}
+        canReturn={dialogStatusActions.canReturn}
+        canPublish1C={dialogStatusActions.canPublish1C}
+        showPartialLabel={dialogStatusActions.showPartialLabel}
         onRowChange={handleDialogRowChange}
         onSave={handleDialogSave}
         saveLoading={dialogSaveLoading}

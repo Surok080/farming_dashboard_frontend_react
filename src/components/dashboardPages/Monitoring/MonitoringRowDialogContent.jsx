@@ -15,6 +15,8 @@ import {
 import {formatNumberForDisplay, formatPeriodRangeDisplay} from "./monitoringUtils";
 import MonitoringFieldTrackMap from "./MonitoringFieldTrackMap";
 
+const TRACK_MAP_HEIGHT = 220;
+
 const MonitoringRowDialogContent = ({
                                         loading,
                                         row,
@@ -218,10 +220,31 @@ const MonitoringRowDialogContent = ({
                         </Box>
 
                         <Box sx={{ width: { xs: "100%", md: 280 }, flexShrink: 0 }}>
-                            <MonitoringFieldTrackMap
-                                geometry={row.field_geometry_json}
-                                trackPoints={row.track_points}
-                            />
+                            {row.is_track_loading ? (
+                                <Box
+                                    sx={{
+                                        height: TRACK_MAP_HEIGHT,
+                                        border: "1px dashed",
+                                        borderColor: "divider",
+                                        borderRadius: 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        px: 1,
+                                        backgroundColor: "action.hover",
+                                    }}
+                                >
+                                    <Typography variant="body2" color="text.secondary" align="center">
+                                        Трек загружается
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                <MonitoringFieldTrackMap
+                                    geometry={row.field_geometry_json}
+                                    trackPoints={row.track_points}
+                                    height={TRACK_MAP_HEIGHT}
+                                />
+                            )}
                         </Box>
                     </Box>
 

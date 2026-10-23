@@ -6,16 +6,20 @@ import IconButton from "@mui/material/IconButton";
 import MonitoringFieldGeometryPreview from "./MonitoringFieldGeometryPreview";
 import MonitoringStatusActions from "./MonitoringStatusActions";
 import MonitoringRowDialogContent from "./MonitoringRowDialogContent";
+import { formatSourceChangedAt } from "./monitoringAutoFilter";
 import {
   MONITORING_NON_EDITABLE_SENT_STATUSES,
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CONFIRMED,
+  MONITORING_STATUS_PARTIAL_COLOR,
+  MONITORING_STATUS_PARTIALLY_CONFIRMED,
   MONITORING_STATUS_RAW,
   MONITORING_STATUS_RAW_COLOR,
   MONITORING_STATUS_RAW_FILL_SOFT,
 } from "./monitoringConstants";
 
 const getDialogBorderColor = (status) => {
+  if (status === MONITORING_STATUS_PARTIALLY_CONFIRMED) return MONITORING_STATUS_PARTIAL_COLOR;
   if (status === MONITORING_STATUS_RAW) return MONITORING_STATUS_RAW_COLOR;
   if (status === MONITORING_STATUS_CONFIRMED) return "#62A65D";
   if (status === MONITORING_STATUS_CANCELED) return "#d32f2f";
@@ -36,6 +40,7 @@ const MonitoringRowDialog = ({
   canReject = true,
   canReturn = true,
   canPublish1C = true,
+  showPartialLabel = false,
   onRowChange,
   onSave,
   saveLoading = false,
@@ -48,6 +53,7 @@ const MonitoringRowDialog = ({
   const drivers = data?.drivers ?? [];
   const operations = data?.tech_operations ?? [];
   const trailers = data?.trailers ?? [];
+  const sourceChangedLabel = formatSourceChangedAt(row?.source_changed_at);
 
   const handleFieldChange = (field) => (event) => {
     const value = event?.target?.value ?? "";
@@ -120,6 +126,11 @@ const MonitoringRowDialog = ({
               <Typography variant="body2" color="text.secondary">
                 Редактирование, отклонения и подтверждения потенциальной обработки
               </Typography>
+              {sourceChangedLabel ? (
+                <Typography variant="body2" sx={{ mt: 0.5, color: "#666" }}>
+                  {`Данные в SMSR изменились ${sourceChangedLabel}`}
+                </Typography>
+              ) : null}
               <MonitoringStatusActions
                 row={row}
                 canEditStatus={canEditStatus}
@@ -129,6 +140,7 @@ const MonitoringRowDialog = ({
                 canReject={canReject}
                 canConfirm={canConfirm}
                 canPublish1C={canPublish1C}
+                showPartialLabel={showPartialLabel}
                 onReturn={onReturn}
                 onReject={onReject}
                 onConfirm={onConfirm}

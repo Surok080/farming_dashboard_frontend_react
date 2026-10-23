@@ -4,13 +4,20 @@ import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutli
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import PublishedWithChangesOutlinedIcon from "@mui/icons-material/PublishedWithChangesOutlined";
-import { MONITORING_STATUS_RAW_COLOR } from "./monitoringConstants";
+import {
+  MONITORING_STATUS_PARTIAL_COLOR,
+  MONITORING_STATUS_PARTIALLY_CONFIRMED,
+  MONITORING_STATUS_RAW_COLOR,
+} from "./monitoringConstants";
 
 const MonitoringStatusCell = ({ status, checked = false, onCheckedChange }) => {
   const common = { fontSize: 24, opacity: 0.8 };
   let icon;
 
   switch (status) {
+    case MONITORING_STATUS_PARTIALLY_CONFIRMED:
+      icon = <CheckCircleOutlineOutlinedIcon sx={{ ...common, color: MONITORING_STATUS_PARTIAL_COLOR }} />;
+      break;
     case "CONFIRMED":
       icon = <CheckCircleOutlineOutlinedIcon sx={{ ...common, color: "#2e7d32" }} />;
       break;

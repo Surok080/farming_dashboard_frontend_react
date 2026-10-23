@@ -1,14 +1,18 @@
 import React from "react";
-import { Box, Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { MONITORING_SORT_BY_OPTIONS, MONITORING_SORT_ORDER_OPTIONS, MONITORING_STATUS_OPTIONS } from "./monitoringConstants";
+import { Box, Button, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, Select, Switch } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { MONITORING_STATUS_OPTIONS } from "./monitoringConstants";
 
 const MonitoringToolbar = ({
   status,
   onStatusChange,
-  sortBy,
-  onSortByChange,
-  sortOrder,
-  onSortOrderChange,
+  equipmentGroups = [],
+  equipmentGroupId,
+  onEquipmentGroupChange,
+  filterEnabled = false,
+  filterToggleDisabled = false,
+  onFilterEnabledChange,
+  onOpenFilterInfo,
   statusCounts,
   total,
   hasSelection = false,
@@ -38,37 +42,44 @@ const MonitoringToolbar = ({
         </Select>
       </FormControl>
 
-      <FormControl size="small" sx={{ minWidth: 200 }}>
-        <InputLabel id="monitoring-sort-by-label">Сортировка</InputLabel>
+      <FormControl size="small" sx={{ minWidth: 220 }}>
+        <InputLabel id="monitoring-equipment-group-label">Группа техники</InputLabel>
         <Select
-          labelId="monitoring-sort-by-label"
-          value={sortBy}
-          label="Сортировка"
-          onChange={(e) => onSortByChange(e.target.value)}
+          labelId="monitoring-equipment-group-label"
+          value={equipmentGroupId ?? "all"}
+          label="Группа техники"
+          onChange={(e) => onEquipmentGroupChange(e.target.value === "all" ? null : e.target.value)}
         >
-          {MONITORING_SORT_BY_OPTIONS.map((o) => (
-            <MenuItem key={o.value} value={o.value}>
-              {o.label}
+          <MenuItem value="all">Все</MenuItem>
+          {equipmentGroups.map((group) => (
+            <MenuItem key={group.id} value={group.id}>
+              {group.name}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
 
-      <FormControl size="small" sx={{ minWidth: 160 }}>
-        <InputLabel id="monitoring-sort-order-label">Порядок</InputLabel>
-        <Select
-          labelId="monitoring-sort-order-label"
-          value={sortOrder}
-          label="Порядок"
-          onChange={(e) => onSortOrderChange(e.target.value)}
-        >
-          {MONITORING_SORT_ORDER_OPTIONS.map((o) => (
-            <MenuItem key={o.value} value={o.value}>
-              {o.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <FormControlLabel
+        sx={{ ml: 0.5 }}
+        control={
+          <Switch
+            size="small"
+            color="success"
+            checked={Boolean(filterEnabled)}
+            disabled={filterToggleDisabled}
+            onChange={(e) => onFilterEnabledChange(e.target.checked)}
+          />
+        }
+        label="Автофильтрование строк"
+      />
+      <IconButton
+        size="small"
+        aria-label="Настройки автофильтра"
+        onClick={onOpenFilterInfo}
+        sx={{ color: "#2e7d32" }}
+      >
+        <InfoOutlinedIcon fontSize="small" />
+      </IconButton>
       </Box>
 
       <Box
