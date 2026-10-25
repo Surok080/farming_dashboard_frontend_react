@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, Select, Switch } from "@mui/material";
+import { Box, Button, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, Select, Switch, Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { MONITORING_STATUS_OPTIONS } from "./monitoringConstants";
 
@@ -72,14 +72,18 @@ const MonitoringToolbar = ({
         }
         label="Автофильтрование строк"
       />
-      <IconButton
-        size="small"
-        aria-label="Настройки автофильтра"
-        onClick={onOpenFilterInfo}
-        sx={{ color: "#2e7d32" }}
+      <Tooltip
+        title="Автофильтрация строк — фильтрация данных с помощью автофильтра для сортировки и отбора данных по заданным алгоритмам. Для настройки параметров автофильтра перейдите в Настройки → Автоматизированные уведомления в чаты"
       >
-        <InfoOutlinedIcon fontSize="small" />
-      </IconButton>
+        <IconButton
+          size="small"
+          aria-label="Настройки автофильтра"
+          onClick={onOpenFilterInfo}
+          sx={{ color: "#2e7d32" }}
+        >
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
       </Box>
 
       <Box

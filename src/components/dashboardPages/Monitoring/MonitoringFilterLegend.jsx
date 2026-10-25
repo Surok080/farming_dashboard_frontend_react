@@ -1,10 +1,12 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
+import { buildLegend } from "./monitoringAutoFilter";
 
 const toneSx = {
-  canceled: { bgcolor: "rgba(211, 47, 47, 0.12)" },
-  confirmed: { bgcolor: "rgba(46, 125, 50, 0.12)" },
-  plain: { bgcolor: "#fff", border: "1px solid #e0e0e0" },
+  canceled: { bgcolor: "rgba(211, 47, 47, 0.16)" },
+  confirmed: { bgcolor: "rgba(46, 125, 50, 0.16)" },
+  partial: { bgcolor: "#fff4c2" },
+  plain: { bgcolor: "#f3f4f2" },
 };
 
 const MonitoringFilterLegend = ({ items = [] }) => (
@@ -37,6 +39,19 @@ const MonitoringFilterLegend = ({ items = [] }) => (
         )}
       </Box>
     ))}
+  </Box>
+);
+
+export const MonitoringStatusReference = () => (
+  <Box sx={{ mt: 1.5 }}>
+    <Alert severity="info" sx={{ textAlign: "left" }}>
+      Для автофильтрации строк применяется цветовая индикация статусов: она позволяет сортировать и отбирать
+      данные по заданным алгоритмам.
+    </Alert>
+    <Typography sx={{ mt: 1.5, mb: 1, fontSize: 14 }}>
+      Стандартная семантика цветов в статусах:
+    </Typography>
+    <MonitoringFilterLegend items={buildLegend(null)} />
   </Box>
 );
 

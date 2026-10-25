@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import MonitoringFieldGeometryPreview from "./MonitoringFieldGeometryPreview";
 import MonitoringStatusActions from "./MonitoringStatusActions";
 import MonitoringRowDialogContent from "./MonitoringRowDialogContent";
-import { formatSourceChangedAt } from "./monitoringAutoFilter";
+import { canceledExclusionLines, formatSourceChangedAt } from "./monitoringAutoFilter";
 import {
   MONITORING_NON_EDITABLE_SENT_STATUSES,
   MONITORING_STATUS_CANCELED,
@@ -130,6 +130,18 @@ const MonitoringRowDialog = ({
                 <Typography variant="body2" sx={{ mt: 0.5, color: "#666" }}>
                   {`Данные в SMSR изменились ${sourceChangedLabel}`}
                 </Typography>
+              ) : null}
+              {row?.status === MONITORING_STATUS_CANCELED ? (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Причина исключения из Автоуведомлений
+                  </Typography>
+                  {canceledExclusionLines(row).map((line) => (
+                    <Typography key={line} variant="body2" color="text.secondary">
+                      {line}
+                    </Typography>
+                  ))}
+                </Box>
               ) : null}
               <MonitoringStatusActions
                 row={row}

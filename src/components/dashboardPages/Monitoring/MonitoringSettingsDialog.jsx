@@ -16,10 +16,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import CloudDownloadOutlinedIcon from "@mui/icons-material/CloudDownloadOutlined";
-import dayjs from "dayjs";
 import { useSnackbar } from "notistack";
-import { useSelector } from "react-redux";
 import {
   getApiErrorMessage,
   getAutoReportSettings,
@@ -28,14 +25,11 @@ import {
 import {
   getMonitoringAutoDownloadStatus,
   getMonitoringFilterSettings,
-  postMonitoringDownloadYesterday,
   postMonitoringFilterSettings,
   toggleMonitoringAutoDownload,
 } from "../../../api/monitoring";
 import { DEFAULT_FILTER_SETTINGS, DEFAULT_REPORT_SETTINGS, isSendTimeAllowed } from "./monitoringAutoFilter";
 import { formatSecondsAsTime, parseTimeToSeconds } from "./monitoringUtils";
-
-const yesterdayLabel = () => dayjs().subtract(1, "day").format("DD.MM.YYYY");
 
 const EMPTY_FIELD_ERRORS = {
   percent: "",
@@ -89,12 +83,10 @@ const reportFieldsFrom = (data, fallback) => {
 
 const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const isSuperAdmin = useSelector((state) => state.user?.userInfo?.role) === "super_admin";
 
   const [autoEnabled, setAutoEnabled] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [toggleLoading, setToggleLoading] = useState(false);
-  const [downloadLoading, setDownloadLoading] = useState(false);
 
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -194,23 +186,6 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
     };
   }, [open, enqueueSnackbar, applyFilterFields, applyReportFields]);
 
-  const handleDownloadYesterday = async () => {
-    setDownloadLoading(true);
-    try {
-      const { data } = await postMonitoringDownloadYesterday();
-      enqueueSnackbar(data?.message || `Скачивание данных за ${yesterdayLabel()} запущено`, {
-        variant: "success",
-        autoHideDuration: 5000,
-      });
-    } catch (error) {
-      enqueueSnackbar(getApiErrorMessage(error, "Не удалось запустить скачивание"), {
-        variant: "error",
-      });
-    } finally {
-      setDownloadLoading(false);
-    }
-  };
-
   const handleToggleAuto = async () => {
     setToggleLoading(true);
     try {
@@ -307,6 +282,11 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ pb: 1, textAlign: "left" }}>Настройки мониторинга</DialogTitle>
       <DialogContent sx={{ pt: 1, textAlign: "left" }}>
+        <Alert severity="info" sx={{ textAlign: "left", mb: 2 }}>
+          Принимая решения на основе автоматически выдаваемых ответов, вы берёте ответственность за любые
+          последствия на себя. Чтобы минимизировать риски и обезопасить себя, рекомендуется создавать или
+          редактировать полевые обработки вручную.
+        </Alert>
         <Box
           sx={{
             display: "grid",
@@ -315,13 +295,6 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
             alignItems: "start",
           }}
         >
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Alert severity="info" sx={{ textAlign: "left" }}>
-              Принимая решения на основе автоматически выдаваемых ответов, вы берёте ответственность за любые
-              последствия на себя. Чтобы минимизировать риски и обезопасить себя, рекомендуется создавать или
-              редактировать полевые обработки вручную.
-            </Alert>
-
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
@@ -332,36 +305,6 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                 </Typography>
 
                 <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  Ручное скачивание
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  Запускает импорт за <b>{yesterdayLabel()}</b>. Ответ приходит сразу, загрузка идёт в фоне
-                  несколько минут — затем обновите таблицу кнопкой «Выполнить» или обновите страницу.
-                </Typography>
-                {isSuperAdmin ? (
-                  <Button
-                    variant="contained"
-                    onClick={handleDownloadYesterday}
-                    disabled={downloadLoading || toggleLoading || statusLoading}
-                    startIcon={
-                      downloadLoading ? (
-                        <CircularProgress size={18} color="inherit" />
-                      ) : (
-                        <CloudDownloadOutlinedIcon />
-                      )
-                    }
-                    sx={{
-                      textTransform: "none",
-                      backgroundColor: "#62A65D",
-                      boxShadow: "none",
-                      "&:hover": { backgroundColor: "#4f8f4b", boxShadow: "none" },
-                    }}
-                  >
-                    {downloadLoading ? "Запуск…" : `Скачать за ${yesterdayLabel()}`}
-                  </Button>
-                ) : null}
-
-                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
                   Автоскачивание
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
@@ -382,7 +325,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                       <Switch
                         checked={autoEnabled}
                         onChange={handleToggleAuto}
-                        disabled={toggleLoading || downloadLoading}
+                        disabled={toggleLoading || statusLoading}
                         color="success"
                         inputProps={{ "aria-label": "Автоскачивание" }}
                       />
@@ -405,58 +348,6 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                 </Alert>
               </CardContent>
             </Card>
-
-            <Card variant="outlined">
-              <CardContent>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                  Автоматизированные уведомления
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  Ежедневная отправка в MAX строк, которые разметил автофильтр
-                </Typography>
-                <FormControlLabel
-                  sx={{ ml: 0, alignItems: "flex-start", mb: 1 }}
-                  control={
-                    <Switch
-                      checked={reportSwitchChecked}
-                      onChange={(event) => {
-                        if (!filterEnabled) return;
-                        setReportEnabled(event.target.checked);
-                      }}
-                      disabled={reportToggleDisabled}
-                      color="success"
-                      inputProps={{ "aria-label": "Автоматизированные уведомления" }}
-                    />
-                  }
-                  label={
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {reportSwitchChecked ? "Включено" : "Выключено"}
-                    </Typography>
-                  }
-                />
-                <TextField
-                  size="small"
-                  fullWidth
-                  type="time"
-                  label="Время отправки"
-                  value={sendTime}
-                  onChange={(event) => {
-                    setSendTime(event.target.value);
-                    setFieldErrors((prev) => ({ ...prev, sendTime: "" }));
-                  }}
-                  disabled={settingsLoading || saving}
-                  error={Boolean(fieldErrors.sendTime)}
-                  helperText={fieldErrors.sendTime || " "}
-                  InputLabelProps={{ shrink: true }}
-                  inputProps={{ "aria-label": "Время отправки", step: 60 }}
-                  sx={{ mb: 1.5 }}
-                />
-                <Typography variant="body2" color="text.secondary">
-                  Чтобы отчёт уходил в MAX, подключите бота в Настройки → Уведомления
-                </Typography>
-              </CardContent>
-            </Card>
-          </Box>
 
           <Card variant="outlined">
             <CardContent>
@@ -576,6 +467,57 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                   ) : null}
                 </Box>
               </Box>
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined" sx={{ gridColumn: { md: "1 / -1" } }}>
+            <CardContent>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                Автоматизированные уведомления
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                Ежедневная отправка в MAX строк, которые разметил автофильтр
+              </Typography>
+              <FormControlLabel
+                sx={{ ml: 0, alignItems: "flex-start", mb: 1 }}
+                control={
+                  <Switch
+                    checked={reportSwitchChecked}
+                    onChange={(event) => {
+                      if (!filterEnabled) return;
+                      setReportEnabled(event.target.checked);
+                    }}
+                    disabled={reportToggleDisabled}
+                    color="success"
+                    inputProps={{ "aria-label": "Автоматизированные уведомления" }}
+                  />
+                }
+                label={
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {reportSwitchChecked ? "Включено" : "Выключено"}
+                  </Typography>
+                }
+              />
+              <TextField
+                size="small"
+                fullWidth
+                type="time"
+                label="Время отправки"
+                value={sendTime}
+                onChange={(event) => {
+                  setSendTime(event.target.value);
+                  setFieldErrors((prev) => ({ ...prev, sendTime: "" }));
+                }}
+                disabled={settingsLoading || saving}
+                error={Boolean(fieldErrors.sendTime)}
+                helperText={fieldErrors.sendTime || " "}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{ "aria-label": "Время отправки", step: 60 }}
+                sx={{ mb: 1.5, maxWidth: 280 }}
+              />
+              <Typography variant="body2" color="text.secondary">
+                Чтобы отчёт уходил в MAX, подключите бота в Настройки → Уведомления
+              </Typography>
             </CardContent>
           </Card>
         </Box>

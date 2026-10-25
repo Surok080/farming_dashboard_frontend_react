@@ -158,9 +158,14 @@ const MonitoringStatusActions = ({
   return (
     <Box sx={{ mt: 1 }}>
       {showPartialLabel ? (
-        <Typography variant="body2" sx={{ fontWeight: 600, color: MONITORING_STATUS_PARTIAL_COLOR, mb: 1 }}>
-          Подтвержден частично
-        </Typography>
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: MONITORING_STATUS_PARTIAL_COLOR }}>
+            Подтвержден частично
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 0.5 }}>
+            Перед переводом в подтверждённый статус сохраните изменения — нажмите кнопку Сохранить
+          </Typography>
+        </Box>
       ) : null}
       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
         <Button

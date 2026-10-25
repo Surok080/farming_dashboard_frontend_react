@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   ButtonBase,
@@ -16,11 +16,12 @@ import {
   MONITORING_PAGE_SIZE_OPTIONS,
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CANCELED_ROW_BG,
+  MONITORING_STATUS_OPTIONS,
   MONITORING_STATUS_PARTIAL_ROW_BG,
   MONITORING_STATUS_PARTIALLY_CONFIRMED,
 } from "./monitoringConstants";
 import { MONITORING_TABLE_COLUMNS } from "./monitoringColumns";
-import { COLUMN_SORT_BY, formatSourceChangedAt } from "./monitoringAutoFilter";
+import { formatSourceChangedAt } from "./monitoringAutoFilter";
 import MonitoringStatusCell from "./MonitoringStatusCell";
 import { formatNumberForDisplay, getPeriodRangeDisplayParts } from "./monitoringUtils";
 
@@ -67,21 +68,43 @@ const rowStatusBackground = (status) => {
   return undefined;
 };
 
-const sortIndicator = (sortValue, sortBy, sortOrder) => {
-  if (!sortValue || sortBy !== sortValue) return null;
-  if (sortOrder === "asc") return "▲";
-  if (sortOrder === "desc") return "▼";
-  return null;
+const asSortable = (value) => {
+  if (value == null || value === "") return null;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  const text = String(value).trim();
+  const numeric = Number(text.replace(",", "."));
+  if (text !== "" && Number.isFinite(numeric) && /^-?\d+([.,]\d+)?$/.test(text)) return numeric;
+  return text;
 };
 
-const columnHeaderContent = (column, sortBy, sortOrder, onColumnSort) => {
-  const sortValue = COLUMN_SORT_BY[column.key];
-  if (!sortValue) return column.label;
-  const indicator = sortIndicator(sortValue, sortBy, sortOrder);
+const compareSortValues = (left, right) => {
+  if (left == null && right == null) return 0;
+  if (left == null) return 1;
+  if (right == null) return -1;
+  if (typeof left === "number" && typeof right === "number") return left - right;
+  return String(left).localeCompare(String(right), "ru", { numeric: true, sensitivity: "base" });
+};
+
+const CLIENT_SORT_ACCESSOR = {
+  status: (row) => MONITORING_STATUS_OPTIONS.find((item) => item.value === row?.status)?.label ?? row?.status ?? "",
+  areaHa: (row) => asSortable(row?.area),
+  equipment: (row) => row?.equipment_name || null,
+  widthM: (row) => asSortable(row?.trailer_width),
+};
+
+const sortClientRows = (rows, key, order) => {
+  const accessor = CLIENT_SORT_ACCESSOR[key];
+  if (!accessor) return rows;
+  const direction = order === "desc" ? -1 : 1;
+  return [...rows].sort((left, right) => direction * compareSortValues(accessor(left), accessor(right)));
+};
+
+const columnHeaderContent = (column, sortColumnKey, sortOrder, onColumnSort) => {
+  const indicator = sortColumnKey === column.key ? (sortOrder === "asc" ? "▲" : sortOrder === "desc" ? "▼" : null) : null;
   return (
     <ButtonBase
       disableRipple
-      onClick={() => onColumnSort?.(sortValue)}
+      onClick={() => onColumnSort?.(column.key)}
       sx={{
         width: "100%",
         justifyContent: column.align === "right" ? "flex-end" : "flex-start",
@@ -118,12 +141,18 @@ const MonitoringTable = ({
   onRowClick,
   isRowSelected,
   onRowCheckedChange,
-  sortBy,
+  sortColumnKey,
   sortOrder,
+  clientSortKey,
   onColumnSort,
   groupTitle,
+  statusReference = null,
 }) => {
   const groupTitleText = visibleGroupTitle(groupTitle);
+  const visibleRows = useMemo(
+    () => (clientSortKey ? sortClientRows(rows, clientSortKey, sortOrder) : rows),
+    [rows, clientSortKey, sortOrder],
+  );
 
   return (
     <Box sx={{ mt: 1 }}>
@@ -165,20 +194,26 @@ const MonitoringTable = ({
                   }}
                   align={c.align || "left"}
                 >
-                  {columnHeaderContent(c, sortBy, sortOrder, onColumnSort)}
+                  {columnHeaderContent(c, sortColumnKey, sortOrder, onColumnSort)}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.length === 0 ? (
+            {statusReference ? (
+              <TableRow>
+                <TableCell colSpan={MONITORING_TABLE_COLUMNS.length} sx={{ p: 1.5, borderBottom: "none" }}>
+                  {statusReference}
+                </TableCell>
+              </TableRow>
+            ) : visibleRows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={MONITORING_TABLE_COLUMNS.length} sx={{ fontSize: 13, color: "#666" }}>
                   Нажмите «ВЫПОЛНИТЬ», чтобы загрузить данные.
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row) => {
+              visibleRows.map((row) => {
                 const sourceChangedLabel = formatSourceChangedAt(row.source_changed_at);
                 return (
                   <TableRow

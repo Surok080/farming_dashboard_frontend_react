@@ -17,7 +17,7 @@ import MonitoringHeader from "./MonitoringHeader";
 import MonitoringIntervalBar from "./MonitoringIntervalBar";
 import MonitoringToolbar from "./MonitoringToolbar";
 import MonitoringTable from "./MonitoringTable";
-import MonitoringFilterLegend from "./MonitoringFilterLegend";
+import MonitoringFilterLegend, { MonitoringStatusReference } from "./MonitoringFilterLegend";
 import MonitoringSettingsDialog from "./MonitoringSettingsDialog";
 import MonitoringRowDialog from "./MonitoringRowDialog";
 import MonitoringStatusConfirmDialog from "./MonitoringStatusConfirmDialog";
@@ -32,7 +32,7 @@ import {
   MONITORING_STATUS_READY_FOR_1C,
   MONITORING_STATUS_RAW,
 } from "./monitoringConstants";
-import { buildLegend, DEFAULT_FILTER_SETTINGS, monitoringStatusActions } from "./monitoringAutoFilter";
+import { buildLegend, COLUMN_SORT_BY, DEFAULT_FILTER_SETTINGS, monitoringStatusActions } from "./monitoringAutoFilter";
 import { getDefaultMonitoringInterval, parseDatetimeLocal, toApiDateTimeString } from "./monitoringUtils";
 import { monitoringRowIdsEqual } from "./monitoringIdUtils";
 import { useMonitoringRowSelection } from "./useMonitoringRowSelection";
@@ -92,6 +92,9 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [status, setStatus] = useState("all");
   const [sortBy, setSortBy] = useState("period_start");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [clientSortKey, setClientSortKey] = useState(null);
+  const [clientSortOrder, setClientSortOrder] = useState("asc");
+  const [searchExecuted, setSearchExecuted] = useState(false);
   const [equipmentGroupId, setEquipmentGroupId] = useState(null);
   const [equipmentGroups, setEquipmentGroups] = useState([]);
   const [filterSettings, setFilterSettings] = useState(DEFAULT_FILTER_SETTINGS);
@@ -207,6 +210,7 @@ const MonitoringPages = ({ year: yearProp }) => {
       return;
     }
     hasExecutedSearchRef.current = true;
+    setSearchExecuted(true);
     setPage(1);
     setAppliedIntervalFrom(intervalFrom);
     setAppliedIntervalTo(intervalTo);
@@ -503,7 +507,7 @@ const MonitoringPages = ({ year: yearProp }) => {
       if (monitoringSavedIdsDirty(row, savedIds)) {
         return {
           ok: false,
-          message: "Сохраните изменения (кнопка «Сохранить») перед переводом в подтверждённый статус",
+          message: "Перед переводом в подтверждённый статус сохраните изменения — нажмите кнопку Сохранить",
         };
       }
       const missingSaved = getMissingRequiredFields(savedIds);
@@ -714,15 +718,29 @@ const MonitoringPages = ({ year: yearProp }) => {
     setTabValue(newValue);
   };
 
-  const handleColumnSort = (nextSortBy) => {
-    if (!nextSortBy) return;
-    if (sortBy === nextSortBy) {
-      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  const handleColumnSort = (columnKey) => {
+    const serverField = COLUMN_SORT_BY[columnKey];
+    if (serverField) {
+      setClientSortKey(null);
+      if (!clientSortKey && sortBy === serverField) {
+        setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+        return;
+      }
+      setSortBy(serverField);
+      setSortOrder("asc");
       return;
     }
-    setSortBy(nextSortBy);
-    setSortOrder("asc");
+    if (clientSortKey === columnKey) {
+      setClientSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+      return;
+    }
+    setClientSortKey(columnKey);
+    setClientSortOrder("asc");
   };
+
+  const activeSortColumn = clientSortKey
+    ?? Object.entries(COLUMN_SORT_BY).find(([, field]) => field === sortBy)?.[0]
+    ?? "period";
 
   const handleEquipmentGroupChange = (nextId) => {
     if (nextId == null || nextId === "all") {
@@ -864,12 +882,16 @@ const MonitoringPages = ({ year: yearProp }) => {
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 onRowClick={handleRowClick}
-                sortBy={sortBy}
-                sortOrder={sortOrder}
+                sortColumnKey={activeSortColumn}
+                sortOrder={clientSortKey ? clientSortOrder : sortOrder}
+                clientSortKey={clientSortKey}
                 onColumnSort={handleColumnSort}
                 groupTitle={equipmentGroupId != null ? equipmentGroupName(equipmentGroups, equipmentGroupId) : ""}
+                statusReference={searchExecuted ? null : <MonitoringStatusReference />}
               />
-              <MonitoringFilterLegend items={buildLegend(selectedRowIds.length === 1 ? legendRow : null)} />
+              {searchExecuted && selectedRowIds.length === 1 ? (
+                <MonitoringFilterLegend items={buildLegend(legendRow)} />
+              ) : null}
             </Box>
           </TabPanel>
 

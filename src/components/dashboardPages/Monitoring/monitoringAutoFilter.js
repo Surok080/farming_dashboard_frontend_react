@@ -45,7 +45,7 @@ const CHECK_LABELS = {
 const GENERIC_LEGEND = [
   { id: 1, tone: "canceled", left: "Нет данных", right: "Не прошла пороги" },
   { id: 2, tone: "confirmed", left: "Все обязательные поля заполнены", right: "Прошла пороги, обязательные поля заполнены" },
-  { id: 3, tone: "plain", left: "Не заполнены следующие обязательные поля:", right: "Прошла пороги, но чего-то не хватает" },
+  { id: 3, tone: "partial", left: "Не заполнены следующие обязательные поля:", right: "Прошла пороги, но чего-то не хватает" },
   { id: 4, tone: "plain", left: "Проверьте, заполнены ли обязательные поля", right: "Нет данных для расчёта порогов, пустая строка" },
 ];
 
@@ -102,4 +102,9 @@ export const buildLegend = (row) => {
       .map(([key, check]) => formatCheck(key, check));
   }
   return items;
+};
+
+export const canceledExclusionLines = (row) => {
+  if (row?.status !== MONITORING_STATUS_CANCELED) return [];
+  return buildLegend(row).find((item) => item.id === 1)?.extra ?? [];
 };
