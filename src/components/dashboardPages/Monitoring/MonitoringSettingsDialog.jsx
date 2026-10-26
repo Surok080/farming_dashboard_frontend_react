@@ -94,6 +94,10 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
   const savingRef = useRef(false);
 
   const [filterEnabled, setFilterEnabled] = useState(DEFAULT_FILTER_SETTINGS.enabled);
+  const [filterSwitchLoading, setFilterSwitchLoading] = useState(false);
+  const [reportSwitchLoading, setReportSwitchLoading] = useState(false);
+  const persistedFilterRef = useRef(DEFAULT_FILTER_SETTINGS);
+  const persistedReportRef = useRef(DEFAULT_REPORT_SETTINGS);
   const [percentInput, setPercentInput] = useState(String(DEFAULT_FILTER_SETTINGS.min_agro_zone_percent));
   const [visitIntervalInput, setVisitIntervalInput] = useState(
     formatSecondsAsTime(DEFAULT_FILTER_SETTINGS.min_visit_interval_seconds),
@@ -105,16 +109,29 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
   const [fieldErrors, setFieldErrors] = useState(EMPTY_FIELD_ERRORS);
 
   const applyFilterFields = useCallback((fields) => {
-    setFilterEnabled(Boolean(fields.enabled));
-    setPercentInput(String(fields.min_agro_zone_percent));
-    setVisitIntervalInput(formatSecondsAsTime(fields.min_visit_interval_seconds));
-    setMinSpeedInput(String(fields.min_speed_kmh));
-    setMaxSpeedInput(String(fields.max_speed_kmh));
+    const next = {
+      enabled: Boolean(fields.enabled),
+      min_agro_zone_percent: fields.min_agro_zone_percent,
+      min_visit_interval_seconds: fields.min_visit_interval_seconds,
+      min_speed_kmh: fields.min_speed_kmh,
+      max_speed_kmh: fields.max_speed_kmh,
+    };
+    persistedFilterRef.current = next;
+    setFilterEnabled(next.enabled);
+    setPercentInput(String(next.min_agro_zone_percent));
+    setVisitIntervalInput(formatSecondsAsTime(next.min_visit_interval_seconds));
+    setMinSpeedInput(String(next.min_speed_kmh));
+    setMaxSpeedInput(String(next.max_speed_kmh));
   }, []);
 
   const applyReportFields = useCallback((fields) => {
-    setReportEnabled(Boolean(fields.enabled));
-    setSendTime(fields.send_time);
+    const next = {
+      enabled: Boolean(fields.enabled),
+      send_time: fields.send_time,
+    };
+    persistedReportRef.current = next;
+    setReportEnabled(next.enabled);
+    setSendTime(next.send_time);
   }, []);
 
   useEffect(() => {
@@ -186,6 +203,61 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
     };
   }, [open, enqueueSnackbar, applyFilterFields, applyReportFields]);
 
+  const handleFilterToggle = async (event) => {
+    const next = event.target.checked;
+    if (filterSwitchLoading || settingsLoading || savingRef.current) return;
+    setFilterSwitchLoading(true);
+    const payload = { ...persistedFilterRef.current, enabled: next };
+    try {
+      const res = await postMonitoringFilterSettings(payload);
+      const saved = filterFieldsFrom(res?.data, payload);
+      persistedFilterRef.current = saved;
+      setFilterEnabled(saved.enabled);
+      onFilterSaved?.(saved);
+      if (!saved.enabled) {
+        try {
+          const reportRes = await getAutoReportSettings();
+          const report = reportFieldsFrom(reportRes?.data, persistedReportRef.current);
+          persistedReportRef.current = report;
+          setReportEnabled(report.enabled);
+        } catch (reportError) {
+          if (reportError?.response?.status === 404) {
+            persistedReportRef.current = { ...persistedReportRef.current, enabled: false };
+            setReportEnabled(false);
+          }
+        }
+      }
+    } catch (error) {
+      enqueueSnackbar(getApiErrorMessage(error, "Не удалось изменить автофильтрование"), {
+        variant: "error",
+      });
+    } finally {
+      setFilterSwitchLoading(false);
+    }
+  };
+
+  const handleReportToggle = async (event) => {
+    const next = event.target.checked;
+    if (reportSwitchLoading || settingsLoading || savingRef.current) return;
+    setReportSwitchLoading(true);
+    const payload = {
+      enabled: next,
+      send_time: persistedReportRef.current.send_time,
+    };
+    try {
+      const res = await postAutoReportSettings(payload);
+      const saved = reportFieldsFrom(res?.data, payload);
+      persistedReportRef.current = saved;
+      setReportEnabled(saved.enabled);
+    } catch (error) {
+      enqueueSnackbar(getApiErrorMessage(error, "Не удалось изменить уведомления"), {
+        variant: "error",
+      });
+    } finally {
+      setReportSwitchLoading(false);
+    }
+  };
+
   const handleToggleAuto = async () => {
     setToggleLoading(true);
     try {
@@ -237,7 +309,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
       max_speed_kmh: maxSpeed,
     };
     const reportPayload = {
-      enabled: filterEnabled ? Boolean(reportEnabled) : false,
+      enabled: Boolean(reportEnabled),
       send_time: sendTime,
     };
 
@@ -275,8 +347,8 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
   };
 
   const filterFieldsDisabled = !filterEnabled || settingsLoading || saving;
-  const reportToggleDisabled = !filterEnabled || settingsLoading || saving;
-  const reportSwitchChecked = filterEnabled && reportEnabled;
+  const filterSwitchDisabled = settingsLoading || saving || filterSwitchLoading;
+  const reportSwitchDisabled = settingsLoading || saving || reportSwitchLoading;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -367,8 +439,8 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                 control={
                   <Switch
                     checked={filterEnabled}
-                    onChange={(event) => setFilterEnabled(event.target.checked)}
-                    disabled={settingsLoading || saving}
+                    onChange={handleFilterToggle}
+                    disabled={filterSwitchDisabled}
                     color="success"
                     inputProps={{ "aria-label": "Автофильтрование строк" }}
                   />
@@ -482,19 +554,16 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                 sx={{ ml: 0, alignItems: "flex-start", mb: 1 }}
                 control={
                   <Switch
-                    checked={reportSwitchChecked}
-                    onChange={(event) => {
-                      if (!filterEnabled) return;
-                      setReportEnabled(event.target.checked);
-                    }}
-                    disabled={reportToggleDisabled}
+                    checked={reportEnabled}
+                    onChange={handleReportToggle}
+                    disabled={reportSwitchDisabled}
                     color="success"
                     inputProps={{ "aria-label": "Автоматизированные уведомления" }}
                   />
                 }
                 label={
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {reportSwitchChecked ? "Включено" : "Выключено"}
+                      {reportEnabled ? "Включено" : "Выключено"}
                   </Typography>
                 }
               />

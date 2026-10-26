@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, LinearProgress, Tab, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Tab, Typography } from "@mui/material";
 import { TabContext, TabPanel } from "@mui/lab";
 import ZoomAwareTabList from "../../ZoomAwareTabList";
 import { useSnackbar } from "notistack";
@@ -99,6 +99,8 @@ const MonitoringPages = ({ year: yearProp }) => {
   const [equipmentGroups, setEquipmentGroups] = useState([]);
   const [filterSettings, setFilterSettings] = useState(DEFAULT_FILTER_SETTINGS);
   const [filterToggleLoading, setFilterToggleLoading] = useState(false);
+  const [filterConfirmOpen, setFilterConfirmOpen] = useState(false);
+  const [filterConfirmNext, setFilterConfirmNext] = useState(false);
 
   const [filterOpen, setFilterOpen] = useState(false);
   const [rows, setRows] = useState([]);
@@ -751,6 +753,18 @@ const MonitoringPages = ({ year: yearProp }) => {
     setEquipmentGroupId(match ? match.id : nextId);
   };
 
+  const requestFilterEnabledChange = (next) => {
+    if (filterToggleLoading) return;
+    setFilterConfirmNext(next);
+    setFilterConfirmOpen(true);
+  };
+
+  const confirmFilterEnabledChange = async () => {
+    const next = filterConfirmNext;
+    setFilterConfirmOpen(false);
+    await handleFilterEnabledChange(next);
+  };
+
   const handleFilterEnabledChange = async (next) => {
     if (filterToggleLoading) return;
     setFilterToggleLoading(true);
@@ -862,7 +876,7 @@ const MonitoringPages = ({ year: yearProp }) => {
                 onEquipmentGroupChange={handleEquipmentGroupChange}
                 filterEnabled={Boolean(filterSettings.enabled)}
                 filterToggleDisabled={filterToggleLoading || filterOpen}
-                onFilterEnabledChange={handleFilterEnabledChange}
+                onFilterEnabledChange={requestFilterEnabledChange}
                 onOpenFilterInfo={() => setFilterOpen(true)}
                 statusCounts={statusCounts}
                 total={total}
@@ -917,6 +931,27 @@ const MonitoringPages = ({ year: yearProp }) => {
         onClose={() => setFilterOpen(false)}
         onFilterSaved={handleFilterSaved}
       />
+      <Dialog open={filterConfirmOpen} onClose={() => setFilterConfirmOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Автофильтрование строк</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {filterConfirmNext ? "Включить автофильтрование строк?" : "Выключить автофильтрование строк?"}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setFilterConfirmOpen(false)} disabled={filterToggleLoading}>
+            Отмена
+          </Button>
+          <Button
+            onClick={confirmFilterEnabledChange}
+            variant="contained"
+            disabled={filterToggleLoading}
+            sx={{ backgroundColor: "#62A65D", boxShadow: "none", "&:hover": { backgroundColor: "#4f8f4b", boxShadow: "none" } }}
+          >
+            Подтвердить
+          </Button>
+        </DialogActions>
+      </Dialog>
       <MonitoringRowDialog
         open={dialogOpen}
         onClose={() => {

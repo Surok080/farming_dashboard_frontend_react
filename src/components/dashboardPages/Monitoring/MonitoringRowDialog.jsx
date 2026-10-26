@@ -133,7 +133,7 @@ const MonitoringRowDialog = ({
               ) : null}
               {row?.status === MONITORING_STATUS_CANCELED ? (
                 <Box sx={{ mt: 1 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: "#d32f2f" }}>
                     Причина исключения из Автоуведомлений
                   </Typography>
                   {canceledExclusionLines(row).map((line) => (
