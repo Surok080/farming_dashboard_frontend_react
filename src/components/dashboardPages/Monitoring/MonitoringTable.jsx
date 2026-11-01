@@ -285,7 +285,7 @@ const MonitoringTable = ({
           rowsPerPage={pageSize}
           onRowsPerPageChange={(e) => onRowsPerPageChange(Number(e.target.value, 10))}
           rowsPerPageOptions={MONITORING_PAGE_SIZE_OPTIONS}
-          labelRowsPerPage="Строк на странице:"
+          labelRowsPerPage="Операций на странице:"
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} из ${count !== -1 ? count : `более чем ${to}`}`}
         />
       ) : null}

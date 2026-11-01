@@ -27,11 +27,11 @@ const MonitoringToolbar = ({
     <Box sx={{ mt: 1 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
       <FormControl size="small" sx={{ minWidth: 220 }}>
-        <InputLabel id="monitoring-status-label">Выберите статус</InputLabel>
+        <InputLabel id="monitoring-status-label">Фильтр</InputLabel>
         <Select
           labelId="monitoring-status-label"
           value={status}
-          label="Выберите статус"
+          label="Фильтр"
           onChange={(e) => onStatusChange(e.target.value)}
         >
           {MONITORING_STATUS_OPTIONS.map((o) => (
@@ -70,10 +70,18 @@ const MonitoringToolbar = ({
             onChange={(e) => onFilterEnabledChange(e.target.checked)}
           />
         }
-        label="Автофильтрование строк"
+        label="Автофильтрование операций"
       />
       <Tooltip
-        title="Автофильтрация строк — фильтрация данных с помощью автофильтра для сортировки и отбора данных по заданным алгоритмам. Для настройки параметров автофильтра перейдите в Настройки → Автоматизированные уведомления в чаты"
+        title={
+          <>
+            Автофильтр ежедневно проверяет загруженные операции по порогам и проставляет статус.
+            <br/>
+            В отчёт попадают только прошедшие проверку.
+            <br/>
+            Решение можно изменить вручную в карточке операции, а пороги в «Настройках».
+          </>
+        }
       >
         <IconButton
           size="small"
@@ -122,7 +130,7 @@ const MonitoringToolbar = ({
         >
           Очистить выбор
         </Button>
-        <Box sx={{ fontWeight: 700 }}>Количество обработок: {Number(total ?? 0)}</Box>
+        <Box sx={{ fontWeight: 700 }}>Всего операций: {Number(total ?? 0)}</Box>
         {statusMetrics.map((metric) => (
           <Box
             key={metric.value}

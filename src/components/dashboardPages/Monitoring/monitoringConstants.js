@@ -20,13 +20,13 @@ export const MONITORING_NON_EDITABLE_SENT_STATUSES = [
 
 /** Подписи для UI (подтверждение смены статуса и т.п.) */
 export const MONITORING_STATUS_LABEL = {
-  [MONITORING_STATUS_RAW]: "Сырой",
-  [MONITORING_STATUS_CONFIRMED]: "Подтверждённый",
-  [MONITORING_STATUS_PARTIALLY_CONFIRMED]: "Подтвержден частично",
-  [MONITORING_STATUS_CANCELED]: "Отклонённый",
-  [MONITORING_STATUS_READY_FOR_1C]: "Опубликованно в 1с",
-  SENT: "Опубликованно в 1с",
-  SENT_TO_1C: "Опубликованно в 1с",
+  [MONITORING_STATUS_RAW]: "Сырая операция",
+  [MONITORING_STATUS_CONFIRMED]: "Подтверждена",
+  [MONITORING_STATUS_PARTIALLY_CONFIRMED]: "Подтверждена частично",
+  [MONITORING_STATUS_CANCELED]: "Отклонена",
+  [MONITORING_STATUS_READY_FOR_1C]: "Готова к отправке в 1С",
+  SENT: "Отправлена в 1С",
+  SENT_TO_1C: "Отправлена в 1С",
 };
 
 /** Максимум строк на странице в запросе /monitoring */
@@ -39,9 +39,9 @@ export const MONITORING_PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 export const MONITORING_STATUS_OPTIONS = [
   { value: "all", label: "Все" },
-  { value: "RAW", label: "Сырая строка" },
-  { value: "CONFIRMED", label: "Подтверждённая" },
-  { value: "PARTIALLY_CONFIRMED", label: "Подтвержден частично" },
-  { value: "CANCELED", label: "Отменённая" },
-  { value: "READY_FOR_1C", label: "Готово к отправке в 1С" },
+  { value: "RAW", label: "Сырая операция" },
+  { value: "CONFIRMED", label: "Подтверждена" },
+  { value: "PARTIALLY_CONFIRMED", label: "Подтверждена частично" },
+  { value: "CANCELED", label: "Отклонена" },
+  { value: "READY_FOR_1C", label: "Готова к отправке в 1С" },
 ];

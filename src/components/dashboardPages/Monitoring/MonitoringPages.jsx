@@ -249,7 +249,7 @@ const MonitoringPages = ({ year: yearProp }) => {
       setDialogSavedFieldIds(pickMonitoringDialogSavedIds(data?.row));
     } catch (err) {
       console.error(err);
-      enqueueSnackbar("Не удалось загрузить детали обработки", { variant: "error", autoHideDuration: 4000 });
+      enqueueSnackbar("Не удалось загрузить детали операции", { variant: "error", autoHideDuration: 4000 });
       setDialogData(null);
       setDialogSavedFieldIds(null);
     } finally {
@@ -365,7 +365,7 @@ const MonitoringPages = ({ year: yearProp }) => {
         const currentIds = selectedRowIdsRef.current;
         if (currentIds.length !== 1 || !monitoringRowIdsEqual(currentIds[0], rowId)) return;
         setLegendRow(null);
-        enqueueSnackbar(getErrorMessage(err, "Не удалось загрузить строку"), {
+        enqueueSnackbar(getErrorMessage(err, "Не удалось загрузить операцию"), {
           variant: "error",
           autoHideDuration: 4000,
         });
@@ -424,7 +424,7 @@ const MonitoringPages = ({ year: yearProp }) => {
     const id = row?.id;
     if (!id) return;
     if (isSentOrReadyStatus(row)) {
-      enqueueSnackbar("Статус «Отправленные» нельзя изменить", {
+      enqueueSnackbar("Статус операции, готовой к отправке или отправленной в 1С, нельзя изменить", {
         variant: "warning",
         autoHideDuration: 3000,
       });
@@ -480,24 +480,24 @@ const MonitoringPages = ({ year: yearProp }) => {
       }
       return {
         ok: false,
-        message: "Вернуть в сырой статус можно только из подтверждённой, частично подтверждённой или отменённой строки",
+        message: "Вернуть в статус «Сырая операция» можно только из подтверждённой, частично подтверждённой или отклонённой операции",
       };
     });
 
   const handleDialogReject = () =>
     openStatusConfirmIfValid("reject", MONITORING_STATUS_CANCELED, "Статус изменён", (row) => {
       if ([MONITORING_STATUS_RAW, MONITORING_STATUS_PARTIALLY_CONFIRMED].includes(row?.status)) return { ok: true };
-      return { ok: false, message: "Отклонение доступно только для сырой или частично подтверждённой строки" };
+      return { ok: false, message: "Отклонение доступно только для сырой или частично подтверждённой операции" };
     });
 
   const handleDialogConfirm = () =>
     openStatusConfirmIfValid("confirm", MONITORING_STATUS_CONFIRMED, "Статус изменён", (row) => {
       if (![MONITORING_STATUS_RAW, MONITORING_STATUS_PARTIALLY_CONFIRMED].includes(row?.status)) {
-        return { ok: false, message: "Подтверждение доступно только для сырой или частично подтверждённой строки" };
+        return { ok: false, message: "Подтверждение доступно только для сырой или частично подтверждённой операции" };
       }
       const savedIds = dialogSavedFieldIds;
       if (!savedIds) {
-        return { ok: false, message: "Данные строки ещё загружаются" };
+        return { ok: false, message: "Данные операции ещё загружаются" };
       }
       const missingInForm = getMissingRequiredFields(row);
       if (missingInForm.length) {
@@ -509,7 +509,7 @@ const MonitoringPages = ({ year: yearProp }) => {
       if (monitoringSavedIdsDirty(row, savedIds)) {
         return {
           ok: false,
-          message: "Перед переводом в подтверждённый статус сохраните изменения — нажмите кнопку Сохранить",
+          message: "Перед переводом в статус «Подтверждена» сохраните изменения — нажмите кнопку Сохранить",
         };
       }
       const missingSaved = getMissingRequiredFields(savedIds);
@@ -526,7 +526,7 @@ const MonitoringPages = ({ year: yearProp }) => {
     const row = dialogData?.row;
     if (!row?.id) return;
     if (isSentOrReadyStatus(row)) {
-      enqueueSnackbar("Статус «Отправленные» нельзя редактировать", {
+      enqueueSnackbar("Операцию, готовую к отправке или отправленную в 1С, нельзя редактировать", {
         variant: "warning",
         autoHideDuration: 3000,
       });
@@ -561,7 +561,7 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const executeMerge = async () => {
     if (!canMerge) {
-      enqueueSnackbar("Для объединения выберите более 1 подтвержденной строки", {
+      enqueueSnackbar("Для объединения выберите более 1 подтверждённой операции", {
         variant: "warning",
         autoHideDuration: 2500,
       });
@@ -571,7 +571,7 @@ const MonitoringPages = ({ year: yearProp }) => {
     try {
       const rowIds = selectedRowIds.map((id) => Number(id)).filter((n) => Number.isFinite(n));
       await postMonitoringMerge(rowIds);
-      enqueueSnackbar("Строки успешно объединены", { variant: "success", autoHideDuration: 2500 });
+      enqueueSnackbar("Операции успешно объединены", { variant: "success", autoHideDuration: 2500 });
       setSelectedRowIds([]);
       await fetchMonitoringData({ targetPage: page, targetPageSize: pageSize });
     } catch (err) {
@@ -588,7 +588,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const onMerge = () => {
     if (mergeLoading || sendMaxLoading) return;
     if (!canMerge) {
-      enqueueSnackbar("Для объединения выберите более 1 подтвержденной строки", {
+      enqueueSnackbar("Для объединения выберите более 1 подтверждённой операции", {
         variant: "warning",
         autoHideDuration: 2500,
       });
@@ -609,7 +609,7 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const executePublish1C = async () => {
     if (!canPublish1C) {
-      enqueueSnackbar("Для публикации выберите минимум 1 подтвержденную строку", {
+      enqueueSnackbar("Для отправки в 1С выберите минимум 1 подтверждённую операцию", {
         variant: "warning",
         autoHideDuration: 2500,
       });
@@ -617,7 +617,7 @@ const MonitoringPages = ({ year: yearProp }) => {
     }
     const rowIds = selectedRowIds.map((id) => Number(id)).filter((n) => Number.isFinite(n));
     if (!rowIds.length) {
-      enqueueSnackbar("Не выбраны строки для публикации", {
+      enqueueSnackbar("Не выбраны операции для отправки в 1С", {
         variant: "warning",
         autoHideDuration: 2500,
       });
@@ -635,15 +635,15 @@ const MonitoringPages = ({ year: yearProp }) => {
       if (successCount > 0) {
         enqueueSnackbar(
           successCount === rowIds.length
-            ? "Строки успешно опубликованы в 1с"
-            : `Опубликовано в 1с: ${successCount} из ${rowIds.length}`,
+            ? "Операции готовы к отправке в 1С"
+            : `Готово к отправке в 1С: ${successCount} из ${rowIds.length}`,
           { variant: "success", autoHideDuration: 3000 }
         );
       }
 
       if (failed.length > 0) {
         const firstError = failed[0]?.reason;
-        enqueueSnackbar(getErrorMessage(firstError, "Не удалось опубликовать часть строк в 1с"), {
+        enqueueSnackbar(getErrorMessage(firstError, "Не удалось отправить часть операций в 1С"), {
           variant: "error",
           autoHideDuration: 4500,
         });
@@ -653,7 +653,7 @@ const MonitoringPages = ({ year: yearProp }) => {
       await fetchMonitoringData({ targetPage: page, targetPageSize: pageSize });
     } catch (err) {
       console.error(err);
-      enqueueSnackbar(getErrorMessage(err, "Не удалось выполнить публикацию в 1с"), {
+      enqueueSnackbar(getErrorMessage(err, "Не удалось отправить операции в 1С"), {
         variant: "error",
         autoHideDuration: 4000,
       });
@@ -669,7 +669,7 @@ const MonitoringPages = ({ year: yearProp }) => {
 
   const executeSendMax = async () => {
     if (!canSendMax) {
-      enqueueSnackbar("Для отправки в MAX выберите подтверждённые, частично подтверждённые или опубликованные в 1С строки", {
+      enqueueSnackbar("Для отправки в MAX выберите подтверждённые, частично подтверждённые или готовые к отправке в 1С операции", {
         variant: "warning",
         autoHideDuration: 3000,
       });
@@ -678,7 +678,7 @@ const MonitoringPages = ({ year: yearProp }) => {
 
     const rowIds = selectedRowIds.map((id) => Number(id)).filter((n) => Number.isFinite(n));
     if (!rowIds.length) {
-      enqueueSnackbar("Не выбраны строки для отправки", {
+      enqueueSnackbar("Не выбраны операции для отправки", {
         variant: "warning",
         autoHideDuration: 2500,
       });
@@ -688,14 +688,14 @@ const MonitoringPages = ({ year: yearProp }) => {
     setSendMaxLoading(true);
     try {
       await postMonitoringSendToChat(rowIds, ["MAX"]);
-      enqueueSnackbar("Строки отправлены в MAX", {
+      enqueueSnackbar("Операции отправлены в MAX", {
         variant: "success",
         autoHideDuration: 3000,
       });
       setSelectedRowIds([]);
     } catch (err) {
       console.error(err);
-      enqueueSnackbar(getErrorMessage(err, "Не удалось отправить строки в MAX"), {
+      enqueueSnackbar(getErrorMessage(err, "Не удалось отправить операции в MAX"), {
         variant: "error",
         autoHideDuration: 4500,
       });
@@ -707,7 +707,7 @@ const MonitoringPages = ({ year: yearProp }) => {
   const onSendMax = () => {
     if (mergeLoading || sendMaxLoading) return;
     if (!canSendMax) {
-      enqueueSnackbar("Для отправки в MAX выберите подтверждённые, частично подтверждённые или опубликованные в 1С строки", {
+      enqueueSnackbar("Для отправки в MAX выберите подтверждённые, частично подтверждённые или готовые к отправке в 1С операции", {
         variant: "warning",
         autoHideDuration: 3000,
       });
@@ -932,10 +932,10 @@ const MonitoringPages = ({ year: yearProp }) => {
         onFilterSaved={handleFilterSaved}
       />
       <Dialog open={filterConfirmOpen} onClose={() => setFilterConfirmOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Автофильтрование строк</DialogTitle>
+        <DialogTitle>Автофильтрование операций</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary">
-            {filterConfirmNext ? "Включить автофильтрование строк?" : "Выключить автофильтрование строк?"}
+            {filterConfirmNext ? "Включить автофильтрование операций?" : "Выключить автофильтрование операций?"}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -1015,7 +1015,7 @@ const MonitoringPages = ({ year: yearProp }) => {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          Отправить выбранные строки ({selectedRowIds.length}) в подключённую группу MAX?
+          Отправить выбранные операции ({selectedRowIds.length}) в подключённую группу MAX?
         </Typography>
       </MonitoringStatusConfirmDialog>
       <MonitoringStatusConfirmDialog
@@ -1031,7 +1031,7 @@ const MonitoringPages = ({ year: yearProp }) => {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          Объединить выбранные подтверждённые строки ({selectedRowIds.length}) в одну запись?
+          Объединить выбранные подтверждённые операции ({selectedRowIds.length}) в одну запись?
         </Typography>
       </MonitoringStatusConfirmDialog>
     </Box>

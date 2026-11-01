@@ -264,7 +264,7 @@ const MonitoringRowDialogContent = ({
                     </Box>
                 </Box>
             ) : (
-                <Typography color="text.secondary">Нет данных по выбранной строке.</Typography>
+                <Typography color="text.secondary">Нет данных по выбранной операции.</Typography>
             )}
         </DialogContent>
     );

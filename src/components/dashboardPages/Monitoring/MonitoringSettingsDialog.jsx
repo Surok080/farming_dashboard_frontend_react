@@ -355,9 +355,8 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
       <DialogTitle sx={{ pb: 1, textAlign: "left" }}>Настройки мониторинга</DialogTitle>
       <DialogContent sx={{ pt: 1, textAlign: "left" }}>
         <Alert severity="info" sx={{ textAlign: "left", mb: 2 }}>
-          Принимая решения на основе автоматически выдаваемых ответов, вы берёте ответственность за любые
-          последствия на себя. Чтобы минимизировать риски и обезопасить себя, рекомендуется создавать или
-          редактировать полевые обработки вручную.
+          Автофильтр помогает в работе, но итоговое решение всегда остаётся за вами. Перед использованием
+          результатов рекомендуем проверять операции и при необходимости редактировать их вручную.
         </Alert>
         <Box
           sx={{
@@ -380,7 +379,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                   Автоскачивание
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  Каждое утро (04:00–06:59 по Москве) автоматически скачиваются данные за предыдущий день.
+                  Каждое утро автоматически скачиваются данные за предыдущий день.
                 </Typography>
 
                 {statusLoading ? (
@@ -403,14 +402,9 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                       />
                     }
                     label={
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {autoEnabled ? "Включено" : "Выключено"}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Переключатель создаёт задачу при первом включении
-                        </Typography>
-                      </Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {autoEnabled ? "Включено" : "Выключено"}
+                      </Typography>
                     }
                   />
                 )}
@@ -424,7 +418,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                Автофильтрование строк
+                Автофильтр операций
               </Typography>
               {settingsLoading ? (
                 <Box display="flex" alignItems="center" gap={1} sx={{ mb: 1.5 }}>
@@ -442,7 +436,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                     onChange={handleFilterToggle}
                     disabled={filterSwitchDisabled}
                     color="success"
-                    inputProps={{ "aria-label": "Автофильтрование строк" }}
+                    inputProps={{ "aria-label": "Автофильтр операций" }}
                   />
                 }
                 label={
@@ -473,7 +467,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                 <TextField
                   size="small"
                   fullWidth
-                  label="Минимальное время между посещениями геозон"
+                  label="Минимальная длительность посещения"
                   value={visitIntervalInput}
                   onChange={(event) => {
                     setVisitIntervalInput(event.target.value);
@@ -486,7 +480,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                   placeholder="00:00:10"
                   inputProps={{
                     pattern: "[0-9]{2}:[0-9]{2}:[0-9]{2}",
-                    "aria-label": "Минимальное время между посещениями геозон",
+                    "aria-label": "Минимальная длительность посещения",
                   }}
                 />
 
@@ -548,7 +542,7 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                 Автоматизированные уведомления
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                Ежедневная отправка в MAX строк, которые разметил автофильтр
+                Ежедневный отчёт по операциям, прошедшим проверку автофильтра
               </Typography>
               <FormControlLabel
                 sx={{ ml: 0, alignItems: "flex-start", mb: 1 }}
@@ -579,13 +573,13 @@ const MonitoringSettingsDialog = ({ open, onClose, onFilterSaved }) => {
                 }}
                 disabled={settingsLoading || saving}
                 error={Boolean(fieldErrors.sendTime)}
-                helperText={fieldErrors.sendTime || " "}
+                helperText={fieldErrors.sendTime || "Можно указать время с 05:00 до 22:00"}
                 InputLabelProps={{ shrink: true }}
                 inputProps={{ "aria-label": "Время отправки", step: 60 }}
                 sx={{ mb: 1.5, maxWidth: 280 }}
               />
               <Typography variant="body2" color="text.secondary">
-                Чтобы отчёт уходил в MAX, подключите бота в Настройки → Уведомления
+                Чтобы отчёт уходил в MAX, подключите чат в Общие настройки → Уведомления
               </Typography>
             </CardContent>
           </Card>

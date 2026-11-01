@@ -72,7 +72,7 @@ const MonitoringHeader = ({
         }}
         startIcon={<PublishedWithChangesOutlinedIcon />}
       >
-        ОПУБЛИКОВАТЬ 1С
+        ОТПРАВИТЬ В 1С
       </Button>
       <Button
         onClick={onSendMax}

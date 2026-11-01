@@ -51,13 +51,13 @@ const enabledInteractiveAccentSx = (accent, hoverBg) => ({
 });
 
 const statusLabelMap = {
-  RAW: "Сырой статус",
-  CANCELED: "Отклоненный статус",
-  PARTIALLY_CONFIRMED: "Подтвержден частично",
-  CONFIRMED: "Подтвержденный статус",
-  READY_FOR_1C: "Опубликованно в 1с",
-  SENT: "Опубликованно в 1с",
-  SENT_TO_1C: "Опубликованно в 1с",
+  RAW: "Сырая операция",
+  CANCELED: "Отклонена",
+  PARTIALLY_CONFIRMED: "Подтверждена частично",
+  CONFIRMED: "Подтверждена",
+  READY_FOR_1C: "Готова к отправке в 1С",
+  SENT: "Отправлена в 1С",
+  SENT_TO_1C: "Отправлена в 1С",
 };
 
 const isPublishedLikeStatus = (status) => MONITORING_NON_EDITABLE_SENT_STATUSES.includes(status);
@@ -138,7 +138,7 @@ const MonitoringStatusActions = ({
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 600 }} p={"3px"} color={"#1565c0"}>
-          {statusLabelMap[row?.status] ?? "Отправлено в 1С"}
+          {statusLabelMap[row?.status] ?? "Отправлена в 1С"}
         </Typography>
       </Box>
     );
@@ -160,10 +160,10 @@ const MonitoringStatusActions = ({
       {showPartialLabel ? (
         <Box sx={{ mb: 1 }}>
           <Typography variant="body2" sx={{ fontWeight: 600, color: MONITORING_STATUS_PARTIAL_COLOR }}>
-            Подтвержден частично
+            Подтверждена частично
           </Typography>
           <Typography variant="body2" sx={{ mt: 0.5 }}>
-            Перед переводом в подтверждённый статус сохраните изменения — нажмите кнопку Сохранить
+            Перед переводом в статус «Подтверждена» сохраните изменения — нажмите кнопку Сохранить
           </Typography>
         </Box>
       ) : null}
@@ -175,7 +175,7 @@ const MonitoringStatusActions = ({
           startIcon={actionLoading && activeAction === "return" ? <CircularProgress size={16} /> : <HelpOutlineOutlinedIcon />}
           sx={mergeStatusButtonSx(MONITORING_STATUS_RAW_COLOR, "rgba(255, 152, 0, 0.12)", activeRaw, disabledReturn)}
         >
-          Сырой статус
+          Сырая операция
         </Button>
         <Button
           variant="outlined"
@@ -184,7 +184,7 @@ const MonitoringStatusActions = ({
           startIcon={actionLoading && activeAction === "reject" ? <CircularProgress size={16} /> : <CancelOutlinedIcon />}
           sx={mergeStatusButtonSx("#d32f2f", "rgba(211, 47, 47, 0.08)", activeReject, disabledReject)}
         >
-          Отклоненный
+          Отклонена
         </Button>
         <Button
           variant="outlined"
@@ -193,7 +193,7 @@ const MonitoringStatusActions = ({
           startIcon={actionLoading && activeAction === "confirm" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
           sx={mergeStatusButtonSx("#62A65D", "rgba(98, 166, 93, 0.12)", activeConfirm, disabledConfirm)}
         >
-          Подтвержденный
+          Подтверждена
         </Button>
         <Button
           variant="outlined"
@@ -202,7 +202,7 @@ const MonitoringStatusActions = ({
           startIcon={actionLoading && activeAction === "publish_1c" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
           sx={mergeStatusButtonSx("#1565c0", "rgba(21, 101, 192, 0.08)", activePublish, disabledPublish)}
         >
-          Опубликовать в 1с
+          Отправить в 1С
         </Button>
       </Box>
     </Box>

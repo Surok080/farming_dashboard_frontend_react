@@ -121,10 +121,10 @@ const MonitoringRowDialog = ({
             ) : null}
             <Box sx={{ minWidth: 0 }}>
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Регистрация обработки, Сезон {year ?? new Date().getFullYear()}
+                Регистрация операции, Сезон {year ?? new Date().getFullYear()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Редактирование, отклонения и подтверждения потенциальной обработки
+                Редактирование, отклонения и подтверждения потенциальной операции
               </Typography>
               {sourceChangedLabel ? (
                 <Typography variant="body2" sx={{ mt: 0.5, color: "#666" }}>
