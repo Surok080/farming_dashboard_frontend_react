@@ -68,4 +68,12 @@ export function toggleMonitoringAutoDownload() {
   return httpService.post("/monitoring/download/auto");
 }
 
+export function getMonitoringFilterSettings() {
+  return httpService.get("/monitoring/filter-settings");
+}
+
+export function postMonitoringFilterSettings(payload) {
+  return httpService.post("/monitoring/filter-settings", payload);
+}
+
 export { getApiErrorMessage };

@@ -7,6 +7,7 @@ import {
   MONITORING_NON_EDITABLE_SENT_STATUSES,
   MONITORING_STATUS_CANCELED,
   MONITORING_STATUS_CONFIRMED,
+  MONITORING_STATUS_PARTIAL_COLOR,
   MONITORING_STATUS_RAW,
   MONITORING_STATUS_RAW_COLOR,
 } from "./monitoringConstants";
@@ -50,12 +51,13 @@ const enabledInteractiveAccentSx = (accent, hoverBg) => ({
 });
 
 const statusLabelMap = {
-  RAW: "Сырой статус",
-  CANCELED: "Отклоненный статус",
-  CONFIRMED: "Подтвержденный статус",
-  READY_FOR_1C: "Опубликованно в 1с",
-  SENT: "Опубликованно в 1с",
-  SENT_TO_1C: "Опубликованно в 1с",
+  RAW: "Сырая операция",
+  CANCELED: "Отклонена",
+  PARTIALLY_CONFIRMED: "Подтверждена частично",
+  CONFIRMED: "Подтверждена",
+  READY_FOR_1C: "Готова к отправке в 1С",
+  SENT: "Отправлена в 1С",
+  SENT_TO_1C: "Отправлена в 1С",
 };
 
 const isPublishedLikeStatus = (status) => MONITORING_NON_EDITABLE_SENT_STATUSES.includes(status);
@@ -114,6 +116,7 @@ const MonitoringStatusActions = ({
   canReject,
   canConfirm,
   canPublish1C,
+  showPartialLabel = false,
   onReturn,
   onReject,
   onConfirm,
@@ -135,7 +138,7 @@ const MonitoringStatusActions = ({
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 600 }} p={"3px"} color={"#1565c0"}>
-          {statusLabelMap[row?.status] ?? "Отправлено в 1С"}
+          {statusLabelMap[row?.status] ?? "Отправлена в 1С"}
         </Typography>
       </Box>
     );
@@ -153,43 +156,55 @@ const MonitoringStatusActions = ({
   const disabledPublish = actionLoading || !canPublish1C;
 
   return (
-    <Box sx={{ mt: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
-      <Button
-        variant="outlined"
-        disabled={disabledReturn}
-        onClick={onReturn}
-        startIcon={actionLoading && activeAction === "return" ? <CircularProgress size={16} /> : <HelpOutlineOutlinedIcon />}
-        sx={mergeStatusButtonSx(MONITORING_STATUS_RAW_COLOR, "rgba(255, 152, 0, 0.12)", activeRaw, disabledReturn)}
-      >
-        Сырой статус
-      </Button>
-      <Button
-        variant="outlined"
-        disabled={disabledReject}
-        onClick={onReject}
-        startIcon={actionLoading && activeAction === "reject" ? <CircularProgress size={16} /> : <CancelOutlinedIcon />}
-        sx={mergeStatusButtonSx("#d32f2f", "rgba(211, 47, 47, 0.08)", activeReject, disabledReject)}
-      >
-        Отклоненный
-      </Button>
-      <Button
-        variant="outlined"
-        disabled={disabledConfirm}
-        onClick={onConfirm}
-        startIcon={actionLoading && activeAction === "confirm" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
-        sx={mergeStatusButtonSx("#62A65D", "rgba(98, 166, 93, 0.12)", activeConfirm, disabledConfirm)}
-      >
-        Подтвержденный
-      </Button>
-      <Button
-        variant="outlined"
-        disabled={disabledPublish}
-        onClick={onPublish1C}
-        startIcon={actionLoading && activeAction === "publish_1c" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
-        sx={mergeStatusButtonSx("#1565c0", "rgba(21, 101, 192, 0.08)", activePublish, disabledPublish)}
-      >
-        Опубликовать в 1с
-      </Button>
+    <Box sx={{ mt: 1 }}>
+      {showPartialLabel ? (
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: MONITORING_STATUS_PARTIAL_COLOR }}>
+            Подтверждена частично
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 0.5 }}>
+            Перед переводом в статус «Подтверждена» сохраните изменения — нажмите кнопку Сохранить
+          </Typography>
+        </Box>
+      ) : null}
+      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+        <Button
+          variant="outlined"
+          disabled={disabledReturn}
+          onClick={onReturn}
+          startIcon={actionLoading && activeAction === "return" ? <CircularProgress size={16} /> : <HelpOutlineOutlinedIcon />}
+          sx={mergeStatusButtonSx(MONITORING_STATUS_RAW_COLOR, "rgba(255, 152, 0, 0.12)", activeRaw, disabledReturn)}
+        >
+          Сырая операция
+        </Button>
+        <Button
+          variant="outlined"
+          disabled={disabledReject}
+          onClick={onReject}
+          startIcon={actionLoading && activeAction === "reject" ? <CircularProgress size={16} /> : <CancelOutlinedIcon />}
+          sx={mergeStatusButtonSx("#d32f2f", "rgba(211, 47, 47, 0.08)", activeReject, disabledReject)}
+        >
+          Отклонена
+        </Button>
+        <Button
+          variant="outlined"
+          disabled={disabledConfirm}
+          onClick={onConfirm}
+          startIcon={actionLoading && activeAction === "confirm" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
+          sx={mergeStatusButtonSx("#62A65D", "rgba(98, 166, 93, 0.12)", activeConfirm, disabledConfirm)}
+        >
+          Подтверждена
+        </Button>
+        <Button
+          variant="outlined"
+          disabled={disabledPublish}
+          onClick={onPublish1C}
+          startIcon={actionLoading && activeAction === "publish_1c" ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
+          sx={mergeStatusButtonSx("#1565c0", "rgba(21, 101, 192, 0.08)", activePublish, disabledPublish)}
+        >
+          Отправить в 1С
+        </Button>
+      </Box>
     </Box>
   );
 };

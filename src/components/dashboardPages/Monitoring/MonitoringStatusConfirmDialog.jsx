@@ -26,7 +26,7 @@ const MonitoringStatusConfirmDialog = ({
             </Typography>
             {isPublishTo1C ? (
               <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }} color="error">
-                После публикации в 1с вернуть статус обратно будет нельзя.
+                После перевода в этот статус вернуть его обратно будет нельзя.
               </Typography>
             ) : null}
           </>

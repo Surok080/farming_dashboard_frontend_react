@@ -31,6 +31,7 @@ export function getAutoReportSettings() {
 
 /**
  * POST /notifications/auto-report/settings
+ * Тело только `{ enabled, send_time }`. Пороги не передавать.
  */
 export function postAutoReportSettings(payload) {
   return httpService.post("/notifications/auto-report/settings", payload);
