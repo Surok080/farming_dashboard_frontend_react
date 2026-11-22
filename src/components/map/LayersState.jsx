@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from "react-leaflet";
 import { Typography } from "@mui/material";
+import {CARTO_VOYAGER_TILE_URL} from "./cartoBasemap";
 
 const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
   const map = useMapEvents({
@@ -61,7 +62,7 @@ const LayersState = memo(({ layer, activeArea, setActiveArea}) => {
         <LayersControl.BaseLayer  name="Basic Map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
+            url={CARTO_VOYAGER_TILE_URL}
             ext="png"
           />
         </LayersControl.BaseLayer>

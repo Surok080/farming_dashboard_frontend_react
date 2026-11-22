@@ -2,6 +2,7 @@ import React, {memo, useEffect, useRef, useState} from "react";
 import {GeoJSON, LayerGroup, LayersControl, TileLayer, Tooltip, useMap} from "react-leaflet";
 import {Typography} from "@mui/material";
 import L from "leaflet";
+import {CARTO_VOYAGER_TILE_URL} from "./cartoBasemap";
 
 const SIDEBAR_WIDTH_DESKTOP = 400;
 const SIDEBAR_WIDTH_MOBILE = 300;
@@ -174,7 +175,7 @@ const Layers = memo(({
         /* Базовый слой когда LayersControl скрыт */
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
+          url={CARTO_VOYAGER_TILE_URL}
           ext="png"
         />
       ) : (
@@ -182,7 +183,7 @@ const Layers = memo(({
           <LayersControl.BaseLayer  name="Basic Map">
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png"
+              url={CARTO_VOYAGER_TILE_URL}
               ext="png"
             />
           </LayersControl.BaseLayer>
