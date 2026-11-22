@@ -22,7 +22,6 @@ import SettingsPage from "../dashboardPages/SettingsPage";
 import WarehouseAccountingPage from "../dashboardPages/WarehouseAccounting/WarehouseAccountingPage";
 import {useEffect} from "react";
 import {useMediaQuery, useTheme} from "@mui/material";
-import {httpService} from "../../api/setup";
 
 export const defaultTheme = createTheme({
     palette: {
@@ -42,31 +41,26 @@ export const defaultTheme = createTheme({
     },
 });
 
+const YEAR_OPTIONS = [2027, 2026, 2025, 2024, 2023];
+const DEFAULT_YEAR = 2026;
+
+function readStoredYear() {
+    const parsed = Number(localStorage.getItem("year"));
+    if (YEAR_OPTIONS.includes(parsed)) {
+        return parsed;
+    }
+    localStorage.setItem("year", String(DEFAULT_YEAR));
+    return DEFAULT_YEAR;
+}
+
 export default function Dashboard() {
     const user = useSelector((state) => state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [valueTabs, setValueTabs] = React.useState("dashboard");
     const [loading, setLoading] = React.useState(true);
-    const [year, setYear] = React.useState(localStorage.getItem('year') ?? new Date().getFullYear());
+    const [year, setYear] = React.useState(readStoredYear);
     const [allArea, setAllArea] = React.useState(null);
-
-    useEffect(() => {
-        if (localStorage.getItem('year')) {
-            return;
-        }
-        httpService.get('/year')
-            .then((res) => {
-                if (res?.status === 200 && res.data?.year) {
-                    const serverYear = res.data.year;
-                    setYear(serverYear);
-                    localStorage.setItem('year', serverYear.toString());
-                }
-            })
-            .catch((error) => {
-                console.error('Ошибка при загрузке года:', error);
-            });
-    }, []);
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg")); // md = 900px (по вашей теме)

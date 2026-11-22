@@ -82,7 +82,7 @@ const equipmentGroupName = (groups, id) => {
 
 const MonitoringPages = ({ year: yearProp }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const year = Number(yearProp ?? localStorage.getItem("year") ?? new Date().getFullYear());
+  const year = Number(yearProp ?? localStorage.getItem("year") ?? 2026);
 
   const [intervalFrom, setIntervalFrom] = useState(() => getDefaultMonitoringInterval().from);
   const [intervalTo, setIntervalTo] = useState(() => getDefaultMonitoringInterval().to);
