@@ -180,7 +180,7 @@ const Layers = memo(({
         />
       ) : (
         <LayersControl position="topright">
-          <LayersControl.BaseLayer  name="Basic Map">
+          <LayersControl.BaseLayer checked name="Basic Map">
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
               url={CARTO_VOYAGER_TILE_URL}
@@ -193,7 +193,7 @@ const Layers = memo(({
               url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
             />
           </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer checked name="WorldImagery">
+          <LayersControl.BaseLayer name="WorldImagery">
             <TileLayer
               attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
